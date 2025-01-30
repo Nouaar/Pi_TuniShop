@@ -27,6 +27,21 @@
 </head>
 
 <body>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const logoutButton = document.querySelector("[onclick*='logout']");
+        if (logoutButton) {
+            logoutButton.addEventListener("click", function () {
+                // Clear JWT Token from cookies, localStorage, and sessionStorage
+                document.cookie = "jwt_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+                localStorage.removeItem("jwt_token");
+                sessionStorage.removeItem("jwt_token");
+            });
+        }
+    });
+</script>
+
     
 {% include 'partials/header.html.twig' %}
 

@@ -13,6 +13,7 @@
         "doctrine/doctrine-bundle": "^2.13",
         "doctrine/doctrine-migrations-bundle": "^3.4",
         "doctrine/orm": "^3.3",
+        "firebase/php-jwt": "^6.11",
         "nelmio/cors-bundle": "^2.5",
         "phpdocumentor/reflection-docblock": "^5.6",
         "phpstan/phpdoc-parser": "^2.0",
@@ -22,6 +23,7 @@
         "symfony/dotenv": "6.4.*",
         "symfony/expression-language": "6.4.*",
         "symfony/flex": "^2",
+        "symfony/form": "6.4.*",
         "symfony/framework-bundle": "6.4.*",
         "symfony/property-access": "6.4.*",
         "symfony/property-info": "6.4.*",
@@ -81,6 +83,7 @@
         }
     },
     "require-dev": {
-        "symfony/maker-bundle": "^1.62"
+        "symfony/maker-bundle": "^1.62",
+        "symfony/security-bundle": "^6.4"
     }
 }

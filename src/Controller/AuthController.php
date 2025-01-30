@@ -1,0 +1,80 @@
+<?php
+namespace App\Controller;
+
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Attribute\Route;
+use App\Repository\UtilisateurRepository;
+use Firebase\JWT\JWT;
+use Symfony\Component\HttpFoundation\Cookie;
+
+final class AuthController extends AbstractController
+{
+    #[Route('/login', name: 'app_utilisateur_login', methods: ['GET', 'POST'])]
+    public function login(Request $request, UtilisateurRepository $userRepository): Response
+    {
+        if ($request->isMethod('POST')) {
+            $email = $request->request->get('email');
+            $password = $request->request->get('mot_de_passe');
+            $utilisateur = $userRepository->findOneBy(['email' => $email]);
+    
+            if (!$utilisateur) {
+                $this->addFlash('error', 'User not found');
+                return $this->redirectToRoute('app_utilisateur_login'); 
+            }
+    
+            $id = $utilisateur->getId();
+            
+            $passwordVerif = $utilisateur->getMotDePasse();
+            if ($passwordVerif === $password) {
+                // Create a JWT token for the user
+                $key = 'your_secret_key'; // Replace with a proper key
+                $payload = [
+                    'id' => $utilisateur->getId(),
+                    'email' => $utilisateur->getEmail(),
+                    'role' => $utilisateur->getRole(),
+                    'iat' => time(), // Issued at: current timestamp
+                    'exp' => time() + 3600, // Expiration: 1 hour
+                ];
+                $jwt = JWT::encode($payload, $key, 'HS256');
+    
+                // Create cookies for both the JWT token and user ID
+                $jwtCookie = new Cookie(
+                    'jwt_token',           // Name of the JWT token cookie
+                    $jwt,                  // Value of the JWT token
+                    time() + 3600,         // Expiration time (1 hour)
+                    '/',                   // Path for which the cookie is valid
+                    null,                  // Domain (null means current domain)
+                    true,                  // Secure: set to true if using HTTPS
+                    true,                  // HttpOnly: ensures the cookie is only sent over HTTP(S), not accessible via JavaScript
+                    false                  // SameSite attribute (use 'Strict' or 'Lax' if needed)
+                );
+    
+                $idCookie = new Cookie(
+                    'user_id',             // Name of the user ID cookie
+                    (string) $id,          // Value of the user ID
+                    time() + 3600,         // Expiration time (1 hour)
+                    '/',                   // Path for which the cookie is valid
+                    null,                  // Domain (null means current domain)
+                    true,                  // Secure: set to true if using HTTPS
+                    true,                  // HttpOnly
+                    false                  // SameSite
+                );
+    
+                // Redirect to home and set the cookies
+                $response = $this->redirectToRoute('home');
+                $response->headers->setCookie($jwtCookie);
+                $response->headers->setCookie($idCookie);
+    
+                $this->addFlash('success', 'User logged in successfully');
+                return $response;
+            } else {
+                $this->addFlash('error', 'Invalid email or password');
+                return $this->redirectToRoute('app_utilisateur_login'); 
+            }
+        }
+    
+        return $this->render('Front/SignUp_LogIn_Form.html.twig'); 
+    }
+}
