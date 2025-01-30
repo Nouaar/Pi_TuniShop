@@ -1,16 +1,164 @@
+<!-- Right Links and Account Options -->
+<div class="col-lg-6 text-center text-lg-right">
+    <div class="d-inline-flex align-items-center">
+        <div class="btn-group">
+            <button type="button" class="btn btn-sm btn-light dropdown-toggle" data-toggle="dropdown">My Account</button>
+            <div class="dropdown-menu dropdown-menu-right">
+                {% if not isAuthenticated %}
+                    <button class="dropdown-item" type="button" onclick="window.location.href='{{ path('sign_in') }}'">Login</button>
+                {% else %}
+                    <button class="dropdown-item" type="button" onclick="window.location.href='{{ path('logout') }}'">Logout</button>
+                    <button class="dropdown-item" type="button" data-bs-toggle="modal" data-bs-target="#editProfileModal">Edit Profile</button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
 
- {% block title %}Edit Utilisateur{% endblock %}
+    {% if isAuthenticated %}
+        <div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="editProfileModalLabel">Edit Profile</h1>
+                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal" aria-label="Close">close</button>
+                    </div>
+                    <div class="modal-body">
+                        {% if utilisateur %}
+                            <!-- Profile Edit Form -->
+                            <form method="post" action="{{ path('edit_profile') }}">
+                                <!-- User Information (Name, Surname, Email) -->
+                                <div class="mb-3">
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control" id="nom" name="nom" value="{{ utilisateur.nom }}" placeholder="Nom">
+                                        <label for="nom">Nom</label>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control" id="prenom" name="prenom" value="{{ utilisateur.prenom }}" placeholder="Prenom">
+                                        <label for="prenom">Prenom</label>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <div class="form-floating">
+                                        <input type="email" class="form-control" id="email" name="email" value="{{ utilisateur.email }}" placeholder="Email">
+                                        <label for="email">Email</label>
+                                    </div>
+                                </div>
 
-{% block body %}
-    <h1>Edit Utilisateur</h1>
+                                <!-- Addresses Section -->
+                                <h4>Adresses</h4>
+                                <div id="addresses-container">
+                                    {% if utilisateur.adresses is empty %}
+                                        <p>Aucune adresse enregistrée.</p>
+                                    {% else %}
+                                        {% for adresse in utilisateur.adresses %}
+                                            <div class="address-block mb-4 p-3 border rounded" id="address-{{ adresse.id }}">
+                                                <!-- Button for deleting the address -->
+                                                <button type="submit" name="adresses[{{ loop.index0 }}][delete]" value="1" class="btn btn-danger">
+                                                    Supprimer cette adresse
+                                                </button>
 
-    {{ include('utilisateur/_form.html.twig', {'button_label': 'Update'}) }}
+                                                <input type="hidden" name="adresses[{{ loop.index0 }}][id]" value="{{ adresse.id }}">
 
-    <a href="{{ path('app_utilisateur_index') }}">back to list</a>
+                                                <!-- Street -->
+                                                <div class="mb-3">
+                                                    <div class="form-floating">
+                                                        <input type="text" class="form-control" name="adresses[{{ loop.index0 }}][rue]" value="{{ adresse.rue }}" placeholder="Rue">
+                                                        <label>Rue</label>
+                                                    </div>
+                                                </div>
+                                                <!-- City -->
+                                                <div class="mb-3">
+                                                    <div class="form-floating">
+                                                        <input type="text" class="form-control" name="adresses[{{ loop.index0 }}][ville]" value="{{ adresse.ville }}" placeholder="Ville">
+                                                        <label>Ville</label>
+                                                    </div>
+                                                </div>
+                                                <!-- Postal Code -->
+                                                <div class="mb-3">
+                                                    <div class="form-floating">
+                                                        <input type="text" class="form-control" name="adresses[{{ loop.index0 }}][code_postal]" value="{{ adresse.codePostal }}" placeholder="Code Postal">
+                                                        <label>Code Postal</label>
+                                                    </div>
+                                                </div>
+                                                <!-- Country -->
+                                                <div class="mb-3">
+                                                    <div class="form-floating">
+                                                        <input type="text" class="form-control" name="adresses[{{ loop.index0 }}][pays]" value="{{ adresse.pays }}" placeholder="Pays">
+                                                        <label>Pays</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
 
-    {{ include('utilisateur/_delete_form.html.twig') }}
-{% endblock %} 
+                                <!-- Add Address Button -->
+                                <button type="button" class="btn btn-success mt-3" id="add-address">Ajouter une adresse</button>
 
+                                <!-- Submit Button -->
+                                <div class="d-flex justify-content-between mt-3">
+                                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                                </div>
+                            </form>
 
+                            <script>
+                                let addressCounter = {{ utilisateur.adresses|length }}; // Track number of addresses
 
+                                // Add address
+                                document.getElementById('add-address').addEventListener('click', function () {
+                                    let container = document.getElementById('addresses-container');
+                                    
+                                    let addressHTML = `
+                                        <div class="address-block mb-4 p-3 border rounded" id="new-address-${addressCounter}">
+                                            <!-- Button for deleting the address -->
+                                            <button type="submit" name="adresses[${addressCounter}][delete]" value="1" class="btn btn-danger">
+                                                Supprimer cette adresse
+                                            </button>
 
+                                            <input type="hidden" name="adresses[${addressCounter}][id]" value=""> <!-- Empty ID for new addresses -->
+
+                                            <div class="mb-3">
+                                                <div class="form-floating">
+                                                    <input type="text" class="form-control" name="adresses[${addressCounter}][rue]" placeholder="Rue">
+                                                    <label>Rue</label>
+                                                </div>
+                                            </div>
+                                            <div class="mb-3">
+                                                <div class="form-floating">
+                                                    <input type="text" class="form-control" name="adresses[${addressCounter}][ville]" placeholder="Ville">
+                                                    <label>Ville</label>
+                                                </div>
+                                            </div>
+                                            <div class="mb-3">
+                                                <div class="form-floating">
+                                                    <input type="text" class="form-control" name="adresses[${addressCounter}][code_postal]" placeholder="Code Postal">
+                                                    <label>Code Postal</label>
+                                                </div>
+                                            </div>
+                                            <div class="mb-3">
+                                                <div class="form-floating">
+                                                    <input type="text" class="form-control" name="adresses[${addressCounter}][pays]" placeholder="Pays">
+                                                    <label>Pays</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    `;
+
+                                    container.insertAdjacentHTML('beforeend', addressHTML);
+                                    addressCounter++;
+                                });
+                            </script>
+
+                        {% else %}
+                            <p>Utilisateur not found.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <p>Please log in to edit your profile.</p>
+    {% endif %}
+</div>

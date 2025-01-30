@@ -74,11 +74,16 @@ final class AdresseUserController extends AbstractController
     #[Route('/{id}', name: 'app_adresse_user_delete', methods: ['POST'])]
     public function delete(Request $request, AdresseUser $adresseUser, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$adresseUser->getId(), $request->getPayload()->getString('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $adresseUser->getId(), $request->request->get('_token'))) {
             $entityManager->remove($adresseUser);
             $entityManager->flush();
+            
+            // Return a JSON response indicating success
+            return $this->json(['success' => true]);
         }
-
-        return $this->redirectToRoute('app_adresse_user_index', [], Response::HTTP_SEE_OTHER);
+    
+        // Return an error response if CSRF is invalid or something goes wrong
+        return $this->json(['success' => false], 400);
     }
+    
 }

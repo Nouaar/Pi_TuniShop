@@ -10,6 +10,9 @@ use App\Service\SecurityService;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Utilisateur;
 use App\Repository\UtilisateurRepository;
+use App\Entity\AdresseUser;
+
+
 
 final class FrontController extends AbstractController
 {
@@ -137,27 +140,30 @@ final class FrontController extends AbstractController
         return $response;
     }
 
+
+
     #[Route('/edit_profile', name: 'edit_profile', methods: ['GET', 'POST'])]
-public function editProfile(Request $request, EntityManagerInterface $entityManager, UtilisateurRepository $repo): Response
-{
+public function editProfile(
+    Request $request, 
+    EntityManagerInterface $entityManager, 
+    UtilisateurRepository $repo
+): Response {
     // Get the user ID from the cookie
     $userId = $request->cookies->get('user_id');
 
     // Check if the user ID exists in the cookie
     if (!$userId) {
-        // Redirect to login or home page if no user ID is found
         return $this->redirectToRoute('app_utilisateur_login');
     }
 
     // Retrieve the user based on the ID
     $utilisateur = $repo->find($userId);
 
-    // Check if the user is found
     if (!$utilisateur) {
         return $this->redirectToRoute('home');
     }
 
-    // If the form is submitted, process the data
+    // Process form submission
     if ($request->isMethod('POST')) {
         $prenom = $request->request->get('prenom');
         $nom = $request->request->get('nom');
@@ -168,20 +174,59 @@ public function editProfile(Request $request, EntityManagerInterface $entityMana
         $utilisateur->setEmail($email);
         $utilisateur->setPrenom($prenom);
 
-        // Persist the changes to the database
+        // Retrieve the adresses data, making sure it's an array
+        $adressesData = $request->request->all('adresses');  // Retrieve all adresses data
+
+        if (is_array($adressesData)) {
+            // Iterate over each address and process delete
+            foreach ($adressesData as $adresseData) {
+                // Check if delete flag is set and the value is "1"
+                if (isset($adresseData['delete']) && $adresseData['delete'] == '1') {
+                    // Find the address to delete
+                    $adresseUser = $entityManager->getRepository(AdresseUser::class)->find($adresseData['id']);
+                    if ($adresseUser) {
+                        // Remove address from database
+                        $entityManager->remove($adresseUser);
+                    }
+                } else {
+                    // Handle address update or new address
+                    $adresse = isset($adresseData['id']) && $adresseData['id'] ? 
+                               $entityManager->getRepository(AdresseUser::class)->find($adresseData['id']) : 
+                               new AdresseUser();
+
+                    // Set the address details
+                    $adresse->setRue($adresseData['rue']);
+                    $adresse->setVille($adresseData['ville']);
+                    $adresse->setCodePostal($adresseData['code_postal']);
+                    $adresse->setPays($adresseData['pays']);
+                    $adresse->setUtilisateur($utilisateur); // Make sure to set the user relation
+
+                    // Persist the new or updated address
+                    $entityManager->persist($adresse);
+                }
+            }
+        } else {
+            // Handle the case where adressesData is not an array
+            throw new \Exception('Expected adresses data to be an array.');
+        }
+
+        // Save all changes to the database
         $entityManager->flush();
 
-        // Add a flash message to indicate success
-        $this->addFlash('success', 'Profile updated successfully!');
+        // Add a success message
+        $this->addFlash('success', 'Profile and addresses updated successfully!');
 
-        // Redirect to the home page with the updated user ID
+        // Redirect back to the homepage or the appropriate route
         return $this->redirectToRoute('home', ['id' => $utilisateur->getId()]);
     }
 
+    // If the form was not submitted, render the edit profile page with the current user data
     return $this->renderWithAuth('front/index.html.twig', [
-        'utilisateur' => $utilisateur,  // Pass the user data to the template
+        'utilisateur' => $utilisateur,
     ]);
 }
+
+    
 
 
 }    

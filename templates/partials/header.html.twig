@@ -20,77 +20,13 @@
             </div>
         </div>
 
-        <!-- Right Links and Account Options -->
-        <div class="col-lg-6 text-center text-lg-right">
-            <div class="d-inline-flex align-items-center">
-    <div class="btn-group">
-        <button type="button" class="btn btn-sm btn-light dropdown-toggle" data-toggle="dropdown">My Account</button>
-        <div class="dropdown-menu dropdown-menu-right">
-           {% if not isAuthenticated %}
-    <button class="dropdown-item" type="button" onclick="window.location.href='{{ path('sign_in') }}'">Login</button>
-{% else %}
-    <button class="dropdown-item" type="button" onclick="window.location.href='{{ path('logout') }}'">Logout</button>
-    <button class="dropdown-item" type="button" data-bs-toggle="modal" data-bs-target="#editProfileModal">Edit Profile</button>
-{% endif %}
 
-        </div>
-    </div>
-</div>
 
-{% if isAuthenticated %}
-    <div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="editProfileModalLabel">Edit Profile</h1>
-                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal" aria-label="Close">close</button>
-                </div>
-                <div class="modal-body">
-                    <!-- Check if 'utilisateur' is available -->
-                    {% if utilisateur %}
-                        <!-- Profile Edit Form -->
-                       <form method="post" action="{{ path('edit_profile') }}">
-    <!-- Name -->
-   <div class="mb-3">
-    <div class="form-floating">
-        <input type="text" class="form-control" id="nom" placeholder="Nom" name="nom" value="{{ utilisateur.nom }}">
-        <label for="nom">Nom</label>
-    </div>
-</div>
 
-<!-- Surname -->
-<div class="mb-3">
-    <div class="form-floating">
-        <input type="text" class="form-control" id="prenom" placeholder="Prenom" name="prenom" value="{{ utilisateur.prenom }}">
-        <label for="prenom">Prenom</label>
-    </div>
-</div>
 
-<!-- Email -->
-<div class="mb-3">
-    <div class="form-floating">
-        <input type="email" class="form-control" id="email" placeholder="Email" name="email" value="{{ utilisateur.email }}">
-        <label for="email">Email</label>
-    </div>
-</div>
+ {# edit profile #}
+{% include 'utilisateur/edit.html.twig' %}
 
-<!-- Submit Button -->
-<div class="d-flex justify-content-between">
-    <button type="submit" class="btn btn-primary">Save Changes</button>
-</div>
-
-</form>
-
-                    {% else %}
-                        <p>Utilisateur not found.</p>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-    </div>
-{% else %}
-    <p>Please log in to edit your profile.</p>
-{% endif %}
 
 
 
