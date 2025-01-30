@@ -1,3 +1,15 @@
+
+
+
+<style>
+    .modal-content {
+        text-align: left !important;
+        direction: ltr !important;
+    }
+
+</style>
+
+
 <!-- Right Links and Account Options -->
 <div class="col-lg-6 text-center text-lg-right">
     <div class="d-inline-flex align-items-center">
@@ -31,34 +43,35 @@
                                 <!-- User Information (Name, Surname, Email) -->
                                 <div class="mb-3">
                                     <div class="form-floating">
-                                        <input type="text" class="form-control" id="nom" name="nom" value="{{ utilisateur.nom }}" placeholder="Nom">
-                                        <label for="nom">Nom</label>
+                                        <label for="nom">Name</label>
+                                        <input type="text" class="form-control" id="nom" name="nom" value="{{ utilisateur.nom }}" placeholder="Name">
                                     </div>
                                 </div>
                                 <div class="mb-3">
                                     <div class="form-floating">
-                                        <input type="text" class="form-control" id="prenom" name="prenom" value="{{ utilisateur.prenom }}" placeholder="Prenom">
-                                        <label for="prenom">Prenom</label>
+                                    <label for="prenom">Surname</label>
+                                        <input type="text" class="form-control" id="prenom" name="prenom" value="{{ utilisateur.prenom }}" placeholder="Surname">
+                                        
                                     </div>
                                 </div>
                                 <div class="mb-3">
                                     <div class="form-floating">
-                                        <input type="email" class="form-control" id="email" name="email" value="{{ utilisateur.email }}" placeholder="Email">
                                         <label for="email">Email</label>
+                                        <input type="email" class="form-control" id="email" name="email" value="{{ utilisateur.email }}" placeholder="Email">
                                     </div>
                                 </div>
 
                                 <!-- Addresses Section -->
-                                <h4>Adresses</h4>
+                                <h4>Addresses</h4>
                                 <div id="addresses-container">
                                     {% if utilisateur.adresses is empty %}
-                                        <p>Aucune adresse enregistrée.</p>
+                                        <p>No addresses saved.</p>
                                     {% else %}
                                         {% for adresse in utilisateur.adresses %}
                                             <div class="address-block mb-4 p-3 border rounded" id="address-{{ adresse.id }}">
                                                 <!-- Button for deleting the address -->
                                                 <button type="submit" name="adresses[{{ loop.index0 }}][delete]" value="1" class="btn btn-danger">
-                                                    Supprimer cette adresse
+                                                    Delete this address
                                                 </button>
 
                                                 <input type="hidden" name="adresses[{{ loop.index0 }}][id]" value="{{ adresse.id }}">
@@ -66,29 +79,33 @@
                                                 <!-- Street -->
                                                 <div class="mb-3">
                                                     <div class="form-floating">
-                                                        <input type="text" class="form-control" name="adresses[{{ loop.index0 }}][rue]" value="{{ adresse.rue }}" placeholder="Rue">
-                                                        <label>Rue</label>
+                                                        <label>Street</label>
+                                                        <input type="text" class="form-control" name="adresses[{{ loop.index0 }}][rue]" value="{{ adresse.rue }}" placeholder="Street">
+                                                        
                                                     </div>
                                                 </div>
                                                 <!-- City -->
                                                 <div class="mb-3">
                                                     <div class="form-floating">
-                                                        <input type="text" class="form-control" name="adresses[{{ loop.index0 }}][ville]" value="{{ adresse.ville }}" placeholder="Ville">
-                                                        <label>Ville</label>
+                                                    <label>City</label>
+                                                        <input type="text" class="form-control" name="adresses[{{ loop.index0 }}][ville]" value="{{ adresse.ville }}" placeholder="City">
+                                                        
                                                     </div>
                                                 </div>
                                                 <!-- Postal Code -->
                                                 <div class="mb-3">
                                                     <div class="form-floating">
-                                                        <input type="text" class="form-control" name="adresses[{{ loop.index0 }}][code_postal]" value="{{ adresse.codePostal }}" placeholder="Code Postal">
-                                                        <label>Code Postal</label>
+                                                    <label>Postal Code</label>
+                                                        <input type="text" class="form-control" name="adresses[{{ loop.index0 }}][code_postal]" value="{{ adresse.codePostal }}" placeholder="Postal Code">
+                                                        
                                                     </div>
                                                 </div>
                                                 <!-- Country -->
                                                 <div class="mb-3">
                                                     <div class="form-floating">
-                                                        <input type="text" class="form-control" name="adresses[{{ loop.index0 }}][pays]" value="{{ adresse.pays }}" placeholder="Pays">
-                                                        <label>Pays</label>
+                                                    <label>Country</label>
+                                                        <input type="text" class="form-control" name="adresses[{{ loop.index0 }}][pays]" value="{{ adresse.pays }}" placeholder="Country">
+                                                        
                                                     </div>
                                                 </div>
                                             </div>
@@ -97,7 +114,7 @@
                                 </div>
 
                                 <!-- Add Address Button -->
-                                <button type="button" class="btn btn-success mt-3" id="add-address">Ajouter une adresse</button>
+                                <button type="button" class="btn btn-success mt-3" id="add-address">Add an address</button>
 
                                 <!-- Submit Button -->
                                 <div class="d-flex justify-content-between mt-3">
@@ -116,33 +133,33 @@
                                         <div class="address-block mb-4 p-3 border rounded" id="new-address-${addressCounter}">
                                             <!-- Button for deleting the address -->
                                             <button type="submit" name="adresses[${addressCounter}][delete]" value="1" class="btn btn-danger">
-                                                Supprimer cette adresse
+                                                Delete this address
                                             </button>
 
                                             <input type="hidden" name="adresses[${addressCounter}][id]" value=""> <!-- Empty ID for new addresses -->
 
                                             <div class="mb-3">
-                                                <div class="form-floating">
-                                                    <input type="text" class="form-control" name="adresses[${addressCounter}][rue]" placeholder="Rue">
-                                                    <label>Rue</label>
+                                                <div class="form-floating"> <label>Street</label>
+                                                    <input type="text" class="form-control" name="adresses[${addressCounter}][rue]" placeholder="Street">
+                                                    
                                                 </div>
                                             </div>
                                             <div class="mb-3">
-                                                <div class="form-floating">
-                                                    <input type="text" class="form-control" name="adresses[${addressCounter}][ville]" placeholder="Ville">
-                                                    <label>Ville</label>
+                                                <div class="form-floating"><label>City</label>
+                                                    <input type="text" class="form-control" name="adresses[${addressCounter}][ville]" placeholder="City">
+                                                    
                                                 </div>
                                             </div>
                                             <div class="mb-3">
-                                                <div class="form-floating">
-                                                    <input type="text" class="form-control" name="adresses[${addressCounter}][code_postal]" placeholder="Code Postal">
-                                                    <label>Code Postal</label>
+                                                <div class="form-floating"><label>Postal Code</label>
+                                                    <input type="text" class="form-control" name="adresses[${addressCounter}][code_postal]" placeholder="Postal Code">
+                                                    
                                                 </div>
                                             </div>
                                             <div class="mb-3">
-                                                <div class="form-floating">
-                                                    <input type="text" class="form-control" name="adresses[${addressCounter}][pays]" placeholder="Pays">
-                                                    <label>Pays</label>
+                                                <div class="form-floating"> <label>Country</label>
+                                                    <input type="text" class="form-control" name="adresses[${addressCounter}][pays]" placeholder="Country">
+                                                   
                                                 </div>
                                             </div>
                                         </div>
@@ -154,7 +171,7 @@
                             </script>
 
                         {% else %}
-                            <p>Utilisateur not found.</p>
+                            <p>User not found.</p>
                         {% endif %}
                     </div>
                 </div>
@@ -179,19 +196,16 @@
                     <div class="mb-3">
                         <div class="form-floating">
                             <input type="password" class="form-control" id="current_password" name="current_password" placeholder="Current Password" required>
-                            <label for="current_password">Current Password</label>
                         </div>
                     </div>
                     <div class="mb-3">
                         <div class="form-floating">
                             <input type="password" class="form-control" id="new_password" name="new_password" placeholder="New Password" required>
-                            <label for="new_password">New Password</label>
                         </div>
                     </div>
                     <div class="mb-3">
                         <div class="form-floating">
                             <input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="Confirm New Password" required>
-                            <label for="confirm_password">Confirm New Password</label>
                         </div>
                     </div>
                     <button type="submit" class="btn btn-primary">Change Password</button>
