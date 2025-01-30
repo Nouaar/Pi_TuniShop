@@ -11,6 +11,9 @@ use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Utilisateur;
 use App\Repository\UtilisateurRepository;
 use App\Entity\AdresseUser;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface; 
+use Symfony\Component\HttpFoundation\JsonResponse;
+
 
 
 
@@ -24,6 +27,10 @@ final class FrontController extends AbstractController
         $this->securityService = $securityService;
         $this->entityManager = $entityManager;
     }
+
+
+
+    
 
     private function renderWithAuth(string $template, array $params = []): Response
     {
@@ -226,7 +233,56 @@ public function editProfile(
     ]);
 }
 
-    
 
 
-}    
+#[Route('/change-password', name: 'change_password', methods: ['POST'])]
+public function changePassword(Request $request, EntityManagerInterface $entityManager, UserPasswordHasherInterface $passwordHasher): JsonResponse
+{
+    // Get the user ID from the cookie
+    $userId = $request->cookies->get('user_id');
+
+    if (!$userId) {
+        return new JsonResponse(['status' => 'error', 'message' => 'User session expired. Please log in again.'], 400);
+    }
+
+    // Retrieve the user based on the ID
+    $user = $entityManager->getRepository(Utilisateur::class)->find($userId);
+
+    if (!$user) {
+        return new JsonResponse(['status' => 'error', 'message' => 'User not found.'], 400);
+    }
+
+    // Get current, new, and confirm passwords from the request
+    $currentPassword = $request->request->get('current_password');
+    $newPassword = $request->request->get('new_password');
+    $confirmPassword = $request->request->get('confirm_password');
+
+    // Validate the current password
+    if (!$passwordHasher->isPasswordValid($user, $currentPassword)) {
+        return new JsonResponse(['status' => 'error', 'message' => 'Current password is incorrect.'], 400);
+    }
+
+    // Ensure new password is different from the old one
+    if ($passwordHasher->isPasswordValid($user, $newPassword)) {
+        return new JsonResponse(['status' => 'error', 'message' => 'New password must be different from the old password.'], 400);
+    }
+
+    // Check if the new password and confirm password match
+    if ($newPassword !== $confirmPassword) {
+        return new JsonResponse(['status' => 'error', 'message' => 'The new passwords do not match.'], 400);
+    }
+
+    // Hash the new password before storing it
+    $hashedPassword = $passwordHasher->hashPassword($user, $newPassword);
+    $user->setPassword($hashedPassword);
+
+    // Persist the changes in the database
+    $entityManager->persist($user);
+    $entityManager->flush();
+
+    return new JsonResponse(['status' => 'success', 'message' => 'Password successfully changed!'], 200);
+}
+
+
+}
+

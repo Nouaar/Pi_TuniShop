@@ -29,7 +29,7 @@ class Utilisateur implements PasswordAuthenticatedUserInterface
     private ?string $role = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $mot_de_passe = null;
+    private ?string $password = null;  // Renamed from $mot_de_passe to $password
 
     #[ORM\OneToMany(mappedBy: 'utilisateur', targetEntity: AdresseUser::class, orphanRemoval: true)]
     private Collection $adresses;
@@ -92,15 +92,14 @@ class Utilisateur implements PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getMotDePasse(): ?string
+    public function getPassword(): ?string
     {
-        return $this->mot_de_passe;
+        return $this->password;  // Use $password here
     }
 
-    public function setMotDePasse(string $mot_de_passe): static
+    public function setPassword(string $password): self
     {
-        $this->mot_de_passe = $mot_de_passe;
-
+        $this->password = $password;  // Use $password here
         return $this;
     }
 
@@ -132,11 +131,5 @@ class Utilisateur implements PasswordAuthenticatedUserInterface
         }
 
         return $this;
-    }
-
-    // Implementing the PasswordAuthenticatedUserInterface method
-    public function getPassword(): string
-    {
-        return $this->mot_de_passe; // Returning the password field
     }
 }

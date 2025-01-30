@@ -9,6 +9,8 @@
                 {% else %}
                     <button class="dropdown-item" type="button" onclick="window.location.href='{{ path('logout') }}'">Logout</button>
                     <button class="dropdown-item" type="button" data-bs-toggle="modal" data-bs-target="#editProfileModal">Edit Profile</button>
+                    <!-- Button for Changing Password -->
+                    <button class="dropdown-item" type="button" data-bs-toggle="modal" data-bs-target="#changePasswordModal">Change Password</button>
                 {% endif %}
             </div>
         </div>
@@ -158,6 +160,81 @@
                 </div>
             </div>
         </div>
+
+
+<!-- Modal for Changing Password -->
+<div class="modal fade" id="changePasswordModal" tabindex="-1" aria-labelledby="changePasswordModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="changePasswordModalLabel">Change Password</h1>
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal" aria-label="Close">Close</button>
+            </div>
+            <div class="modal-body">
+                <!-- Alerts Container -->
+                <div id="passwordChangeAlert"></div>
+
+                <!-- Password Change Form -->
+                <form id="changePasswordForm" method="post" action="{{ path('change_password') }}">
+                    <div class="mb-3">
+                        <div class="form-floating">
+                            <input type="password" class="form-control" id="current_password" name="current_password" placeholder="Current Password" required>
+                            <label for="current_password">Current Password</label>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-floating">
+                            <input type="password" class="form-control" id="new_password" name="new_password" placeholder="New Password" required>
+                            <label for="new_password">New Password</label>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-floating">
+                            <input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="Confirm New Password" required>
+                            <label for="confirm_password">Confirm New Password</label>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Change Password</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<script>
+   document.addEventListener("DOMContentLoaded", function () {
+    document.querySelector("#changePasswordForm").addEventListener("submit", function (event) {
+        event.preventDefault(); // Prevent form from reloading the page
+
+        let formData = new FormData(this);
+
+        fetch(this.action, {
+            method: "POST",
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            let alertContainer = document.querySelector("#passwordChangeAlert");
+            alertContainer.innerHTML = `
+                <div class="alert alert-${data.status === 'success' ? 'success' : 'danger'} alert-dismissible fade show" role="alert">
+                    ${data.message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            `;
+            if (data.status === "success") {
+                document.querySelector("#changePasswordForm").reset();
+            }
+        })
+        .catch(error => console.error("Error:", error));
+    });
+});
+
+</script>
+
+
     {% else %}
         <p>Please log in to edit your profile.</p>
     {% endif %}

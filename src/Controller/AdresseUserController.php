@@ -45,13 +45,7 @@ final class AdresseUserController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_adresse_user_show', methods: ['GET'])]
-    public function show(AdresseUser $adresseUser): Response
-    {
-        return $this->render('adresse_user/show.html.twig', [
-            'adresse_user' => $adresseUser,
-        ]);
-    }
+  
 
     #[Route('/{id}/edit', name: 'app_adresse_user_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, AdresseUser $adresseUser, EntityManagerInterface $entityManager): Response
