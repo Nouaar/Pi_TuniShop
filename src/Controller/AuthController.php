@@ -30,10 +30,10 @@ final class AuthController extends AbstractController
                 $this->addFlash('error', 'User not found');
                 return $this->redirectToRoute('app_utilisateur_login'); 
             }
-
+    
             // Get the hashed password stored in the database
             $storedPasswordHash = $utilisateur->getPassword();
-
+    
             // Verify the entered password against the stored hash
             if ($passwordHasher->isPasswordValid($utilisateur, $password)) {
                 // Password is correct, proceed with login
@@ -72,8 +72,14 @@ final class AuthController extends AbstractController
                     false                  // SameSite
                 );
     
-                // Redirect to home and set the cookies
-                $response = $this->redirectToRoute('home');
+                // Check if user is admin and redirect to '/back', else to home
+                if (in_array('ROLE_ADMIN', $utilisateur->getRoles())) {
+                    $response = $this->redirectToRoute('back'); // Replace 'back' with your back office route name
+                } else {
+                    $response = $this->redirectToRoute('home'); // Redirect to home if not an admin
+                }
+    
+                // Set the cookies and return the response
                 $response->headers->setCookie($jwtCookie);
                 $response->headers->setCookie($idCookie);
     

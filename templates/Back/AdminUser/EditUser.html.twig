@@ -1,0 +1,215 @@
+<style>
+    /* Custom Styling for Table */
+    .table th {
+        text-align: center;
+        font-weight: bold;
+        background-color: #f8f9fa;
+    }
+
+    .table td {
+        vertical-align: middle;
+    }
+
+    /* Table row hover effect */
+    .table tbody tr:hover {
+        background-color: #f1f3f5;
+    }
+
+    /* Custom Button Styles */
+    .btn i {
+        margin-right: 8px;
+    }
+
+    /* Add custom shadow and smooth card transitions */
+    .card {
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+
+    .card:hover {
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+    }
+</style>
+
+{% block title %}User Profiles and Addresses{% endblock %}
+
+{% block body %}
+<div class="container my-5">
+    <!-- Users Table -->
+    <h1 class="text-center mb-4">User Profiles</h1>
+    <div class="card shadow-lg rounded-4">
+        <div class="card-body">
+            <table class="table table-striped table-bordered table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Surname</th>
+                        <th>Email</th>
+                        <th>Roles</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for utilisateur in utilisateurs %}
+                        <tr>
+                            <td>{{ utilisateur.id }}</td>
+                            <td>{{ utilisateur.nom }}</td>
+                            <td>{{ utilisateur.prenom }}</td>
+                            <td>{{ utilisateur.email }}</td>
+                            <td>
+                                {% if utilisateur.roles %}
+                                    {% for role in utilisateur.roles %}
+                                        <span class="badge bg-info">{{ role == 'ROLE_ADMIN' ? 'Admin' : 'User' }}</span>
+                                    {% endfor %}
+                                {% else %}
+                                    <span class="badge bg-secondary">No roles assigned</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <!-- Edit Button -->
+                                <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editUserModal{{ utilisateur.id }}">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+
+                               <!-- Edit User Modal -->
+<div class="modal fade" id="editUserModal{{ utilisateur.id }}" tabindex="-1" aria-labelledby="editUserModalLabel{{ utilisateur.id }}" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editUserModalLabel{{ utilisateur.id }}">Edit User</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="{{ path('app_utilisateur_edit', {'id': utilisateur.id}) }}" method="post">
+                    <div class="mb-3">
+                        <label for="nom" class="form-label">Name</label>
+                        <input type="text" class="form-control" id="nom" name="nom" value="{{ utilisateur.nom }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="prenom" class="form-label">Surname</label>
+                        <input type="text" class="form-control" id="prenom" name="prenom" value="{{ utilisateur.prenom }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" name="email" value="{{ utilisateur.email }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="role" class="form-label">Role</label>
+                        <select class="form-control" id="role" name="role" required>
+                            <option value="ROLE_USER" {% if utilisateur.getRole() == 'ROLE_USER' %}selected{% endif %}>User</option>
+                            <option value="ROLE_ADMIN" {% if utilisateur.getRole() == 'ROLE_ADMIN' %}selected{% endif %}>Admin</option>
+                        </select>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Save changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+                                <!-- Delete Button -->
+                                <form action="{{ path('app_utilisateur_delete', {'id': utilisateur.id}) }}" method="post" style="display:inline;">
+                                    <button type="submit" class="btn btn-danger btn-sm">
+                                        <i class="fas fa-trash-alt"></i> Delete
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center text-muted">No users found.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- User Addresses Table -->
+    <h1 class="text-center mb-4">User Addresses</h1>
+    <div class="card shadow-lg rounded-4">
+        <div class="card-body">
+            <table class="table table-striped table-bordered table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>User Name</th>
+                        <th>Street</th>
+                        <th>City</th>
+                        <th>Postal Code</th>
+                        <th>Country</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for adresse_user in adresse_users %}
+                        <tr>
+                            <td>{{ adresse_user.utilisateur.nom }} {{ adresse_user.utilisateur.prenom }}</td>
+                            <td>{{ adresse_user.rue }}</td>
+                            <td>{{ adresse_user.ville }}</td>
+                            <td>{{ adresse_user.codePostal }}</td>
+                            <td>{{ adresse_user.pays }}</td>
+                            <td>
+                                <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editAddressModal{{ adresse_user.id }}">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+
+                                <!-- Edit Address Modal -->
+                                <div class="modal fade" id="editAddressModal{{ adresse_user.id }}" tabindex="-1" aria-labelledby="editAddressModalLabel{{ adresse_user.id }}" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="editAddressModalLabel{{ adresse_user.id }}">Edit Address</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <form action="{{ path('app_adresse_user_edit', {'id': adresse_user.id}) }}" method="post">
+                                                    <div class="mb-3">
+                                                        <label for="rue" class="form-label">Street</label>
+                                                        <input type="text" class="form-control" id="rue" name="rue" value="{{ adresse_user.rue }}" required>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label for="ville" class="form-label">City</label>
+                                                        <input type="text" class="form-control" id="ville" name="ville" value="{{ adresse_user.ville }}" required>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label for="codePostal" class="form-label">Postal Code</label>
+                                                        <input type="text" class="form-control" id="codePostal" name="codePostal" value="{{ adresse_user.codePostal }}" required>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label for="pays" class="form-label">Country</label>
+                                                        <input type="text" class="form-control" id="pays" name="pays" value="{{ adresse_user.pays }}" required>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                        <button type="submit" class="btn btn-primary">Save changes</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Delete Button -->
+                                <form action="{{ path('app_adresse_user_delete', {'id': adresse_user.id}) }}" method="post" style="display:inline;">
+                                    <button type="submit" class="btn btn-danger btn-sm">
+                                        <i class="fas fa-trash-alt"></i> Delete
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center text-muted">No addresses found.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

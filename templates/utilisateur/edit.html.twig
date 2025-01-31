@@ -19,7 +19,7 @@
                 {% if not isAuthenticated %}
                     <button class="dropdown-item" type="button" onclick="window.location.href='{{ path('sign_in') }}'">Login</button>
                 {% else %}
-                    <button class="dropdown-item" type="button" onclick="window.location.href='{{ path('logout') }}'">Logout</button>
+<button class="dropdown-item" type="button" onclick="window.location.href='{{ path('logout') }}'">Logout</button>
                     <button class="dropdown-item" type="button" data-bs-toggle="modal" data-bs-target="#editProfileModal">Edit Profile</button>
                     <!-- Button for Changing Password -->
                     <button class="dropdown-item" type="button" data-bs-toggle="modal" data-bs-target="#changePasswordModal">Change Password</button>
@@ -62,7 +62,7 @@
                                 </div>
 
                                 <!-- Addresses Section -->
-                                <h4>Addresses</h4>
+                                <h1>Addresses</h1>
                                 <div id="addresses-container">
                                     {% if utilisateur.adresses is empty %}
                                         <p>No addresses saved.</p>

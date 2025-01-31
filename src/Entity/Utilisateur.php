@@ -7,9 +7,10 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: UtilisateurRepository::class)]
-class Utilisateur implements PasswordAuthenticatedUserInterface
+class Utilisateur implements PasswordAuthenticatedUserInterface, UserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -22,16 +23,16 @@ class Utilisateur implements PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255)]
     private ?string $prenom = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, unique: true)]
     private ?string $email = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $role = null;
+    #[ORM\Column(length: 50)]
+    private ?string $role = 'ROLE_USER'; // Default role
 
     #[ORM\Column(length: 255)]
-    private ?string $password = null;  // Renamed from $mot_de_passe to $password
+    private ?string $password = null;
 
-    #[ORM\OneToMany(mappedBy: 'utilisateur', targetEntity: AdresseUser::class, orphanRemoval: true)]
+    #[ORM\OneToMany(mappedBy: 'utilisateur', targetEntity: AdresseUser::class, orphanRemoval: true, cascade: ['remove'])]
     private Collection $adresses;
 
     public function __construct()
@@ -52,7 +53,6 @@ class Utilisateur implements PasswordAuthenticatedUserInterface
     public function setNom(string $nom): static
     {
         $this->nom = $nom;
-
         return $this;
     }
 
@@ -64,7 +64,6 @@ class Utilisateur implements PasswordAuthenticatedUserInterface
     public function setPrenom(string $prenom): static
     {
         $this->prenom = $prenom;
-
         return $this;
     }
 
@@ -76,11 +75,10 @@ class Utilisateur implements PasswordAuthenticatedUserInterface
     public function setEmail(string $email): static
     {
         $this->email = $email;
-
         return $this;
     }
 
-    public function getRole(): ?string
+    public function getRole(): string
     {
         return $this->role;
     }
@@ -88,24 +86,25 @@ class Utilisateur implements PasswordAuthenticatedUserInterface
     public function setRole(string $role): static
     {
         $this->role = $role;
-
         return $this;
+    }
+
+    public function getRoles(): array
+    {
+        return [$this->role]; // Symfony requires an array
     }
 
     public function getPassword(): ?string
     {
-        return $this->password;  // Use $password here
+        return $this->password;
     }
 
-    public function setPassword(string $password): self
+    public function setPassword(string $password): static
     {
-        $this->password = $password;  // Use $password here
+        $this->password = $password;
         return $this;
     }
 
-    /**
-     * @return Collection<int, AdresseUser>
-     */
     public function getAdresses(): Collection
     {
         return $this->adresses;
@@ -117,19 +116,26 @@ class Utilisateur implements PasswordAuthenticatedUserInterface
             $this->adresses[] = $adresse;
             $adresse->setUtilisateur($this);
         }
-
         return $this;
     }
 
     public function removeAdresse(AdresseUser $adresse): static
     {
         if ($this->adresses->removeElement($adresse)) {
-            // Set the owning side to null (unless already done)
             if ($adresse->getUtilisateur() === $this) {
                 $adresse->setUtilisateur(null);
             }
         }
-
         return $this;
+    }
+
+    public function getUserIdentifier(): string
+    {
+        return $this->email;
+    }
+
+    public function eraseCredentials()
+    {
+        // Clear temporary sensitive data if needed
     }
 }

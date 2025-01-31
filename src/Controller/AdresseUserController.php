@@ -10,6 +10,12 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
+
+
+
+
+
+
 #[Route('/adresse_user')]
 final class AdresseUserController extends AbstractController
 {
@@ -22,6 +28,7 @@ final class AdresseUserController extends AbstractController
 
         return $this->render('adresse_user/index.html.twig', [
             'adresse_users' => $adresseUsers,
+         
         ]);
     }
 
@@ -47,23 +54,23 @@ final class AdresseUserController extends AbstractController
 
   
 
-    #[Route('/{id}/edit', name: 'app_adresse_user_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, AdresseUser $adresseUser, EntityManagerInterface $entityManager): Response
-    {
-        $form = $this->createForm(AdresseUserType::class, $adresseUser);
-        $form->handleRequest($request);
+    // #[Route('/{id}/edit', name: 'app_adresse_user_edit', methods: ['GET', 'POST'])]
+    // public function edit(Request $request, AdresseUser $adresseUser, EntityManagerInterface $entityManager): Response
+    // {
+    //     $form = $this->createForm(AdresseUserType::class, $adresseUser);
+    //     $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
+    //     if ($form->isSubmitted() && $form->isValid()) {
+    //         $entityManager->flush();
 
-            return $this->redirectToRoute('app_adresse_user_index', [], Response::HTTP_SEE_OTHER);
-        }
+    //         return $this->redirectToRoute('app_adresse_user_index', [], Response::HTTP_SEE_OTHER);
+    //     }
 
-        return $this->render('adresse_user/edit.html.twig', [
-            'adresse_user' => $adresseUser,
-            'form' => $form,
-        ]);
-    }
+    //     return $this->render('adresse_user/edit.html.twig', [
+    //         'adresse_user' => $adresseUser,
+    //         'form' => $form,
+    //     ]);
+    // }
 
     #[Route('/{id}', name: 'app_adresse_user_delete', methods: ['POST'])]
     public function delete(Request $request, AdresseUser $adresseUser, EntityManagerInterface $entityManager): Response
@@ -79,5 +86,48 @@ final class AdresseUserController extends AbstractController
         // Return an error response if CSRF is invalid or something goes wrong
         return $this->json(['success' => false], 400);
     }
+
+
+
+    #[Route('/{id}/edit', name: 'app_adresse_user_edit', methods: ['GET', 'POST'])]
+    public function editAdresse(int $id, Request $request, EntityManagerInterface $em): Response
+    {
+        // Fetch the address by ID
+        $adresse = $em->getRepository(AdresseUser::class)->find($id);
+    
+        // If address not found, throw an exception or redirect
+        if (!$adresse) {
+            throw $this->createNotFoundException('Address not found.');
+        }
+    
+        // Handle POST request
+        if ($request->isMethod('POST')) {
+            $rue = $request->request->get('rue', '');
+            $ville = $request->request->get('ville', '');
+            $codePostal = $request->request->get('codePostal', '');
+            $pays = $request->request->get('pays', '');
+    
+            // Update the address
+            $adresse->setRue($rue);
+            $adresse->setVille($ville);
+            $adresse->setCodePostal($codePostal);
+            $adresse->setPays($pays);
+    
+            $em->flush();
+    
+            return $this->redirectToRoute('back');
+        }
+    
+        // Render the edit form (GET request)
+        return $this->render('adresse/edit.html.twig', [
+            'adresse' => $adresse,
+        ]);
+    }
+    
+    
+
+
+
+
     
 }

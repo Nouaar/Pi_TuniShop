@@ -42,10 +42,10 @@ class UtilisateurType extends AbstractType
                     'class' => 'form-control'
                 ]
             ])
-            ->add('mot_de_passe', PasswordType::class, [
+            ->add('password', PasswordType::class, [
                 'attr' => [
                     'class' => 'form-control',
-                    'placeholder' => 'Mot de Passe'
+                    'placeholder' => 'password'
                 ]
             ]);
     }

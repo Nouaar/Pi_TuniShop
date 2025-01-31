@@ -1,60 +1,59 @@
-<!DOCTYPE html>
-<html lang="en">
 
-<head>
-  <!-- Required meta tags -->
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <title>PolluxUI Admin</title>
-  <!-- base:css -->
-  <link rel="stylesheet" href="vendors/typicons/typicons.css">
-  <link rel="stylesheet" href="vendors/css/vendor.bundle.base.css">
-  <!-- endinject -->
-  <!-- inject:css -->
-  <link rel="stylesheet" href="css/vertical-layout-light/style.css">
-  <!-- endinject -->
-  <link rel="shortcut icon" href="images/favicon.png" />
-</head>
+ <link rel="stylesheet" href="vendors/typicons/typicons.css">
+    <link rel="stylesheet" href="vendors/css/vendor.bundle.base.css">
+    <link rel="stylesheet" href="css/vertical-layout-light/style.css">
+    <link rel="shortcut icon" href="images/favicon.png" />
 
-<body>
-  <div class="row" id="proBanner">
-   
-  </div>
-  <div class="container-scroller">
-    {% include 'partials/_navbar.html.twig' %}
 
-    <div class="container-fluid">
-      <div class="row">
-        <!-- Sidebar -->
-        <div class="col-md-3">
-          {% include 'partials/_sidebar.html.twig' %}
-        </div>
-        <!-- Sidebar -->
-
-        <!-- Table Content -->
-        <div class="col-md-9">
-          {% include 'utilisateur/index.html.twig' %}
-        </div>
-        <!-- Table Content -->
-
+{% if not isAuthenticated or utilisateur.role != 'ROLE_ADMIN' %}
+  <!-- Non-admin or non-authenticated user view -->
+  <div class="container">
+    <div class="row justify-content-center mt-5">
+      <div class="col-md-6 text-center">
+        <h2 class="text-danger">Access Restricted</h2>
+        <p class="text-muted">You must be an admin to access this page. Please log in or contact your administrator.</p>
+        <button class="btn btn-primary" type="button" onclick="window.location.href='{{ path('sign_in') }}'">Login</button>
       </div>
     </div>
-
-    <!-- content-wrapper ends -->
-    <!-- partial:partials/_footer.html -->
-    {% include 'partials/_footer.html.twig' %}
-    <!-- partial -->
   </div>
-  <!-- container-scroller -->
 
-  <!-- base:js -->
-  <script src="vendors/js/vendor.bundle.base.js"></script>
-  <!-- endinject -->
-  <!-- inject:js -->
-  <script src="js/off-canvas.js"></script>
-  <script src="js/hoverable-collapse.js"></script>
-  <script src="js/template.js"></script>
-  <!-- endinject -->
-</body>
+{% else %}
+  <!-- Admin user view -->
+  <!DOCTYPE html>
+  <html lang="en">
 
-</html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>PolluxUI Admin</title>
+    <link rel="stylesheet" href="vendors/typicons/typicons.css">
+    <link rel="stylesheet" href="vendors/css/vendor.bundle.base.css">
+    <link rel="stylesheet" href="css/vertical-layout-light/style.css">
+    <link rel="shortcut icon" href="images/favicon.png" />
+  </head>
+
+  <body>
+    <div class="container-scroller">
+      {% include 'partials/_navbar.html.twig' %}
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-md-3">
+            {% include 'partials/_sidebar.html.twig' %}
+          </div>
+          <div class="col-md-9">
+            {% include 'Back/AdminUser/EditUser.html.twig' %}
+          </div>
+        </div>
+      </div>
+
+      {% include 'partials/_footer.html.twig' %}
+    </div>
+    <script src="vendors/js/vendor.bundle.base.js"></script>
+    <script src="js/off-canvas.js"></script>
+    <script src="js/hoverable-collapse.js"></script>
+    <script src="js/template.js"></script>
+  </body>
+
+  </html>
+
+{% endif %}

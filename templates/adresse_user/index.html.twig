@@ -1,41 +1,87 @@
-{# {% extends 'base.html.twig' %} #}
+{% block title %}AdresseUser Index{% endblock %}
 
-{% block title %}AdresseUser index{% endblock %}
+<style>
+/* Custom Styling for Table */
+.table th {
+    text-align: center;
+    font-weight: bold;
+    background-color: #f8f9fa;
+}
+
+.table td {
+    vertical-align: middle;
+}
+
+/* Table row hover effect */
+.table tbody tr:hover {
+    background-color: #f1f3f5;
+}
+
+/* Custom Button Styles */
+.btn i {
+    margin-right: 8px;
+}
+
+/* Add custom shadow and smooth card transitions */
+.card {
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+}
+
+
+</style>
 
 {% block body %}
-    <h1>AdresseUser index</h1>
+    <div class="container my-5">
+        <h1 class="text-center mb-4">Liste des Adresses Utilisateurs</h1>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Rue</th>
-                <th>Ville</th>
-                <th>Code_postal</th>
-                <th>Pays</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for adresse_user in adresse_users %}
-            <tr>
-                <td>{{ adresse_user.id }}</td>
-                <td>{{ adresse_user.rue }}</td>
-                <td>{{ adresse_user.ville }}</td>
-                <td>{{ adresse_user.codePostal }}</td>
-                <td>{{ adresse_user.pays }}</td>
-                <td>
-                    <a href="{{ path('app_adresse_user_show', {'id': adresse_user.id}) }}">show</a>
-                    <a href="{{ path('app_adresse_user_edit', {'id': adresse_user.id}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="6">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+        <!-- Tableau des adresses utilisateurs -->
+        <div class="card shadow-lg rounded-4">
+            <div class="card-body">
+                <table class="table table-striped table-bordered table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Id</th>
+                            <th>Rue</th>
+                            <th>Ville</th>
+                            <th>Code Postal</th>
+                            <th>Pays</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for adresse_user in adresse_users %}
+                        <tr>
+                            <td>{{ adresse_user.id }}</td>
+                            <td>{{ adresse_user.rue }}</td>
+                            <td>{{ adresse_user.ville }}</td>
+                            <td>{{ adresse_user.codePostal }}</td>
+                            <td>{{ adresse_user.pays }}</td>
+                            <td>
+                                <a href="{{ path('app_adresse_user_edit', {'id': adresse_user.id}) }}" class="btn btn-warning btn-sm">
+                                    <i class="fas fa-edit"></i> Éditer
+                                </a>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center text-muted">Aucun enregistrement trouvé</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
 
-    <a href="{{ path('app_adresse_user_new') }}">Create new</a>
+        <!-- Lien pour créer une nouvelle adresse utilisateur -->
+        <div class="text-center mt-4">
+            <a href="{{ path('app_adresse_user_new') }}" class="btn btn-success btn-lg">
+                <i class="fas fa-plus-circle"></i> Créer une nouvelle adresse
+            </a>
+        </div>
+    </div>
 {% endblock %}

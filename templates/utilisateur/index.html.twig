@@ -1,70 +1,64 @@
-
-
 {% block stylesheets %}
-    <!-- base:css -->
+    <!-- Base CSS -->
     <link rel="stylesheet" href="{{ asset('vendors/typicons/typicons.css') }}">
     <link rel="stylesheet" href="{{ asset('vendors/css/vendor.bundle.base.css') }}">
-    <!-- endinject -->
-    <!-- plugin css for this page -->
-    <!-- End plugin css for this page -->
-    <!-- inject:css -->
     <link rel="stylesheet" href="{{ asset('css/vertical-layout-light/style.css') }}">
-    <!-- endinject -->
     <link rel="shortcut icon" href="{{ asset('images/favicon.png') }}" />
 {% endblock %}
 
 {% block body %}
-<h1>Les Utilisateur :</h1>
+<h1>Les Utilisateurs :</h1>
 
 <div class="row">
-  <div class="col-md-12">
-    <div class="card">
-      <div class="table-responsive pt-3">
-        <table class="table table-striped project-orders-table">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Nom</th>
-              <th>Prenom</th>
-              <th>Email</th>
-              <th>Role</th>
-              <th>Mot_de_passe</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for utilisateur in utilisateurs %}
-              <tr>
-                <td>#{{ utilisateur.id }}</td>
-                <td>{{ utilisateur.nom }}</td>
-                <td>{{ utilisateur.prenom }}</td>
-                <td>{{ utilisateur.email }}</td>
-                <td>{{ utilisateur.role }}</td>
-                <td>{{ utilisateur.motDePasse }}</td>
-                <td>
-                  <div class="d-flex align-items-center">
-                    <a href="{{ path('app_utilisateur_show', {'id': utilisateur.id}) }}" class="btn btn-success btn-sm btn-icon-text mr-3">
-                      Show
-                      <i class="typcn typcn-edit btn-icon-append"></i>
-                    </a>
-                    <a href="{{ path('app_utilisateur_edit', {'id': utilisateur.id}) }}" class="btn btn-primary btn-sm btn-icon-text mr-3">
-                      Edit
-                      <i class="typcn typcn-edit btn-icon-append"></i>
-                    </a>
-                    
-                  </div>
-                </td>
-              </tr>
-            {% else %}
-              <tr>
-                <td colspan="7">No records found</td>
-              </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
+    <div class="col-md-12">
+        <div class="card">
+            <div class="table-responsive pt-3">
+                <table class="table table-striped project-orders-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nom</th>
+                            <th>Prenom</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for utilisateur in utilisateurs ?? [] %}
+                            <tr>
+                                <td>#{{ utilisateur.id }}</td>
+                                <td>{{ utilisateur.nom }}</td>
+                                <td>{{ utilisateur.prenom }}</td>
+                                <td>{{ utilisateur.email }}</td>
+                                <td>{{ utilisateur.role }}</td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <a href="{{ path('app_adresse_user_index', {'id': utilisateur.id}) }}" class="btn btn-info btn-sm btn-icon-text mr-3">
+                                            Show Addresses
+                                            <i class="typcn typcn-eye btn-icon-append"></i>
+                                        </a>
+                                        <a href="{{ path('app_utilisateur_edit', {'id': utilisateur.id}) }}" class="btn btn-warning btn-sm btn-icon-text mr-3">
+                                            Update
+                                            <i class="typcn typcn-edit btn-icon-append"></i>
+                                        </a>
+                                        <form method="post" action="{{ path('app_utilisateur_delete', {'id': utilisateur.id}) }}" onsubmit="return confirm('Are you sure you want to delete this user?');">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ utilisateur.id) }}">
+                                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="6" class="text-center">No users found</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
-  </div>
 </div>
 
 <a href="{{ path('app_utilisateur_new') }}" class="btn btn-primary">Create New</a>
