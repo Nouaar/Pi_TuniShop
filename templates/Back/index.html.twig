@@ -1,9 +1,7 @@
-
- <link rel="stylesheet" href="vendors/typicons/typicons.css">
-    <link rel="stylesheet" href="vendors/css/vendor.bundle.base.css">
-    <link rel="stylesheet" href="css/vertical-layout-light/style.css">
-    <link rel="shortcut icon" href="images/favicon.png" />
-
+<link rel="stylesheet" href="vendors/typicons/typicons.css">
+<link rel="stylesheet" href="vendors/css/vendor.bundle.base.css">
+<link rel="stylesheet" href="css/vertical-layout-light/style.css">
+<link rel="shortcut icon" href="images/favicon.png" />
 
 {% if not isAuthenticated or utilisateur.role != 'ROLE_ADMIN' %}
   <!-- Non-admin or non-authenticated user view -->
@@ -19,7 +17,6 @@
 
 {% else %}
   <!-- Admin user view -->
-  <!DOCTYPE html>
   <html lang="en">
 
   <head>
@@ -40,7 +37,8 @@
           <div class="col-md-3">
             {% include 'partials/_sidebar.html.twig' %}
           </div>
-          <div class="col-md-9">
+          <div class="col-md-9" id="editUserContent" style="display:none;">
+            {# Initially hidden content #}
             {% include 'Back/AdminUser/EditUser.html.twig' %}
           </div>
         </div>
@@ -52,6 +50,13 @@
     <script src="js/off-canvas.js"></script>
     <script src="js/hoverable-collapse.js"></script>
     <script src="js/template.js"></script>
+
+    <script>
+      // JavaScript to show EditUser content when button is clicked
+      document.getElementById('editUserButton').addEventListener('click', function() {
+        document.getElementById('editUserContent').style.display = 'block';
+      });
+    </script>
   </body>
 
   </html>
