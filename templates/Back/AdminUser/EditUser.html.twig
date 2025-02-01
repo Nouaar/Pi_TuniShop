@@ -37,9 +37,15 @@
 <div class="container my-5">
     <!-- Users Table -->
     <h1 class="text-center mb-4">User Profiles</h1>
+
+    <!-- Search Bar for Users -->
+    <div class="mb-3">
+        <input type="text" id="searchUsers" class="form-control" placeholder="Search Users...">
+    </div>
+
     <div class="card shadow-lg rounded-4">
         <div class="card-body">
-            <table class="table table-striped table-bordered table-hover">
+            <table class="table table-striped table-bordered table-hover" id="usersTable">
                 <thead class="table-light">
                     <tr>
                         <th>ID</th>
@@ -73,44 +79,43 @@
                                 </button>
 
                                <!-- Edit User Modal -->
-<div class="modal fade" id="editUserModal{{ utilisateur.id }}" tabindex="-1" aria-labelledby="editUserModalLabel{{ utilisateur.id }}" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="editUserModalLabel{{ utilisateur.id }}">Edit User</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form action="{{ path('app_utilisateur_edit', {'id': utilisateur.id}) }}" method="post">
-                    <div class="mb-3">
-                        <label for="nom" class="form-label">Name</label>
-                        <input type="text" class="form-control" id="nom" name="nom" value="{{ utilisateur.nom }}" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="prenom" class="form-label">Surname</label>
-                        <input type="text" class="form-control" id="prenom" name="prenom" value="{{ utilisateur.prenom }}" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="email" class="form-label">Email</label>
-                        <input type="email" class="form-control" id="email" name="email" value="{{ utilisateur.email }}" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="role" class="form-label">Role</label>
-                        <select class="form-control" id="role" name="role" required>
-                            <option value="ROLE_USER" {% if utilisateur.getRole() == 'ROLE_USER' %}selected{% endif %}>User</option>
-                            <option value="ROLE_ADMIN" {% if utilisateur.getRole() == 'ROLE_ADMIN' %}selected{% endif %}>Admin</option>
-                        </select>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary">Save changes</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
+                                <div class="modal fade" id="editUserModal{{ utilisateur.id }}" tabindex="-1" aria-labelledby="editUserModalLabel{{ utilisateur.id }}" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="editUserModalLabel{{ utilisateur.id }}">Edit User</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <form action="{{ path('app_utilisateur_edit', {'id': utilisateur.id}) }}" method="post">
+                                                    <div class="mb-3">
+                                                        <label for="nom" class="form-label">Name</label>
+                                                        <input type="text" class="form-control" id="nom" name="nom" value="{{ utilisateur.nom }}" required>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label for="prenom" class="form-label">Surname</label>
+                                                        <input type="text" class="form-control" id="prenom" name="prenom" value="{{ utilisateur.prenom }}" required>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label for="email" class="form-label">Email</label>
+                                                        <input type="email" class="form-control" id="email" name="email" value="{{ utilisateur.email }}" required>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label for="role" class="form-label">Role</label>
+                                                        <select class="form-control" id="role" name="role" required>
+                                                            <option value="ROLE_USER" {% if utilisateur.getRole() == 'ROLE_USER' %}selected{% endif %}>User</option>
+                                                            <option value="ROLE_ADMIN" {% if utilisateur.getRole() == 'ROLE_ADMIN' %}selected{% endif %}>Admin</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                        <button type="submit" class="btn btn-primary">Save changes</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
 
                                 <!-- Delete Button -->
                                 <form action="{{ path('app_utilisateur_delete', {'id': utilisateur.id}) }}" method="post" style="display:inline;">
@@ -132,9 +137,15 @@
 
     <!-- User Addresses Table -->
     <h1 class="text-center mb-4">User Addresses</h1>
+
+    <!-- Search Bar for Addresses -->
+    <div class="mb-3">
+        <input type="text" id="searchAddresses" class="form-control" placeholder="Search Addresses...">
+    </div>
+
     <div class="card shadow-lg rounded-4">
         <div class="card-body">
-            <table class="table table-striped table-bordered table-hover">
+            <table class="table table-striped table-bordered table-hover" id="addressesTable">
                 <thead class="table-light">
                     <tr>
                         <th>User Name</th>
@@ -212,4 +223,55 @@
         </div>
     </div>
 </div>
+
+<script>
+    // Search functionality for Users
+    document.getElementById('searchUsers').addEventListener('keyup', function() {
+        var input = this.value.toLowerCase();
+        var rows = document.getElementById('usersTable').getElementsByTagName('tr');
+
+        for (var i = 1; i < rows.length; i++) {
+            var cells = rows[i].getElementsByTagName('td');
+            var found = false;
+
+            for (var j = 0; j < cells.length - 1; j++) {
+                if (cells[j].textContent.toLowerCase().includes(input)) {
+                    found = true;
+                    break;
+                }
+            }
+
+            if (found) {
+                rows[i].style.display = '';
+            } else {
+                rows[i].style.display = 'none';
+            }
+        }
+    });
+
+    // Search functionality for Addresses
+    document.getElementById('searchAddresses').addEventListener('keyup', function() {
+        var input = this.value.toLowerCase();
+        var rows = document.getElementById('addressesTable').getElementsByTagName('tr');
+
+        for (var i = 1; i < rows.length; i++) {
+            var cells = rows[i].getElementsByTagName('td');
+            var found = false;
+
+            for (var j = 0; j < cells.length - 1; j++) {
+                if (cells[j].textContent.toLowerCase().includes(input)) {
+                    found = true;
+                    break;
+                }
+            }
+
+            if (found) {
+                rows[i].style.display = '';
+            } else {
+                rows[i].style.display = 'none';
+            }
+        }
+    });
+</script>
+
 {% endblock %}
