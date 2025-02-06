@@ -1,0 +1,51 @@
+<!-- Add Product Form Start -->
+<div class="container-fluid pt-5">
+    <div class="row px-xl-5">
+        <div class="col-lg-8 mb-5">
+            <div class="contact-form bg-light p-30">
+                <div id="success"></div>
+                <form method="post" action="{{ path('product_add') }}" enctype="multipart/form-data">
+                    <div class="control-group">
+                        <label for="title">Title</label>
+                        <input type="text" class="form-control" id="title" name="title" placeholder="Product Title" data-validation-required-message="Please enter the product title" />
+                        <p class="help-block text-danger"></p>
+                    </div>
+                    <div class="control-group">
+                        <label for="price">Price DT</label>
+                        <input type="number" class="form-control" id="price" name="price" placeholder="Product Price" data-validation-required-message="Please enter the product price" />
+                        <p class="help-block text-danger"></p>
+                    </div>
+                    <div class="control-group">
+                        <label for="description">Description</label>
+                        <textarea class="form-control" id="description" name="description" placeholder="Product Description" data-validation-required-message="Please enter the product description"></textarea>
+                        <p class="help-block text-danger"></p>
+                    </div>
+                    <div class="control-group">
+                        <label for="categorie">Categorie</label>
+                        <input type="text" class="form-control" id="categorie" name="categorie" placeholder="Product Categorie" data-validation-required-message="Please enter the product categorie" />
+                        <p class="help-block text-danger"></p>
+                    </div>
+                    <div class="control-group">
+                        <label for="location">Location</label>
+                        <input type="text" class="form-control" id="location" name="location" placeholder="Product Location" data-validation-required-message="Please enter the product location" />
+                        <p class="help-block text-danger"></p>
+                    </div>
+                    <div class="control-group">
+                        <label for="image">Image</label>
+                        <input type="file" class="form-control" id="image" name="image" data-validation-required-message="Please upload the product image" />
+                        <p class="help-block text-danger"></p>
+                    </div>
+                    <div class="control-group">
+                        <label for="quantity">Quantity</label>
+                        <input type="number" class="form-control" id="quantity" name="quantity" placeholder="Product Quantity" data-validation-required-message="Please enter the product quantity" />
+                        <p class="help-block text-danger"></p>
+                    </div>
+                    <div>
+                        <button class="btn btn-primary py-2 px-4" type="submit" id="sendMessageButton">Add Product</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Add Product Form End -->
