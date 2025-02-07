@@ -239,7 +239,7 @@ public function editProfile(
 public function changePassword(Request $request, EntityManagerInterface $entityManager, UserPasswordHasherInterface $passwordHasher): JsonResponse
 {
     // Get the user ID from the cookie
-    $userId = $request->cookies->get('user_id');
+    $userId = $request->cookies->get('user_id'); 
 
     if (!$userId) {
         return new JsonResponse(['status' => 'error', 'message' => 'User session expired. Please log in again.'], 400);
