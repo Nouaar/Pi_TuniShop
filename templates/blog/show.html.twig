@@ -1,0 +1,46 @@
+
+
+{% block title %}Blog{% endblock %}
+
+{% block body %}
+    <h1>Blog</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ blog.id }}</td>
+            </tr>
+            <tr>
+                <th>Titre</th>
+                <td>{{ blog.titre }}</td>
+            </tr>
+            <tr>
+                <th>Contenu</th>
+                <td>{{ blog.contenu }}</td>
+            </tr>
+            <tr>
+                <th>Date_creation</th>
+                <td>{{ blog.dateCreation ? blog.dateCreation|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Image</th>
+                <td>{{ blog.image }}</td>
+            </tr>
+            <tr>
+                <th>Nb_likes</th>
+                <td>{{ blog.nbLikes }}</td>
+            </tr>
+            <tr>
+                <th>Nb_commentaires</th>
+                <td>{{ blog.nbCommentaires }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_blog_index') }}">back to list</a>
+
+    <a href="{{ path('app_blog_edit', {'id': blog.id}) }}">edit</a>
+
+    {{ include('blog/_delete_form.html.twig') }}
+{% endblock %}

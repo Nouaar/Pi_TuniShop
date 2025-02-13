@@ -76,6 +76,15 @@ final class FrontController extends AbstractController
         return $this->renderWithAuth('Front/contact.html.twig');
     }
 
+
+    #[Route('/blog', name: 'blog')]
+    public function blog(): Response
+    {
+        return $this->renderWithAuth('blog/index.html.twig');
+    }
+
+
+
     #[Route('/help', name: 'help')]
     public function help(): Response
     {

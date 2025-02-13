@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20250206184944 extends AbstractMigration
+final class Version20250213183346 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -21,9 +21,11 @@ final class Version20250206184944 extends AbstractMigration
     {
         // this up() migration is auto-generated, please modify it to your needs
         $this->addSql('CREATE TABLE adresse_user (id INT AUTO_INCREMENT NOT NULL, utilisateur_id INT NOT NULL, rue VARCHAR(255) NOT NULL, ville VARCHAR(100) NOT NULL, code_postal VARCHAR(20) NOT NULL, pays VARCHAR(100) NOT NULL, INDEX IDX_7D95019FFB88E14F (utilisateur_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
+        $this->addSql('CREATE TABLE blog (id INT AUTO_INCREMENT NOT NULL, utilisateur_id INT NOT NULL, titre VARCHAR(255) NOT NULL, contenu LONGTEXT NOT NULL, date_creation DATETIME NOT NULL, image VARCHAR(255) DEFAULT NULL, nb_likes INT DEFAULT 0 NOT NULL, nb_commentaires INT DEFAULT 0 NOT NULL, INDEX IDX_C0155143FB88E14F (utilisateur_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE products (id INT AUTO_INCREMENT NOT NULL, utilisateur_id INT NOT NULL, title VARCHAR(255) NOT NULL, price VARCHAR(255) NOT NULL, description VARCHAR(255) NOT NULL, categorie VARCHAR(255) NOT NULL, location VARCHAR(255) NOT NULL, image VARCHAR(255) NOT NULL, quantity VARCHAR(255) NOT NULL, INDEX IDX_B3BA5A5AFB88E14F (utilisateur_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE utilisateur (id INT AUTO_INCREMENT NOT NULL, nom VARCHAR(255) NOT NULL, prenom VARCHAR(255) NOT NULL, email VARCHAR(255) NOT NULL, role VARCHAR(50) NOT NULL, password VARCHAR(255) NOT NULL, UNIQUE INDEX UNIQ_1D1C63B3E7927C74 (email), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('ALTER TABLE adresse_user ADD CONSTRAINT FK_7D95019FFB88E14F FOREIGN KEY (utilisateur_id) REFERENCES utilisateur (id)');
+        $this->addSql('ALTER TABLE blog ADD CONSTRAINT FK_C0155143FB88E14F FOREIGN KEY (utilisateur_id) REFERENCES utilisateur (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE products ADD CONSTRAINT FK_B3BA5A5AFB88E14F FOREIGN KEY (utilisateur_id) REFERENCES utilisateur (id)');
     }
 
@@ -31,8 +33,10 @@ final class Version20250206184944 extends AbstractMigration
     {
         // this down() migration is auto-generated, please modify it to your needs
         $this->addSql('ALTER TABLE adresse_user DROP FOREIGN KEY FK_7D95019FFB88E14F');
+        $this->addSql('ALTER TABLE blog DROP FOREIGN KEY FK_C0155143FB88E14F');
         $this->addSql('ALTER TABLE products DROP FOREIGN KEY FK_B3BA5A5AFB88E14F');
         $this->addSql('DROP TABLE adresse_user');
+        $this->addSql('DROP TABLE blog');
         $this->addSql('DROP TABLE products');
         $this->addSql('DROP TABLE utilisateur');
     }

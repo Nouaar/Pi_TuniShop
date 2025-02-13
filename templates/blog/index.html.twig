@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>TuniShop</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="pi" name="keywords">
+    <meta content="pi" name="description">
+
+    <!-- Favicon -->
+    <link href="img/favicon.ico" rel="icon">
+
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Libraries Stylesheet -->
+    <link href="lib/animate/animate.min.css" rel="stylesheet">
+    <link href="lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
+
+    <!-- Customized Bootstrap Stylesheet -->
+    <link href="css/style.css" rel="stylesheet">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const logoutButton = document.querySelector("[onclick*='logout']");
+        if (logoutButton) {
+            logoutButton.addEventListener("click", function () {
+                // Clear JWT Token from cookies, localStorage, and sessionStorage
+                document.cookie = "jwt_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+                localStorage.removeItem("jwt_token");
+                sessionStorage.removeItem("jwt_token");
+            });
+        }
+    });
+</script>
+
+{% if not isAuthenticated or utilisateur is not defined or utilisateur.role != 'ROLE_ADMIN' %}
+  <!-- Non-admin or non-authenticated user view -->
+  <div class="container">
+    <div class="row justify-content-center mt-5">
+      <div class="col-md-6 text-center">
+        <h2 class="text-danger">Access Restricted</h2>
+        <p class="text-muted">You must be an admin to access this page. Please log in or contact your administrator.</p>
+        <button class="btn btn-primary" type="button" onclick="window.location.href='{{ path('sign_in') }}'">Login</button>
+      </div>
+    </div>
+  </div>
+{% else %}
+    {% include 'partials/header.html.twig' %}
+
+    <div class="container mt-5">
+        <table class="table table-bordered table-hover">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Id</th>
+                    <th>Titre</th>
+                    <th>Contenu</th>
+                    <th>Date de création</th>
+                    <th>Image</th>
+                    <th>Likes</th>
+                    <th>Commentaires</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for blog in blogs %}
+                <tr>
+                    <td>{{ blog.id }}</td>
+                    <td>{{ blog.titre }}</td>
+                    <td>{{ blog.contenu|slice(0, 50) ~ '...' }}</td>
+                    <td>{{ blog.dateCreation ? blog.dateCreation|date('Y-m-d H:i:s') : 'Non définie' }}</td>
+                    <td>
+                        {% if blog.image %}
+                            <img src="{{ asset('uploads/blog/' ~ blog.image) }}" alt="Image" class="img-thumbnail" width="100">
+                        {% else %}
+                            <span class="text-muted">Pas d'image</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ blog.nbLikes }}</td>
+                    <td>{{ blog.nbCommentaires }}</td>
+                    <td>
+                        <a href="{{ path('app_blog_show', {'id': blog.id}) }}" class="btn btn-info btn-sm">Voir</a>
+                        <a href="{{ path('app_blog_edit', {'id': blog.id}) }}" class="btn btn-warning btn-sm">Éditer</a>
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="8" class="text-center text-muted">Aucun article trouvé</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+        <a href="{{ path('app_blog_new') }}" class="btn btn-success">Créer un nouvel article</a>
+    </div>
+
+    {% include 'partials/footer.html.twig' %}
+
+    <!-- Back to Top -->
+    <a href="#" class="btn btn-primary back-to-top"><i class="fa fa-angle-double-up"></i></a>
+
+    <!-- Bootstrap JS and Popper.js -->
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Custom JS -->
+    <script src="js/main.js"></script>
+{% endif %}
+
+</body>
+
+</html>

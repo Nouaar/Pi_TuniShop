@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>TuniShop</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="pi" name="keywords">
+    <meta content="pi" name="description">
+
+    <!-- Favicon -->
+    <link href="img/favicon.ico" rel="icon">
+
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">  
+
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Libraries Stylesheet -->
+    <link href="lib/animate/animate.min.css" rel="stylesheet">
+    <link href="lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
+
+    <!-- Customized Bootstrap Stylesheet -->
+    <link href="css/style.css" rel="stylesheet">
+</head>
+
+<body>
+
+{% if not isAuthenticated or utilisateur.role != 'ROLE_ADMIN' %}
+    <!-- Non-admin or non-authenticated user view -->
+    <div class="container">
+        <div class="row justify-content-center mt-5">
+            <div class="col-md-6 text-center">
+                <h2 class="text-danger">Access Restricted</h2>
+                <p class="text-muted">You must be an admin to access this page. Please log in or contact your administrator.</p>
+                <button class="btn btn-primary" type="button" onclick="window.location.href='{{ path('sign_in') }}'">Login</button>
+            </div>
+        </div>
+    </div>
+{% else %}
+
+    <!-- Modal -->
+    <div class="modal fade" id="editBlogModal" tabindex="-1" role="dialog" aria-labelledby="editBlogModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editBlogModalLabel">Edit Blog</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- The form will be injected here via JavaScript -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="saveBlogChanges">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mt-5">
+        <h1 class="mb-4">Blog Index</h1>
+        <table class="table table-bordered table-hover">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Id</th>
+                    <th>Titre</th>
+                    <th>Contenu</th>
+                    <th>Date de création</th>
+                    <th>Image</th>
+                    <th>Likes</th>
+                    <th>Commentaires</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for blog in blogs %}
+                <tr>
+                    <td>{{ blog.id }}</td>
+                    <td>{{ blog.titre }}</td>
+                    <td>{{ blog.contenu|slice(0, 50) ~ '...' }}</td>
+                    <td>{{ blog.dateCreation ? blog.dateCreation|date('Y-m-d H:i:s') : 'Non définie' }}</td>
+                    <td>
+                        {% if blog.image %}
+                            <img src="{{ asset('uploads/blog/' ~ blog.image) }}" alt="Image" class="img-thumbnail" width="100">
+                        {% else %}
+                            <span class="text-muted">Pas d'image</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ blog.nbLikes }}</td>
+                    <td>{{ blog.nbCommentaires }}</td>
+                    <td>
+                        <button class="btn btn-warning btn-sm" data-toggle="modal" data-target="#editBlogModal" onclick="loadEditForm({{ blog.id }})">Éditer</button>
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="8" class="text-center text-muted">Aucun article trouvé</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+        <a href="{{ path('app_blog_new') }}" class="btn btn-success">Créer un nouvel article</a>
+    </div>
+
+{% endif %}
+
+<!-- Back to Top -->
+<a href="#" class="btn btn-primary back-to-top"><i class="fa fa-angle-double-up"></i></a>
+
+<!-- jQuery and Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    // Function to load the edit form dynamically
+    function loadEditForm(blogId) {
+        fetch('{{ path('app_blog_edit', {'id': 'placeholder'}) }}'.replace('placeholder', blogId))
+            .then(response => response.text())
+            .then(data => {
+                // Inject the form into the modal body
+                document.querySelector('#editBlogModal .modal-body').innerHTML = data;
+            })
+            .catch(error => console.error('Error loading edit form:', error));
+    }
+</script>
+
+</body>
+</html>
