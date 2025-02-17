@@ -1,9 +1,18 @@
-<link rel="stylesheet" href="vendors/typicons/typicons.css">
-<link rel="stylesheet" href="vendors/css/vendor.bundle.base.css">
-<link rel="stylesheet" href="css/vertical-layout-light/style.css">
-<link rel="shortcut icon" href="images/favicon.png" />
+<!DOCTYPE html>
+<html lang="en">
 
-{% if not isAuthenticated or utilisateur.role != 'ROLE_ADMIN' %}
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Admin</title>
+  <link rel="stylesheet" href="vendors/typicons/typicons.css">
+  <link rel="stylesheet" href="vendors/css/vendor.bundle.base.css">
+  <link rel="stylesheet" href="css/vertical-layout-light/style.css">
+  <link rel="shortcut icon" href="images/favicon.png" />
+</head>
+
+<body>
+  {% if not isAuthenticated or utilisateur.role != 'ROLE_ADMIN' %}
   <!-- Non-admin or non-authenticated user view -->
   <div class="container">
     <div class="row justify-content-center mt-5">
@@ -15,50 +24,66 @@
     </div>
   </div>
 
-{% else %}
+  {% else %}
   <!-- Admin user view -->
-  <html lang="en">
+  <div class="container-scroller">
+    {% include 'partials/_navbar.html.twig' %}
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-md-3">
+          {% include 'partials/_sidebar.html.twig' %}
+        </div>
 
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Admin</title>
-    <link rel="stylesheet" href="vendors/typicons/typicons.css">
-    <link rel="stylesheet" href="vendors/css/vendor.bundle.base.css">
-    <link rel="stylesheet" href="css/vertical-layout-light/style.css">
-    <link rel="shortcut icon" href="images/favicon.png" />
-  </head>
-
-  <body>
-    <div class="container-scroller">
-      {% include 'partials/_navbar.html.twig' %}
-      <div class="container-fluid">
-        <div class="row">
-          <div class="col-md-3">
-            {% include 'partials/_sidebar.html.twig' %}
-          </div>
-          <div class="col-md-9" id="editUserContent" style="display:none;">
-            {# Initially hidden content #}
+        <div class="col-md-9">
+          <!-- Contenu dynamique affiché selon le bouton cliqué -->
+          <div id="editUserContent" style="display:none;">
             {% include 'Back/AdminUser/EditUser.html.twig' %}
+          </div>
+
+          <div id="editReclamationContent" style="display:none;">
+            {% include 'Back/editreclamation.html.twig' %}
           </div>
         </div>
       </div>
-
-      {% include 'partials/_footer.html.twig' %}
     </div>
-    <script src="vendors/js/vendor.bundle.base.js"></script>
-    <script src="js/off-canvas.js"></script>
-    <script src="js/hoverable-collapse.js"></script>
-    <script src="js/template.js"></script>
 
-    <script>
-      // JavaScript to show EditUser content when button is clicked
-      document.getElementById('editUserButton').addEventListener('click', function() {
-        document.getElementById('editUserContent').style.display = 'block';
-      });
-    </script>
-  </body>
+    {% include 'partials/_footer.html.twig' %}
+  </div>
 
-  </html>
+  <!-- Scripts -->
+  <script src="vendors/js/vendor.bundle.base.js"></script>
+  <script src="js/off-canvas.js"></script>
+  <script src="js/hoverable-collapse.js"></script>
+  <script src="js/template.js"></script>
 
-{% endif %}
+  <script>
+    // Fonction pour afficher une section et cacher l'autre
+    function showSection(sectionId) {
+      document.getElementById('editUserContent').style.display = 'none';
+      document.getElementById('editReclamationContent').style.display = 'none';
+      document.getElementById(sectionId).style.display = 'block';
+    }
+
+    // Vérification avant d'ajouter les événements
+    document.addEventListener("DOMContentLoaded", function() {
+      var editUserButton = document.getElementById('editUserButton');
+      var editReclamationButton = document.getElementById('editReclamationButton');
+
+      if (editUserButton) {
+        editUserButton.addEventListener('click', function() {
+          showSection('editUserContent');
+        });
+      }
+
+      if (editReclamationButton) {
+        editReclamationButton.addEventListener('click', function() {
+          showSection('editReclamationContent');
+        });
+      }
+    });
+  </script>
+
+  {% endif %}
+</body>
+
+</html>

@@ -1,66 +1,64 @@
-{% block stylesheets %}
-    <!-- Base CSS -->
-    <link rel="stylesheet" href="{{ asset('vendors/typicons/typicons.css') }}">
-    <link rel="stylesheet" href="{{ asset('vendors/css/vendor.bundle.base.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/vertical-layout-light/style.css') }}">
-    <link rel="shortcut icon" href="{{ asset('images/favicon.png') }}" />
-{% endblock %}
+<link rel="stylesheet" href="vendors/typicons/typicons.css">
+<link rel="stylesheet" href="vendors/css/vendor.bundle.base.css">
+<link rel="stylesheet" href="css/vertical-layout-light/style.css">
+<link rel="shortcut icon" href="images/favicon.png" />
 
-{% block body %}
-<h1>Les Utilisateurs :</h1>
-
-<div class="row">
-    <div class="col-md-12">
-        <div class="card">
-            <div class="table-responsive pt-3">
-                <table class="table table-striped project-orders-table">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Nom</th>
-                            <th>Prenom</th>
-                            <th>Email</th>
-                            <th>Role</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for utilisateur in utilisateurs ?? [] %}
-                            <tr>
-                                <td>#{{ utilisateur.id }}</td>
-                                <td>{{ utilisateur.nom }}</td>
-                                <td>{{ utilisateur.prenom }}</td>
-                                <td>{{ utilisateur.email }}</td>
-                                <td>{{ utilisateur.role }}</td>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <a href="{{ path('app_adresse_user_index', {'id': utilisateur.id}) }}" class="btn btn-info btn-sm btn-icon-text mr-3">
-                                            Show Addresses
-                                            <i class="typcn typcn-eye btn-icon-append"></i>
-                                        </a>
-                                        <a href="{{ path('app_utilisateur_edit', {'id': utilisateur.id}) }}" class="btn btn-warning btn-sm btn-icon-text mr-3">
-                                            Update
-                                            <i class="typcn typcn-edit btn-icon-append"></i>
-                                        </a>
-                                        <form method="post" action="{{ path('app_utilisateur_delete', {'id': utilisateur.id}) }}" onsubmit="return confirm('Are you sure you want to delete this user?');">
-                                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ utilisateur.id) }}">
-                                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                                        </form>
-                                    </div>
-                                </td>
-                            </tr>
-                        {% else %}
-                            <tr>
-                                <td colspan="6" class="text-center">No users found</td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
+{% if not isAuthenticated or utilisateur.role != 'ROLE_ADMIN' %}
+  <!-- Non-admin or non-authenticated user view -->
+  <div class="container">
+    <div class="row justify-content-center mt-5">
+      <div class="col-md-6 text-center">
+        <h2 class="text-danger">Access Restricted</h2>
+        <p class="text-muted">You must be an admin to access this page. Please log in or contact your administrator.</p>
+        <button class="btn btn-primary" type="button" onclick="window.location.href='{{ path('sign_in') }}'">Login</button>
+      </div>
     </div>
-</div>
+  </div>
 
-<a href="{{ path('app_utilisateur_new') }}" class="btn btn-primary">Create New</a>
+{% else %}
+  <!-- Admin user view -->
+  <html lang="en">
 
-{% endblock %}
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Admin</title>
+    <link rel="stylesheet" href="vendors/typicons/typicons.css">
+    <link rel="stylesheet" href="vendors/css/vendor.bundle.base.css">
+    <link rel="stylesheet" href="css/vertical-layout-light/style.css">
+    <link rel="shortcut icon" href="images/favicon.png" />
+  </head>
+
+  <body>
+    <div class="container-scroller">
+      {% include 'partials/_navbar.html.twig' %}
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-md-3">
+            {% include 'partials/_sidebar.html.twig' %}
+          </div>
+          <div class="col-md-9" id="editUserContent" style="display:none;">
+            {# Initially hidden content #}
+            {% include 'Back/AdminUser/EditUser.html.twig' %}
+          </div>
+        </div>
+      </div>
+
+      {% include 'partials/_footer.html.twig' %}
+    </div>
+    <script src="vendors/js/vendor.bundle.base.js"></script>
+    <script src="js/off-canvas.js"></script>
+    <script src="js/hoverable-collapse.js"></script>
+    <script src="js/template.js"></script>
+
+    <script>
+      // JavaScript to show EditUser content when button is clicked
+      document.getElementById('editUserButton').addEventListener('click', function() {
+        document.getElementById('editUserContent').style.display = 'block';
+      });
+    </script>
+  </body>
+
+  </html>
+
+{% endif %}

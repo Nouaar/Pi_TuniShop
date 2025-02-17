@@ -10,6 +10,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\Security;
 use App\Service\SecurityService; // Ensure to import your SecurityService for authentication check
 use App\Entity\AdresseUser;
 
@@ -59,36 +60,42 @@ final class UtilisateurController extends AbstractController
 
 
     #[Route('/utilisateur/{id}/edit', name: 'app_utilisateur_edit', methods: ['GET', 'POST'])]
-public function editUtilisateur(int $id, Request $request, EntityManagerInterface $em): Response
-{
-    // Fetch the user by ID
-    $utilisateur = $em->getRepository(Utilisateur::class)->find($id);
-
-    if (!$utilisateur) {
-        throw $this->createNotFoundException('User not found.');
+    public function editUtilisateur(int $id, Request $request, EntityManagerInterface $em, Security $security): Response
+    {
+        // Fetch the user by ID
+        $utilisateur = $em->getRepository(Utilisateur::class)->find($id);
+    
+        if (!$utilisateur) {
+            throw $this->createNotFoundException('User not found.');
+        }
+    
+        // Check if the user is authenticated
+        $isAuthenticated = $security->isGranted('IS_AUTHENTICATED_FULLY');
+    
+        // Handle POST request to update user details
+        if ($request->isMethod('POST')) {
+            $nom = $request->request->get('nom', $utilisateur->getNom());
+            $prenom = $request->request->get('prenom', $utilisateur->getPrenom());
+            $email = $request->request->get('email', $utilisateur->getEmail());
+            $role = $request->request->get('role', $utilisateur->getRole()); // Get role as a string
+    
+            // Update user details
+            $utilisateur->setNom($nom);
+            $utilisateur->setPrenom($prenom);
+            $utilisateur->setEmail($email);
+            $utilisateur->setRole($role); // Assign role directly (not an array)
+    
+            $em->flush();
+    
+            return $this->redirectToRoute('back');
+        }
+    
+        // Pass `isAuthenticated` to the Twig template
+        return $this->render('utilisateur/edit.html.twig', [
+            'utilisateur' => $utilisateur,
+            'isAuthenticated' => $isAuthenticated,  // pass the variable here
+        ]);
     }
-
-    // Handle POST request to update user details
-    if ($request->isMethod('POST')) {
-        $nom = $request->request->get('nom', $utilisateur->getNom());
-        $prenom = $request->request->get('prenom', $utilisateur->getPrenom());
-        $email = $request->request->get('email', $utilisateur->getEmail());
-        $role = $request->request->get('role', $utilisateur->getRole()); // Get role as a string
-
-        // Update user details
-        $utilisateur->setNom($nom);
-        $utilisateur->setPrenom($prenom);
-        $utilisateur->setEmail($email);
-        $utilisateur->setRole($role); // Assign role directly (not an array)
-
-        $em->flush();
-
-        return $this->redirectToRoute('back');
-    }
-
-    // If it's a GET request, redirect back
-    return $this->redirectToRoute('back');
-}
 
 
     // #[Route('/{id}/edit', name: 'app_utilisateur_edit', methods: ['GET', 'POST'])]

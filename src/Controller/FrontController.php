@@ -11,8 +11,12 @@ use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Utilisateur;
 use App\Repository\UtilisateurRepository;
 use App\Entity\AdresseUser;
+use App\Entity\Reclamation;
+use App\Form\ReclamationType;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface; 
 use Symfony\Component\HttpFoundation\JsonResponse;
+use App\Repository\ReclamationRepository;
+
 
 
 
@@ -70,12 +74,29 @@ final class FrontController extends AbstractController
         return $this->renderWithAuth('Front/about.html.twig');
     }
 
-    #[Route('/contact', name: 'contact')]
-    public function contact(): Response
+    #[Route('/contact', name: 'contact', methods: ['GET', 'POST'])]
+    public function contact(Request $request): Response
     {
-        return $this->renderWithAuth('Front/contact.html.twig');
+        // Création d'une nouvelle instance de Reclamation
+        $reclamation = new Reclamation();
+        
+        // Création du formulaire pour Reclamation
+        $form = $this->createForm(ReclamationType::class, $reclamation);
+        
+        // Gestion de la soumission du formulaire
+        $form->handleRequest($request);
+    
+        // Vérification si l'utilisateur est authentifié
+        $isAuthenticated = $this->getUser() !== null;
+    
+        // Rendre la vue avec le formulaire et l'état de l'authentification
+        return $this->render('Front/contact.html.twig', [
+            'form' => $form->createView(),
+            'isAuthenticated' => $isAuthenticated, // Passage de la variable à Twig
+        ]);
     }
-
+    
+    
     #[Route('/help', name: 'help')]
     public function help(): Response
     {
@@ -129,6 +150,8 @@ final class FrontController extends AbstractController
     {
         return $this->renderWithAuth('Front/checkout.html.twig');
     }
+
+    
 
     #[Route('/logout', name: 'logout')]
     public function logout(Request $request): Response
@@ -283,6 +306,12 @@ public function changePassword(Request $request, EntityManagerInterface $entityM
     return new JsonResponse(['status' => 'success', 'message' => 'Password successfully changed!'], 200);
 }
 
-
+#[Route(name: 'app_reclamation_index', methods: ['GET'])]
+public function index(ReclamationRepository $reclamationRepository)
+{
+    return $this->render('reclamation/index.html.twig', [
+        'reclamations' => $reclamationRepository->findAll(), // Ici vous récupérez toutes les réclamations
+    ]);
+}
 }
 

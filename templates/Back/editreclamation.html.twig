@@ -1,0 +1,227 @@
+{% block title %}Réclamations et Remboursements{% endblock %}
+
+{% block body %}
+<div class="container my-5">
+    <!-- Réclamations Table -->
+    <h1 class="text-center mb-4">Réclamations</h1>
+
+    <!-- Search Bar for Réclamations -->
+    <div class="mb-3">
+        <input type="text" id="searchReclamations" class="form-control" placeholder="Rechercher Réclamations...">
+    </div>
+
+    <div class="card shadow-lg rounded-4">
+        <div class="card-body">
+            <table class="table table-striped table-bordered table-hover" id="reclamationsTable">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Commande ID</th>
+                        <th>Produit ID</th>
+                        <th>Raison</th>
+                        <th>Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for reclamation in reclamations %}
+                        <tr>
+                            <td>{{ reclamation.id }}</td>
+                            <td>{{ reclamation.idCommande }}</td>
+                            <td>{{ reclamation.idProduit }}</td>
+                            <td>{{ reclamation.raison }}</td>
+                            <td>{{ reclamation.date | date('d-m-Y H:i') }}</td>
+                            <td>
+                           
+  <a href="{{ path('app_reclamation_showback', {'id': reclamation.id}) }}" class="btn btn-info btn-sm">Show</a>
+                                <!-- Edit Réclamation Modal -->
+                                <div class="modal fade" id="editReclamationModal{{ reclamation.id }}" tabindex="-1" aria-labelledby="editReclamationModalLabel{{ reclamation.id }}" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="editReclamationModalLabel{{ reclamation.id }}">Edit Réclamation</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <form action="{{ path('app_reclamation_edit', {'id': reclamation.id}) }}" method="post">
+                                                    <div class="mb-3">
+                                                        <label for="raison" class="form-label">Raison</label>
+                                                        <input type="text" class="form-control" id="raison" name="raison" value="{{ reclamation.raison }}" required>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label for="date" class="form-label">Date</label>
+                                                        <input type="text" class="form-control" id="date" name="date" value="{{ reclamation.date | date('Y-m-d H:i:s') }}" required>
+                                                    </div>
+
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                        <button type="submit" class="btn btn-primary">Save changes</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Delete Button -->
+                                <form method="post" action="{{ path('app_reclamation_delete', {'id': reclamation.id}) }}" onsubmit="return confirm('Are you sure you want to delete this item?');">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ reclamation.id) }}">
+                                    <button class="btn btn-danger btn-sm">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center text-muted">No reclamations found.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+
+    <!-- Remboursements Table -->
+    <h1 class="text-center mb-4">Remboursements</h1>
+
+    <!-- Search Bar for Remboursements -->
+    <div class="mb-3">
+        <input type="text" id="searchRemboursements" class="form-control" placeholder="Rechercher Remboursements...">
+    </div>
+
+    <div class="card shadow-lg rounded-4">
+        <div class="card-body">
+            <table class="table table-striped table-bordered table-hover" id="remboursementsTable">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID Remboursement</th>
+                        <th>Montant</th>
+                        <th>Mode Remboursement</th>
+                        <th>Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for remboursement in remboursements %}
+                        <tr>
+                            <td>{{ remboursement.idRemboursement }}</td>
+                            <td>{{ remboursement.montant }}</td>
+                            <td>{{ remboursement.modeRemboursement }}</td>
+                            <td>{{ remboursement.date | date('d-m-Y H:i') }}</td>
+                            <td>
+                                <!-- Edit Button -->
+                                <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editRemboursementModal{{ remboursement.idRemboursement }}">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                      <a href="{{ path('app_remboursement_show', {'id': remboursement.idRemboursement}) }}" class="btn btn-info btn-sm">Show</a>
+
+                                <!-- Edit Remboursement Modal -->
+                                <div class="modal fade" id="editRemboursementModal{{ remboursement.idRemboursement }}" tabindex="-1" aria-labelledby="editRemboursementModalLabel{{ remboursement.idRemboursement }}" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="editRemboursementModalLabel{{ remboursement.idRemboursement }}">Edit Remboursement</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <form action="{{ path('app_remboursement_edit', {'id': remboursement.idRemboursement}) }}" method="post">
+                                                    <div class="mb-3">
+                                                        <label for="montant" class="form-label">Montant</label>
+                                                        <input type="text" class="form-control" id="montant" name="montant" value="{{ remboursement.montant }}" required>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label for="mode_remboursement" class="form-label">Mode Remboursement</label>
+                                                        <input type="text" class="form-control" id="mode_remboursement" name="mode_remboursement" value="{{ remboursement.modeRemboursement }}" required>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label for="date" class="form-label">Date</label>
+                                                        <input type="text" class="form-control" id="date" name="date" value="{{ remboursement.date | date('Y-m-d H:i:s') }}" required>
+                                                    </div>
+
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                        <button type="submit" class="btn btn-primary">Save changes</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Delete Button -->
+                                <form method="post" action="{{ path('app_remboursement_delete', {'id': remboursement.idRemboursement }) }}" onsubmit="return confirm('Are you sure you want to delete this item?');">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ remboursement.idRemboursement) }}">
+                                    <button class="btn btn-danger btn-sm">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center text-muted">No remboursements found.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+                                              <!-- Button to Add a New Remboursement -->
+    <div class="text-end mb-4">
+        <a href="{{ path('app_remboursement_new') }}" class="btn btn-success">
+            <i class="fas fa-plus"></i> Ajouter un Remboursement
+        </a>
+    </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    // Search functionality for Réclamations
+    document.getElementById('searchReclamations').addEventListener('keyup', function() {
+        var input = this.value.toLowerCase();
+        var rows = document.getElementById('reclamationsTable').getElementsByTagName('tr');
+
+        for (var i = 1; i < rows.length; i++) {
+            var cells = rows[i].getElementsByTagName('td');
+            var found = false;
+
+            for (var j = 0; j < cells.length - 1; j++) {
+                if (cells[j].textContent.toLowerCase().includes(input)) {
+                    found = true;
+                    break;
+                }
+            }
+
+            if (found) {
+                rows[i].style.display = '';
+            } else {
+                rows[i].style.display = 'none';
+            }
+        }
+    });
+
+    // Search functionality for Remboursements
+    document.getElementById('searchRemboursements').addEventListener('keyup', function() {
+        var input = this.value.toLowerCase();
+        var rows = document.getElementById('remboursementsTable').getElementsByTagName('tr');
+
+        for (var i = 1; i < rows.length; i++) {
+            var cells = rows[i].getElementsByTagName('td');
+            var found = false;
+
+            for (var j = 0; j < cells.length - 1; j++) {
+                if (cells[j].textContent.toLowerCase().includes(input)) {
+                    found = true;
+                    break;
+                }
+            }
+
+            if (found) {
+                rows[i].style.display = '';
+            } else {
+                rows[i].style.display = 'none';
+            }
+        }
+    });
+</script>
+{% endblock %}
