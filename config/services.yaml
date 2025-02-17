@@ -6,6 +6,7 @@ services:
     _defaults:
         autowire: true      # Automatically injects dependencies in your services.
         autoconfigure: true # Automatically registers services as commands, event subscribers, etc.
+ 
 
     # Makes classes in src/ available as services
     # This creates a service per class whose ID is the fully-qualified class name
