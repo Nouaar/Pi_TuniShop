@@ -93,6 +93,28 @@ final class BlogController extends AbstractController
     }
 
 
+//delete blog from back office
+#[Route('/back/blog/delete/{id}', name: 'app_blog_delete', methods: ['POST'])]
+public function deleteBlogBack(int $id, EntityManagerInterface $em): Response
+{
+    $blog = $em->getRepository(Blog::class)->find($id);
+
+    if ($blog) {
+        // Supprimer d'abord les commentaires liés
+        $commentaires = $blog->getCommentsSection();
+        foreach ($commentaires as $commentaire) {
+            $em->remove($commentaire);
+        }
+
+        $em->remove($blog);
+        $em->flush();
+    }
+
+    return $this->redirectToRoute('back');
+}
+
+
+
     #[Route('/blog/edit/{id}', name: 'blog_update')]
 public function edit(Request $request, Blog $blog, EntityManagerInterface $em): Response
 {
