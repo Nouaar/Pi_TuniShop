@@ -41,6 +41,10 @@
             {# Initially hidden content #}
             {% include 'Back/AdminUser/EditUser.html.twig' %}
           </div>
+          <div class="col-md-9" id="editDepotContent" style="display:none;">
+            {# Initially hidden content #}
+            {% include 'Back/AdminDepot/depot_dashboard.html.twig' %}
+          </div>
         </div>
       </div>
 
@@ -52,10 +56,17 @@
     <script src="js/template.js"></script>
 
     <script>
-      // JavaScript to show EditUser content when button is clicked
+      // JavaScript to switch to EditUser content when button is clicked
       document.getElementById('editUserButton').addEventListener('click', function() {
         document.getElementById('editUserContent').style.display = 'block';
+        document.getElementById('editDepotContent').style.display = 'none';
       });
+      // JavaScript to switch to depot_dashboard content when button is clicked
+      document.getElementById('editDepotButton').addEventListener('click', function() {
+        document.getElementById('editDepotContent').style.display = 'block';
+        document.getElementById('editUserContent').style.display = 'none';
+      });
+      
     </script>
   </body>
 

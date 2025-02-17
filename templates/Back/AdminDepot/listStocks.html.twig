@@ -1,0 +1,221 @@
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Stocks in {{ depot.nom }}</title>
+    <link rel="stylesheet" href="{{ asset('vendors/typicons/typicons.css') }}">
+    <link rel="stylesheet" href="{{ asset('vendors/css/vendor.bundle.base.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/vertical-layout-light/style.css') }}">
+    <link rel="shortcut icon" href="{{ asset('images/favicon.png') }}" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+</head>
+<nav class="navbar navbar-expand-lg navbar-light bg-light p-3 fixed-top d-flex flex-row">
+  <div class="navbar-menu-wrapper d-flex align-items-center  container">
+  
+     
+        <h4 class="mb-0 text-dark">Dashboard</h4>
+      
+    
+<!-- Right Links and Account Options -->
+<div class="col-lg-6 text-center text-lg-right">
+    <div class="d-inline-flex align-items-center">
+        <div class="btn-group">
+            <button type="button" class="btn btn-sm btn-light dropdown-toggle" data-toggle="dropdown">My Account</button>
+            <div class="dropdown-menu dropdown-menu-right">
+                
+<button class="dropdown-item" type="button" onclick="window.location.href='{{ path('logout') }}'">Logout</button>
+                    <!-- Button for Changing Password -->
+                    <button class="dropdown-item" type="button" data-bs-toggle="modal" data-bs-target="#changePasswordModal">Change Password</button>
+                
+            </div>
+        </div>
+    </div>
+  </div>
+</nav>
+
+
+
+
+<!-- Modal for Changing Password -->
+<div class="modal fade" id="changePasswordModal" tabindex="-1" aria-labelledby="changePasswordModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="changePasswordModalLabel">Change Password</h1>
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal" aria-label="Close">Close</button>
+            </div>
+            <div class="modal-body">
+                <!-- Alerts Container -->
+                <div id="passwordChangeAlert"></div>
+
+                <!-- Password Change Form -->
+                <form id="changePasswordForm" method="post" action="{{ path('change_password') }}">
+                    <div class="mb-3">
+                        <div class="form-floating">
+                        <lable>Current Password</lable>
+                            <input type="password" class="form-control" id="current_password" name="current_password" placeholder="Current Password" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-floating">
+                            <lable>New Password</lable>
+
+                            <input type="password" class="form-control" id="new_password" name="new_password" placeholder="New Password" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-floating">
+                            <lable>Confirm New Password</lable>
+                            <input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="Confirm New Password" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Change Password</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+{% block body %}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
+<div class="container my-5">
+    <br>
+    <br>
+    <br>
+    <h1 class="text-center mb-4">Stocks in <strong>{{ depot.nom }}</strong></h1>
+
+    <!-- Search Bar for Stocks -->
+    <div class="mb-3">
+        <input type="text" id="searchStocks" class="form-control" placeholder="Search Stocks...">
+    </div>
+
+    <div class="card shadow-lg rounded-4">
+        <div class="card-body">
+            <table class="table table-striped table-bordered table-hover" id="stocksTable">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Quantity</th>
+                        <th>Min Quantity</th>
+                        <th>Max Quantity</th>
+                        <th>Status</th>
+                        <th>Last Updated</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for stock in stocks %}
+                        <tr>
+                            <td>{{ stock.id }}</td>
+                            <td>{{ stock.quantite }}</td>
+                            <td>{{ stock.quantitemin }}</td>
+                            <td>{{ stock.quantitemax }}</td>
+                            <td>
+                                
+                                <span>
+                                    {% if stock.status == 'disponible' %}✅{% else %}❌{% endif %}
+                                    
+                                </span>
+                            </td>
+                            <td>{{ stock.lastupdatedate ? stock.lastupdatedate|date('Y-m-d H:i:s') : 'Never updated' }}</td>
+                            <td class="action-buttons">
+                            <form action="{{ path('app_stock_update', {'id': stock.id}) }}" method="post" style="display:inline;">
+   <button type="submit" class="btn btn-secondary">
+                                        <i class="fas fa-trash-alt"></i> Upadte
+                                    </button>
+</form>
+                            <form action="{{ path('app_stock_delete', {'id': stock.id}) }}" method="post" style="display:inline;">
+    <button type="submit" class="btn btn-danger">
+        Delete
+    </button>
+</form>
+                                
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="7" class="text-center text-muted">No stocks found for this depot.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <!-- Add Stock Button -->
+            <div class="text-end mt-3">
+                <a href="{{ path('app_add_stock', {'depotId': depot.id}) }}" class="btn btn-success">
+                    Add Stock
+                </a>
+            </div>
+
+            <!-- Back to Depot List Button -->
+            <div class="text-start back-btn">
+                <a href="{{ path('back') }}" class="btn btn-secondary">
+                    Back to Depots
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript for Search Filtering -->
+<script>
+    document.getElementById('searchStocks').addEventListener('keyup', function() {
+        var input = this.value.toLowerCase();
+        var rows = document.getElementById('stocksTable').getElementsByTagName('tr');
+
+        for (var i = 1; i < rows.length; i++) { // Start at 1 to skip the table header
+            var nameCell = rows[i].getElementsByTagName('td')[1]; // Column 2 (Quantity)
+
+            if (nameCell) {
+                var stockName = nameCell.textContent.toLowerCase();
+                rows[i].style.display = stockName.includes(input) ? '' : 'none';
+            }
+        }
+    });
+</script>
+<script>
+   document.addEventListener("DOMContentLoaded", function () {
+    document.querySelector("#changePasswordForm").addEventListener("submit", function (event) {
+        event.preventDefault(); // Prevent form from reloading the page
+
+        let formData = new FormData(this);
+
+        fetch(this.action, {
+            method: "POST",
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            let alertContainer = document.querySelector("#passwordChangeAlert");
+            alertContainer.innerHTML = `
+                <div class="alert alert-${data.status === 'success' ? 'success' : 'danger'} alert-dismissible fade show" role="alert">
+                    ${data.message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            `;
+            if (data.status === "success") {
+                document.querySelector("#changePasswordForm").reset();
+            }
+        })
+        .catch(error => console.error("Error:", error));
+    });
+});
+
+</script>
+
+
+<br>
+<br>
+{% include 'partials/_footer.html.twig' %}
+{% endblock %}
+
+
