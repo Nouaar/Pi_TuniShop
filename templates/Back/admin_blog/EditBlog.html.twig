@@ -74,25 +74,26 @@
                             </td>
                             <td>
                                 <!-- Delete Button -->
-                                <form action="{{ path('app_blog_delete', {'id': blog.id}) }}" method="post" style="display:inline;">
+                                <!--{#<form action="{{ path('app_blog_delete', {'id': blog.id}) }}" method="post" style="display:inline;">#}
                                     <button type="submit" class="btn btn-danger btn-sm">
                                         <i class="fas fa-trash-alt"></i> Delete
                                     </button>
-                                </form> 
+                                </form>--> 
                                 
                                 <!-- Update Button -->
-                                <form action="{{ path('app_blog_update', {'id': blog.id}) }}" method="post" style="display:inline;">
+                            
+                                <!--{#<form action="{{ path('app_blog_update', {'id': blog.id}) }}" method="post" style="display:inline;">#}
                                     <button type="submit" class="btn btn-secondary btn-sm">
                                         <i class="fas fa-edit"></i> Update
                                     </button>
-                                </form> 
+                                </form>-->
 
                                 <!-- View Button for Blog Details -->
-                                <form action="{{ path('app_blog_view', {'id': blog.id}) }}" method="get" style="display:inline;">
+                                <!--{#<form action="{{ path('app_blog_view', {'id': blog.id}) }}" method="get" style="display:inline;">#}
                                     <button type="submit" class="btn btn-warning btn-sm">
                                         <i class="fas fa-eye"></i> View
                                     </button>
-                                </form>
+                                </form>-->
                             </td>
                         </tr>
                     {% else %}
@@ -102,7 +103,7 @@
                     {% endfor %}
                 </tbody>
             </table>
-            <a href="{{ path('app_blog_add') }}" class="btn btn-success">Add New Blog</a>
+            <!--{#<a href="{{ path('app_blog_add') }}" class="btn btn-success">Add New Blog</a>#}-->
         </div>
     </div>
 
