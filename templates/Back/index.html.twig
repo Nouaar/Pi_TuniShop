@@ -41,6 +41,11 @@
             {# Initially hidden content #}
             {% include 'Back/AdminUser/EditUser.html.twig' %}
           </div>
+
+          <div class="col-md-9" id="editBlogContent" style="display:none;">
+            {# Initially hidden content #}
+            {% include 'Back/admin_blog/EditBlog.html.twig' %}
+          </div>
         </div>
       </div>
 
@@ -55,6 +60,12 @@
       // JavaScript to show EditUser content when button is clicked
       document.getElementById('editUserButton').addEventListener('click', function() {
         document.getElementById('editUserContent').style.display = 'block';
+        document.getElementById('editBlogContent').style.display = 'none';
+      });
+
+       document.getElementById('editBlogButton').addEventListener('click', function() {
+        document.getElementById('editUserContent').style.display = 'none';
+        document.getElementById('editBlogContent').style.display = 'block';
       });
     </script>
   </body>

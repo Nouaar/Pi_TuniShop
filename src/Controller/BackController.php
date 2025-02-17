@@ -12,6 +12,7 @@ use App\Entity\Utilisateur;
 use App\Entity\AdresseUser;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface; 
 use Symfony\Component\HttpFoundation\JsonResponse;
+use App\Entity\Blog;
 
 
 
@@ -64,6 +65,9 @@ final class BackController extends AbstractController
     #[Route('/back', name: 'back')]
     public function index(UtilisateurRepository $utilisateurRepository): Response
     {
+
+
+        $blogs = $this->entityManager->getRepository(Blog::class)->findAll();
         // Fetch all utilisateurs
         $utilisateurs = $utilisateurRepository->findAll();
 
@@ -74,9 +78,9 @@ final class BackController extends AbstractController
         return $this->renderWithAuth('back/index.html.twig', [
             'utilisateurs' => $utilisateurs, 
             'adresse_users' => $adresse_users, 
+            'blogs' => $blogs, 
         ]);
     }
-
 
 
 

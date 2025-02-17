@@ -1,0 +1,125 @@
+<style>
+    /* Custom Styling for Table */
+    .table th {
+        text-align: center;
+        font-weight: bold;
+        background-color: #f8f9fa;
+    }
+
+    .table td {
+        vertical-align: middle;
+    }
+
+    /* Table row hover effect */
+    .table tbody tr:hover {
+        background-color: #f1f3f5;
+    }
+
+    /* Custom Button Styles */
+    .btn i {
+        margin-right: 8px;
+    }
+
+    /* Add custom shadow and smooth card transitions */
+    .card {
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+
+    .card:hover {
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+    }
+</style>
+
+{% block title %}Blog Posts{% endblock %}
+
+{% block body %}
+<div class="container my-5">
+    <!-- Blog Posts Table -->
+    <h1 class="text-center mb-4">Blog Posts</h1>
+
+    <!-- Search Bar for Blogs -->
+    <div class="mb-3">
+        <input type="text" id="searchBlogs" class="form-control" placeholder="Search Blogs...">
+    </div>
+
+    <div class="card shadow-lg rounded-4">
+        <div class="card-body">
+            <table class="table table-striped table-bordered table-hover" id="blogTable">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Title</th>
+                        <th>Description</th>
+                        <th>Likes</th>
+                        <th>Creation Date</th>
+                        <th>Image</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for blog in blogs %}
+                        <tr>
+                            <td>{{ blog.id }}</td>
+                            <td>{{ blog.titre }}</td>
+                            <td>{{ blog.description }}</td>
+                            <td>{{ blog.nbLikes }}</td>
+                            <td>{{ blog.dateCreation|date('Y-m-d H:i:s') }}</td>
+                            <td>
+                                {% if blog.image %}
+                                    <img src="{{ asset(blog.image) }}" alt="Blog Image" class="img-fluid" style="max-height: 50px;">
+                                {% else %}
+                                    <span>No Image</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <!-- Delete Button -->
+                                <form action="{{ path('app_blog_delete', {'id': blog.id}) }}" method="post" style="display:inline;">
+                                    <button type="submit" class="btn btn-danger btn-sm">
+                                        <i class="fas fa-trash-alt"></i> Delete
+                                    </button>
+                                </form> 
+                                
+                                <!-- Update Button -->
+                                <form action="{{ path('app_blog_update', {'id': blog.id}) }}" method="post" style="display:inline;">
+                                    <button type="submit" class="btn btn-secondary btn-sm">
+                                        <i class="fas fa-edit"></i> Update
+                                    </button>
+                                </form> 
+
+                                <!-- View Button for Blog Details -->
+                                <form action="{{ path('app_blog_view', {'id': blog.id}) }}" method="get" style="display:inline;">
+                                    <button type="submit" class="btn btn-warning btn-sm">
+                                        <i class="fas fa-eye"></i> View
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="7" class="text-center text-muted">No blogs found.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <a href="{{ path('app_blog_add') }}" class="btn btn-success">Add New Blog</a>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('searchBlogs').addEventListener('keyup', function() {
+            var input = this.value.toLowerCase();
+            var rows = document.getElementById('blogTable').getElementsByTagName('tr');
+
+            for (var i = 1; i < rows.length; i++) { // Start at 1 to skip the table header
+                var titleCell = rows[i].getElementsByTagName('td')[1]; // Column 2 (Blog Title)
+
+                if (titleCell) {
+                    var blogTitle = titleCell.textContent.toLowerCase();
+                    rows[i].style.display = blogTitle.includes(input) ? '' : 'none';
+                }
+            }
+        });
+    </script>
+</div>
+{% endblock %}

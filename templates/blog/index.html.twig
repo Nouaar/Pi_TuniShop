@@ -152,9 +152,9 @@
                     <span class="like-btn" data-id="{{ blog.id }}">
                         👍 Like
                     </span>
-                    <span class="comment-btn" data-id="{{ blog.id }}">
-                        💬 Comment
-                    </span>
+                   <a href="{{ path('blog_comment', {id: blog.id}) }}" class="comment-btn">
+    💬 Comment
+</a>
                 </div>
 
                 <!-- Modify and Delete Buttons (Icon Style) -->

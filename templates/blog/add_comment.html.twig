@@ -1,0 +1,21 @@
+{% block title %}Add Comment{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <h2>💬 Add a Comment</h2>
+
+        <!-- Blog Post -->
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">{{ blog.titre }}</h5>
+                <p class="card-text">{{ blog.description }}</p>
+            </div>
+        </div>
+
+        <!-- Comment Form -->
+        {{ form_start(form) }}
+            {{ form_row(form.text) }}  <!-- Textarea for comment -->
+            {{ form_row(form.submit) }} <!-- Submit button -->
+        {{ form_end(form) }}
+    </div>
+{% endblock %}
