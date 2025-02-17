@@ -13,11 +13,9 @@ use App\Entity\Products;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use App\Repository\UtilisateurRepository;
-
-
-
-
-
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
+use Symfony\Component\Security\Csrf\CsrfToken;
+use App\Repository\ProductsRepository;
 
 final class ProductsController extends AbstractController
 {
@@ -36,26 +34,34 @@ final class ProductsController extends AbstractController
         return $this->renderWithAuth('products/index.html.twig');
     }
 
-
-
-
-
-    #[Route('/products', name: 'product_add', methods: ['GET', 'POST'])]
+    #[Route('/productsadd', name: 'product_add', methods: ['GET', 'POST'])]
     public function addProduct(
         Request $request,
         EntityManagerInterface $entityManager,
         SluggerInterface $slugger,
-        UtilisateurRepository $utilisateurRepository // Inject Utilisateur repository
+        UtilisateurRepository $utilisateurRepository,
+        CsrfTokenManagerInterface $csrfTokenManager
     ): Response {
         if ($request->isMethod('POST')) {
+
+            // CSRF Validation
+            $csrfToken = $request->request->get('_csrf_token');
+            if (!$csrfTokenManager->isTokenValid(new CsrfToken('product_add', $csrfToken))) {
+                throw $this->createAccessDeniedException('Invalid CSRF token');
+            }
+
+            // Check form submission
+            dump($request->request->all());
+            dump($request->files->all());
+            
             $product = new Products();
     
             // Get user_id from cookies
-            $userId = $request->cookies->get('user_id'); // Assuming the cookie name is 'user_id'
-    
+            $userId = $request->cookies->get('user_id'); 
+
             if (!$userId) {
                 $this->addFlash('error', 'User ID not found in cookies.');
-                return $this->redirectToRoute('login'); // Redirect to login or another appropriate route
+                return $this->redirectToRoute('login'); 
             }
     
             // Find the user by user_id
@@ -63,10 +69,10 @@ final class ProductsController extends AbstractController
     
             if (!$utilisateur) {
                 $this->addFlash('error', 'User not found.');
-                return $this->redirectToRoute('login'); // Redirect to login or another appropriate route
+                return $this->redirectToRoute('login'); 
             }
     
-            $product->setUtilisateur($utilisateur); // Set the user for the product
+            $product->setUtilisateur($utilisateur); 
     
             // Set product details from form data
             $product->setTitle($request->request->get('title'));
@@ -84,7 +90,6 @@ final class ProductsController extends AbstractController
                 $newFilename = $safeFilename . '-' . uniqid() . '.' . $imageFile->guessExtension();
     
                 try {
-                    // Move the uploaded image to the specified directory
                     $imageFile->move(
                         $this->getParameter('images_directory'),
                         $newFilename
@@ -101,42 +106,100 @@ final class ProductsController extends AbstractController
             $entityManager->flush();
     
             $this->addFlash('success', 'Product added successfully!');
-            return $this->renderWithAuth('products/index.html.twig');
+            return $this->redirectToRoute('app_products');
         }
     
         return $this->renderWithAuth('products/index.html.twig');
     }
-    
-    
+    #[Route('/listproducts', name: 'list_products')]
+    public function listProducts(ProductsRepository $productsRepository): Response
+    {
+        $products = $productsRepository->findAll();
+
+        if (!$products) {
+            $this->addFlash('error', 'No products found.');
+        }
+
+        return $this->renderWithAuth('products/listproducts.html.twig', [
+            'products' => $products,
+        ]);
+    }
+    #[Route('/product/edit/{id}', name: 'product_edit')]
+public function editProduct(int $id, Request $request, EntityManagerInterface $entityManager): Response
+{
+    // Find the product by ID
+    $product = $entityManager->getRepository(Products::class)->find($id);
+
+    if (!$product) {
+        throw $this->createNotFoundException('Product not found');
+    }
+
+    // If the form is submitted and the data is valid
+    if ($request->isMethod('POST')) {
+        $product->setTitle($request->get('title'));
+        $product->setPrice($request->get('price'));
+        $product->setDescription($request->get('description'));
+        $product->setCategorie($request->get('categorie'));
+        $product->setLocation($request->get('location'));
+        $product->setQuantity($request->get('quantity'));
+
+        // If an image was uploaded, handle the file upload
+        $imageFile = $request->files->get('image');
+        if ($imageFile) {
+            // Handle image upload logic here if needed
+            $newFilename = uniqid() . '.' . $imageFile->guessExtension();
+            $imageFile->move($this->getParameter('images_directory'), $newFilename);
+            $product->setImage($newFilename);
+        }
+
+        // Persist the changes to the database
+        $entityManager->flush();
+
+        // Add flash message and redirect
+        $this->addFlash('success', 'Product updated successfully!');
+        return $this->renderWithAuth('list_products');
+    }
+
+    return $this->renderWithAuth('products/edit_product.html.twig', [
+        'product' => $product
+    ]);
+}
+#[Route('/product/delete/{id}', name: 'product_delete', methods: ['POST'])]
+public function deleteProduct(int $id, EntityManagerInterface $entityManager): Response
+{
+    // Find the product by ID
+    $product = $entityManager->getRepository(Products::class)->find($id);
+
+    if (!$product) {
+        throw $this->createNotFoundException('Product not found');
+    }
+
+    // Remove the product from the database
+    $entityManager->remove($product);
+    $entityManager->flush();
+
+    // Add flash message
+    $this->addFlash('success', 'Product deleted successfully!');
+
+    // Redirect back to the list of products
+    return $this->renderWithAuth('list_products');
+}
+
 
 
     private function renderWithAuth(string $template, array $params = []): Response
     {
-        // Get the current request
         $request = $this->container->get('request_stack')->getCurrentRequest();
-        
-        // Get the user ID from the cookie
         $userId = $request->cookies->get('user_id');
-        
-        // Default to null if no user ID is found
         $utilisateur = null;
-    
-        // If user ID exists, fetch the user from the repository
+
         if ($userId) {
             $utilisateur = $this->entityManager->getRepository(Utilisateur::class)->find($userId);
         }
-    
-        // Add the authenticated user and status to the params
+
         $params['isAuthenticated'] = $this->securityService->isUserAuthenticated($request);
         $params['utilisateur'] = $utilisateur;
-    
+
         return $this->render($template, $params);
     }
-    
-
-
-
-
-
-
 }

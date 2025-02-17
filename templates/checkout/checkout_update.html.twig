@@ -1,0 +1,56 @@
+{% block body %}
+    <div class="container my-5">
+        <h1 class="text-center mb-4">Edit Checkout</h1>
+
+        <form method="post" action="{{ path('checkout_update_frontend', {'id': checkout.id, 'productId': product.id}) }}">
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="firstName">First Name</label>
+                        <input type="text" class="form-control" id="firstName" name="firstName" value="{{ checkout.firstName }}" required>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="secondName">Last Name</label>
+                        <input type="text" class="form-control" id="secondName" name="secondName" value="{{ checkout.secondName }}" required>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" class="form-control" id="email" name="email" value="{{ checkout.email }}" required>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label for="street">Street</label>
+                        <input type="text" class="form-control" id="street" name="street" value="{{ checkout.street }}" required>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="city">City</label>
+                        <input type="text" class="form-control" id="city" name="city" value="{{ checkout.city }}" required>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="postalCode">Postal Code</label>
+                        <input type="text" class="form-control" id="postalCode" name="postalCode" value="{{ checkout.postalCode }}" required>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="country">Country</label>
+                        <input type="text" class="form-control" id="country" name="country" value="{{ checkout.country }}" required>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <button type="submit" class="btn btn-primary">Update Checkout</button>
+                </div>
+            </div>
+        </form>
+    </div>
+{% endblock %}

@@ -10,6 +10,7 @@ use App\Service\SecurityService;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Utilisateur;
 use App\Entity\AdresseUser;
+use App\Entity\Products;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface; 
 use Symfony\Component\HttpFoundation\JsonResponse;
 
@@ -70,11 +71,16 @@ final class BackController extends AbstractController
         // Fetch all adresse users
         $adresse_users = $this->entityManager->getRepository(AdresseUser::class)->findAll();
 
+        //fetch all products
+        $products = $this->entityManager->getRepository(products::class)->findAll();
+        
         // Add the utilisateurs data to the params array
         return $this->renderWithAuth('back/index.html.twig', [
             'utilisateurs' => $utilisateurs, 
             'adresse_users' => $adresse_users, 
+            'products' => $products,
         ]);
+        
     }
 
 

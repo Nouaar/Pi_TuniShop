@@ -13,7 +13,8 @@ use App\Repository\UtilisateurRepository;
 use App\Entity\AdresseUser;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface; 
 use Symfony\Component\HttpFoundation\JsonResponse;
-
+use App\Entity\Products;
+use App\Repository\ProductsRepository;
 
 
 
@@ -115,20 +116,41 @@ final class FrontController extends AbstractController
     #[Route('/shop', name: 'shop')]
     public function shop(): Response
     {
-        return $this->renderWithAuth('Front/shop.html.twig');
+        $products = $this->entityManager->getRepository(Products::class)->findAll();
+        return $this->renderWithAuth('Front/shop.html.twig', [
+            'products' => $products,
+        ]);
+    }
+    #[Route('/shop_detail/{id}', name: 'shop_detail')]
+    public function shopDetail(int $id, ProductsRepository $productsRepository): Response
+    {
+        $product = $productsRepository->find($id);
+    
+        if (!$product) {
+            throw $this->createNotFoundException('Product not found');
+        }
+    
+        return $this->renderWithAuth('Front/detail.html.twig', [
+            'product' => $product
+        ]);
+    }
+    
+
+#[Route('/checkout/{id}', name: 'checkout')]
+public function checkout(int $id, EntityManagerInterface $entityManager): Response
+{
+    $product = $entityManager->getRepository(Products::class)->find($id);
+
+    if (!$product) {
+        throw $this->createNotFoundException('Product not found');
     }
 
-    #[Route('/shop_detail', name: 'shop_detail')]
-    public function shop_detail(): Response
-    {
-        return $this->renderWithAuth('Front/detail.html.twig');
-    }
+    return $this->renderWithAuth('front/checkout.html.twig', [
+        'product' => $product,
+    ]);
+}
 
-    #[Route('/checkout', name: 'checkout')]
-    public function checkout(): Response
-    {
-        return $this->renderWithAuth('Front/checkout.html.twig');
-    }
+
 
     #[Route('/logout', name: 'logout')]
     public function logout(Request $request): Response
