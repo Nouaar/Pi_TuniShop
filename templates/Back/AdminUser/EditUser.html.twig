@@ -29,6 +29,15 @@
     .card:hover {
         box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
     }
+
+    .is-invalid {
+    border-color: red;
+}
+
+.is-invalid:focus {
+    box-shadow: 0 0 0 0.2rem rgba(255, 0, 0, 0.25);
+}
+
 </style>
 
 {% block title %}User Profiles and Addresses{% endblock %}
@@ -87,31 +96,32 @@
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                             </div>
                                             <div class="modal-body">
-                                                <form action="{{ path('app_utilisateur_edit', {'id': utilisateur.id}) }}" method="post">
-                                                    <div class="mb-3">
-                                                        <label for="nom" class="form-label">Name</label>
-                                                        <input type="text" class="form-control" id="nom" name="nom" value="{{ utilisateur.nom }}" required>
-                                                    </div>
-                                                    <div class="mb-3">
-                                                        <label for="prenom" class="form-label">Surname</label>
-                                                        <input type="text" class="form-control" id="prenom" name="prenom" value="{{ utilisateur.prenom }}" required>
-                                                    </div>
-                                                    <div class="mb-3">
-                                                        <label for="email" class="form-label">Email</label>
-                                                        <input type="email" class="form-control" id="email" name="email" value="{{ utilisateur.email }}" required>
-                                                    </div>
-                                                    <div class="mb-3">
-                                                        <label for="role" class="form-label">Role</label>
-                                                        <select class="form-control" id="role" name="role" required>
-                                                            <option value="ROLE_USER" {% if utilisateur.getRole() == 'ROLE_USER' %}selected{% endif %}>User</option>
-                                                            <option value="ROLE_ADMIN" {% if utilisateur.getRole() == 'ROLE_ADMIN' %}selected{% endif %}>Admin</option>
-                                                        </select>
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                                        <button type="submit" class="btn btn-primary">Save changes</button>
-                                                    </div>
-                                                </form>
+                                                <form action="{{ path('app_utilisateur_edit', {'id': utilisateur.id}) }}" method="post" class="editUserForm">
+    <div class="mb-3">
+        <label for="nom" class="form-label">Name</label>
+        <input type="text" class="form-control" id="nom" name="nom" value="{{ utilisateur.nom }}" required>
+    </div>
+    <div class="mb-3">
+        <label for="prenom" class="form-label">Surname</label>
+        <input type="text" class="form-control" id="prenom" name="prenom" value="{{ utilisateur.prenom }}" required>
+    </div>
+    <div class="mb-3">
+        <label for="email" class="form-label">Email</label>
+        <input type="email" class="form-control" id="email" name="email" value="{{ utilisateur.email }}" required>
+    </div>
+    <div class="mb-3">
+        <label for="role" class="form-label">Role</label>
+        <select class="form-control" id="role" name="role" required>
+            <option value="ROLE_USER" {% if utilisateur.getRole() == 'ROLE_USER' %}selected{% endif %}>User</option>
+            <option value="ROLE_ADMIN" {% if utilisateur.getRole() == 'ROLE_ADMIN' %}selected{% endif %}>Admin</option>
+        </select>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-primary">Save changes</button>
+    </div>
+</form>
+
                                             </div>
                                         </div>
                                     </div>
@@ -178,28 +188,29 @@
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                             </div>
                                             <div class="modal-body">
-                                                <form action="{{ path('app_adresse_user_edit', {'id': adresse_user.id}) }}" method="post">
-                                                    <div class="mb-3">
-                                                        <label for="rue" class="form-label">Street</label>
-                                                        <input type="text" class="form-control" id="rue" name="rue" value="{{ adresse_user.rue }}" required>
-                                                    </div>
-                                                    <div class="mb-3">
-                                                        <label for="ville" class="form-label">City</label>
-                                                        <input type="text" class="form-control" id="ville" name="ville" value="{{ adresse_user.ville }}" required>
-                                                    </div>
-                                                    <div class="mb-3">
-                                                        <label for="codePostal" class="form-label">Postal Code</label>
-                                                        <input type="text" class="form-control" id="codePostal" name="codePostal" value="{{ adresse_user.codePostal }}" required>
-                                                    </div>
-                                                    <div class="mb-3">
-                                                        <label for="pays" class="form-label">Country</label>
-                                                        <input type="text" class="form-control" id="pays" name="pays" value="{{ adresse_user.pays }}" required>
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                                        <button type="submit" class="btn btn-primary">Save changes</button>
-                                                    </div>
-                                                </form>
+                                                <form action="{{ path('app_adresse_user_edit', {'id': adresse_user.id}) }}" method="post" class="editAddressForm">
+    <div class="mb-3">
+        <label for="rue" class="form-label">Street</label>
+        <input type="text" class="form-control" id="rue" name="rue" value="{{ adresse_user.rue }}" required>
+    </div>
+    <div class="mb-3">
+        <label for="ville" class="form-label">City</label>
+        <input type="text" class="form-control" id="ville" name="ville" value="{{ adresse_user.ville }}" required>
+    </div>
+    <div class="mb-3">
+        <label for="codePostal" class="form-label">Postal Code</label>
+        <input type="text" class="form-control" id="codePostal" name="codePostal" value="{{ adresse_user.codePostal }}" required>
+    </div>
+    <div class="mb-3">
+        <label for="pays" class="form-label">Country</label>
+        <input type="text" class="form-control" id="pays" name="pays" value="{{ adresse_user.pays }}" required>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-primary">Save changes</button>
+    </div>
+</form>
+
                                             </div>
                                         </div>
                                     </div>
@@ -272,6 +283,92 @@
             }
         }
     });
+
+
+document.addEventListener("DOMContentLoaded", function () {
+    // General Validation Function
+    function validateInput(input, regex, errorMessage) {
+        let isValid = true;
+        input.addEventListener("input", function () {
+            if (!regex.test(input.value)) {
+                input.classList.add("is-invalid");
+                if (!input.nextElementSibling || !input.nextElementSibling.classList.contains("invalid-feedback")) {
+                    let errorDiv = document.createElement("div");
+                    errorDiv.className = "invalid-feedback";
+                    errorDiv.textContent = errorMessage;
+                    input.parentNode.appendChild(errorDiv);
+                }
+                isValid = false;
+            } else {
+                input.classList.remove("is-invalid");
+                if (input.nextElementSibling && input.nextElementSibling.classList.contains("invalid-feedback")) {
+                    input.nextElementSibling.remove();
+                }
+                isValid = true;
+            }
+
+            toggleSaveButton(isValid);
+        });
+    }
+
+    // Function to enable or disable the "Save changes" button
+    function toggleSaveButton(isValid) {
+        const saveButton = document.querySelector('button[type="submit"]');
+        const inputs = document.querySelectorAll('input, select');
+        let allValid = true;
+
+        // Check if all inputs are valid
+        inputs.forEach(input => {
+            if (input.classList.contains("is-invalid") || !input.value.trim()) {
+                allValid = false;
+            }
+        });
+
+        if (allValid) {
+            saveButton.disabled = false;
+        } else {
+            saveButton.disabled = true;
+        }
+    }
+
+    // Validate User Form Inputs
+    function validateUserForm() {
+        validateInput(document.getElementById("nom"), /^[A-Za-zÀ-ÿ -]{2,30}$/, "Please enter a valid name (2-30 characters, letters only).");
+        validateInput(document.getElementById("prenom"), /^[A-Za-zÀ-ÿ -]{2,30}$/, "Please enter a valid surname (2-30 characters, letters only).");
+        validateInput(document.getElementById("email"), /^[^\s@]+@[^\s@]+\.[^\s@]+$/, "Please enter a valid email address.");
+    }
+
+    // Validate Address Form Inputs
+    function validateAddressInputs(modal) {
+        modal.querySelectorAll("input[name^='rue']").forEach(function (input) {
+            validateInput(input, /^.{3,50}$/, "Street name must be between 3-50 characters.");
+        });
+        modal.querySelectorAll("input[name^='ville']").forEach(function (input) {
+            validateInput(input, /^[A-Za-zÀ-ÿ -]{2,50}$/, "City name must contain only letters and be 2-50 characters long.");
+        });
+        modal.querySelectorAll("input[name^='codePostal']").forEach(function (input) {
+            validateInput(input, /^\d{4,6}$/, "Please enter a valid postal code (4-6 digits).");
+        });
+        modal.querySelectorAll("input[name^='pays']").forEach(function (input) {
+            validateInput(input, /^[A-Za-zÀ-ÿ -]{2,50}$/, "Please enter a valid country name.");
+        });
+    }
+
+    // Trigger validation when modals are opened
+    document.querySelectorAll('.modal').forEach(modal => {
+        modal.addEventListener('show.bs.modal', function () {
+            if (modal.id.includes('editUserModal')) {
+                // Apply user validation logic
+                validateUserForm();
+            } else if (modal.id.includes('editAddressModal')) {
+                // Apply address validation logic
+                validateAddressInputs(modal);
+            }
+        });
+    });
+});
+
+
 </script>
 
 {% endblock %}

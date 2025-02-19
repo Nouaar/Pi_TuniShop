@@ -137,7 +137,6 @@ final class FrontController extends AbstractController
         $session = $request->getSession();
         $session->invalidate();
 
-        // Clear authentication token (if using Symfony security)
         $this->container->get('security.token_storage')->setToken(null);
 
         // Clear JWT token cookie if using JWT authentication
@@ -146,6 +145,45 @@ final class FrontController extends AbstractController
 
         return $response;
     }
+
+    #[Route('/delete-account', name: 'delete_account', methods: ['POST'])]
+    public function deleteAccount(Request $request, EntityManagerInterface $entityManager, UtilisateurRepository $repo): JsonResponse
+    {
+        // Get the user ID from the cookie
+        $userId = $request->cookies->get('user_id');
+    
+        if (!$userId) {
+            return new JsonResponse(['status' => 'error', 'message' => 'User session expired. Please log in again.'], 400);
+        }
+    
+        // Retrieve the user based on the ID
+        $user = $repo->find($userId);
+    
+        if (!$user) {
+            return new JsonResponse(['status' => 'error', 'message' => 'User not found.'], 400);
+        }
+    
+        // Remove associated addresses if any
+        foreach ($user->getAdresses() as $adresse) {
+            $entityManager->remove($adresse);
+        }
+    
+        // Remove the user from the database
+        $entityManager->remove($user);
+        $entityManager->flush();
+    
+        // Optionally, clear session and cookies after account deletion
+        $response = new JsonResponse(['status' => 'success', 'message' => 'Account deleted successfully.'], 200);
+        $response->headers->clearCookie('user_id'); 
+        $response->headers->clearCookie('jwt_token');
+        $this->container->get('security.token_storage')->setToken(null);
+
+        $request->getSession()->invalidate(); // Invalidate the session
+    
+        return $response;
+    }
+
+
 
 
 

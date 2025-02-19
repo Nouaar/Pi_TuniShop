@@ -31,9 +31,14 @@ class Utilisateur implements PasswordAuthenticatedUserInterface, UserInterface
 
     #[ORM\Column(length: 255)]
     private ?string $password = null;
+    
+
 
     #[ORM\OneToMany(mappedBy: 'utilisateur', targetEntity: AdresseUser::class, orphanRemoval: true, cascade: ['remove'])]
     private Collection $adresses;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $verificationToken = null; // New field for email verification
 
     public function __construct()
     {
@@ -137,5 +142,18 @@ class Utilisateur implements PasswordAuthenticatedUserInterface, UserInterface
     public function eraseCredentials()
     {
         // Clear temporary sensitive data if needed
+    }
+
+ 
+
+    public function getVerificationToken(): ?string
+    {
+        return $this->verificationToken;
+    }
+
+    public function setVerificationToken(?string $verificationToken): static
+    {
+        $this->verificationToken = $verificationToken;
+        return $this;
     }
 }
