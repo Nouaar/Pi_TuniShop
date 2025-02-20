@@ -73,7 +73,7 @@ final class AuthController extends AbstractController
                 if (in_array('ROLE_ADMIN', $utilisateur->getRoles())) {
                     $response = $this->redirectToRoute('back');
                 } elseif (in_array('ROLE_SELLER', $utilisateur->getRoles())) {
-                    $response = $this->redirectToRoute('productsadd'); // Redirect to seller page
+                    $response = $this->redirectToRoute('product_add'); // Redirect to seller page
                 } else {
                     $response = $this->redirectToRoute('home');
                 }
