@@ -4,7 +4,12 @@
 <head>
     <meta charset="utf-8">
     <title>{{ product.title }} - Product Detail</title>
+    <title>{{ product.title }} - Product Detail</title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet">
+    
     
     <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet">
@@ -72,26 +77,37 @@
                     <p class="mb-4">{{ product.description }}</p>
 
                     <!-- Quantity & Add to Cart -->
-                    <div class="d-flex align-items-center mb-4 pt-2">
-                        <div class="input-group quantity mr-3" style="width: 130px;">
-                            <div class="input-group-btn">
-                                <button class="btn btn-primary btn-minus">
-                                    <i class="fa fa-minus"></i>
-                                </button>
+                  <div class="d-flex align-items-center mb-4 pt-2">
+                        <!-- Formulaire Add to Cart -->
+                        <form action="{{ path('cart_add', {'id': product.id}) }}" method="POST" class="d-flex">
+                            <div class="input-group quantity mr-3" style="width: 130px;">
+                                <div class="input-group-btn">
+                                    <button type="button" class="btn btn-primary btn-minus" onclick="decreaseQuantity()">
+                                        <i class="fa fa-minus"></i>
+                                    </button>
+                                </div>
+                                <input type="text" id="quantity" name="quantity" class="form-control bg-secondary border-0 text-center" value="1">
+                                <div class="input-group-btn">
+                                    <button type="button" class="btn btn-primary btn-plus" onclick="increaseQuantity()">
+                                        <i class="fa fa-plus"></i>
+                                    </button>
+                                </div>
                             </div>
-                            <input type="text" class="form-control bg-secondary border-0 text-center" value="1">
-                            <div class="input-group-btn">
-                                <button class="btn btn-primary btn-plus">
-                                    <i class="fa fa-plus"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <button class="btn btn-primary px-3"><i class="fa fa-shopping-cart mr-1"></i> Add To Cart</button>
-                        <!-- Buy Now Button -->
-                        <a href="{{ path('checkout', {'id': product.id}) }}" class="btn btn-success px-3 ml-2">
-                            <i class="fa fa-credit-card mr-1"></i> Buy Now
-                        </a>
+                            <button type="submit" class="btn btn-primary px-3">
+                                <i class="fa fa-shopping-cart mr-1"></i> Add To Cart
+                            </button>
+                        </form>
+
+                        <!-- Formulaire Buy Now avec espacement -->
+                        <form action="{{ path('checkout_cart') }}" method="GET" class="ml-3">  {# Ajoute un espace à gauche #}
+                            <input type="hidden" name="productId" value="{{ product.id }}">
+                            <button type="submit" class="btn btn-success">
+                                <i class="fa fa-credit-card"></i> Buy Now
+                            </button>
+                        </form>
                     </div>
+
+
                     <!-- Share Section -->
                     <div class="d-flex pt-2">
                         <strong class="text-dark mr-2">Share on:</strong>
@@ -140,9 +156,24 @@
     <script src="{{ asset('lib/easing/easing.min.js') }}"></script>
     <script src="{{ asset('lib/owlcarousel/owl.carousel.min.js') }}"></script>
 
+    <!-- Quantity Button Script -->
+    <script>
+        function increaseQuantity() {
+            let quantityInput = document.getElementById('quantity');
+            quantityInput.value = parseInt(quantityInput.value) + 1;
+        }
+
+        function decreaseQuantity() {
+            let quantityInput = document.getElementById('quantity');
+            let currentValue = parseInt(quantityInput.value);
+            if (currentValue > 1) {
+                quantityInput.value = currentValue - 1;
+            }
+        }
+    </script>
+
     <!-- Template Javascript -->
     <script src="{{ asset('js/main.js') }}"></script>
 
 </body>
-
 </html>

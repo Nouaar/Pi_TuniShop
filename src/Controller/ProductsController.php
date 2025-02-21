@@ -157,7 +157,7 @@ public function editProduct(int $id, Request $request, EntityManagerInterface $e
 
         // Add flash message and redirect
         $this->addFlash('success', 'Product updated successfully!');
-        return $this->renderWithAuth('list_products');
+        return $this->redirectToRoute('list_products');
     }
 
     return $this->renderWithAuth('products/edit_product.html.twig', [
@@ -182,7 +182,7 @@ public function deleteProduct(int $id, EntityManagerInterface $entityManager): R
     $this->addFlash('success', 'Product deleted successfully!');
 
     // Redirect back to the list of products
-    return $this->renderWithAuth('list_products');
+    return $this->redirectToRoute('list_products');
 }
 
 

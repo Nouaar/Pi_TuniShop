@@ -34,69 +34,7 @@
 
 <body>
 
-
-<!-- Logo and Shop Name -->
-<div class="row align-items-center bg-light py-3 px-xl-5 d-none d-lg-flex">
-    <div class="col-lg-4 d-flex align-items-center">
-        <img class="img-fluid mr-3" src="{{ asset('img/logo.png') }}" alt="Logo" style="max-width: 50px;">
-        <a href="{{ path('home') }}" class="text-decoration-none d-block ">
-            <span class="h1 text-uppercase text-dark bg-light px-2">Tuni</span>
-            <span class="h1 text-uppercase text-light bg-primary px-2 ml-n1">Shop</span>
-        </a>
-    </div>
-
-    <!-- Search Bar -->
-    <div class="col-lg-4 col-6 text-left">
-        <form action="{{ path('search') }}">
-            <div class="input-group">
-                <input type="text" class="form-control" placeholder="Search for products" name="query">
-                <div class="input-group-append">
-                    <span class="input-group-text bg-transparent text-primary">
-                        <i class="fa fa-search"></i>
-                    </span>
-                </div>
-            </div>
-        </form>
-    </div>
-</div>
-
-{% include 'utilisateur/edit.html.twig' %}
-
-<!-- Navbar Start -->
-<div class="container-fluid bg-dark mb-30">
-    <div class="row px-xl-5">
-        <div class="col-lg-9">
-            <nav class="navbar navbar-expand-lg bg-dark navbar-dark py-3 py-lg-0 px-0">
-                <a href="{{ path('home') }}" class="text-decoration-none d-block d-lg-none">
-                    <span class="h1 text-uppercase text-dark bg-light px-2">Tuni</span>
-                    <span class="h1 text-uppercase text-light bg-primary px-2 ml-n1">Shop</span>
-                </a>
-                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbarCollapse">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse justify-content-between" id="navbarCollapse">
-                    <div class="navbar-nav mr-auto py-0">
-                        <a href="{{ path('home') }}" class="nav-item nav-link">Home</a>
-                        <a href="{{ path('shop') }}" class="nav-item nav-link">Shop</a>
-                       
-                        
-                        <!-- Add "List Products" with conditional active class -->
-                        <a href="{{ path('list_products') }}" class="nav-item nav-link {% if app.request.attributes.get('_route') == 'list_products' %}active{% endif %}">List Products</a>
-                        
-                        <a href="{{ path('product_add') }}" class="nav-item nav-link">Add Product</a>
-                        
-                        <div class="nav-item dropdown">
-                            <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Pages <i class="fa fa-angle-down mt-1"></i></a>
-                        </div>
-                        <a href="{{ path('contact') }}" class="nav-item nav-link">Contact</a>
-                    </div>
-                    <div class="navbar-nav ml-auto py-0 d-none d-lg-block">
-                    </div>
-                </div>
-            </nav>
-        </div>
-    </div>
-</div>
+{% include 'partials/header.html.twig' %}
 
 
 {% block title %}List of Checkouts{% endblock %}

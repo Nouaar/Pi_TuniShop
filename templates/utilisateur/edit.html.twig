@@ -120,55 +120,137 @@
                                 <div class="d-flex justify-content-between mt-3">
                                     <button type="submit" class="btn btn-primary">Save Changes</button>
                                 </div>
+                                <!-- Button for Deleting User -->
+<button type="button" class="btn btn-danger mt-3" id="delete-account-btn">Delete My Account</button>
                             </form>
 
-                            <script>
-                                let addressCounter = {{ utilisateur.adresses|length }}; // Track number of addresses
+                           <script>
+   document.addEventListener("DOMContentLoaded", function () {
+       document.querySelector("#changePasswordForm").addEventListener("submit", function (event) {
+           event.preventDefault(); // Prevent form from reloading the page
 
-                                // Add address
-                                document.getElementById('add-address').addEventListener('click', function () {
-                                    let container = document.getElementById('addresses-container');
-                                    
-                                    let addressHTML = `
-                                        <div class="address-block mb-4 p-3 border rounded" id="new-address-${addressCounter}">
-                                            <!-- Button for deleting the address -->
-                                            <button type="submit" name="adresses[${addressCounter}][delete]" value="1" class="btn btn-danger">
-                                                Delete this address
-                                            </button>
+           let formData = new FormData(this);
 
-                                            <input type="hidden" name="adresses[${addressCounter}][id]" value=""> <!-- Empty ID for new addresses -->
+           fetch(this.action, {
+               method: "POST",
+               body: formData
+           })
+           .then(response => response.json())
+           .then(data => {
+               let alertContainer = document.querySelector("#passwordChangeAlert");
+               alertContainer.innerHTML = `
+                   <div class="alert alert-${data.status === 'success' ? 'success' : 'danger'} alert-dismissible fade show" role="alert">
+                       ${data.message}
+                       <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                   </div>
+               `;
+               if (data.status === "success") {
+                   document.querySelector("#changePasswordForm").reset();
+               }
+           })
+           .catch(error => console.error("Error:", error));
+       });
 
-                                            <div class="mb-3">
-                                                <div class="form-floating"> <label>Street</label>
-                                                    <input type="text" class="form-control" name="adresses[${addressCounter}][rue]" placeholder="Street">
-                                                    
-                                                </div>
-                                            </div>
-                                            <div class="mb-3">
-                                                <div class="form-floating"><label>City</label>
-                                                    <input type="text" class="form-control" name="adresses[${addressCounter}][ville]" placeholder="City">
-                                                    
-                                                </div>
-                                            </div>
-                                            <div class="mb-3">
-                                                <div class="form-floating"><label>Postal Code</label>
-                                                    <input type="text" class="form-control" name="adresses[${addressCounter}][code_postal]" placeholder="Postal Code">
-                                                    
-                                                </div>
-                                            </div>
-                                            <div class="mb-3">
-                                                <div class="form-floating"> <label>Country</label>
-                                                    <input type="text" class="form-control" name="adresses[${addressCounter}][pays]" placeholder="Country">
-                                                   
-                                                </div>
-                                            </div>
-                                        </div>
-                                    `;
+       document.querySelector("form").addEventListener("submit", function (event) {
+           let isValid = true;
+           let addressBlocks = document.querySelectorAll(".address-block");
 
-                                    container.insertAdjacentHTML('beforeend', addressHTML);
-                                    addressCounter++;
-                                });
-                            </script>
+           addressBlocks.forEach(function (block) {
+               let inputs = block.querySelectorAll("input[type='text']");
+               inputs.forEach(function (input) {
+                   if (input.value.trim() === "") {
+                       isValid = false;
+                       input.classList.add("is-invalid");
+                   } else {
+                       input.classList.remove("is-invalid");
+                   }
+               });
+           });
+
+           if (!isValid) {
+               event.preventDefault();
+               alert("Please fill out all address fields before submitting.");
+           }
+       });
+
+       let addressCounter = {{ utilisateur.adresses|length }}; // Track number of addresses
+
+       // Add address
+       document.getElementById('add-address').addEventListener('click', function () {
+           let container = document.getElementById('addresses-container');
+
+           let addressHTML = `
+               <div class="address-block mb-4 p-3 border rounded" id="new-address-${addressCounter}">
+                   <button type="button" class="btn btn-danger remove-address">Delete this address</button>
+                   <input type="hidden" name="adresses[${addressCounter}][id]" value="">
+                   <div class="mb-3">
+                       <label>Street</label>
+                       <input type="text" class="form-control" name="adresses[${addressCounter}][rue]" placeholder="Street">
+                   </div>
+                   <div class="mb-3">
+                       <label>City</label>
+                       <input type="text" class="form-control" name="adresses[${addressCounter}][ville]" placeholder="City">
+                   </div>
+                   <div class="mb-3">
+                       <label>Postal Code</label>
+                       <input type="text" class="form-control" name="adresses[${addressCounter}][code_postal]" placeholder="Postal Code">
+                   </div>
+                   <div class="mb-3">
+                       <label>Country</label>
+                       <input type="text" class="form-control" name="adresses[${addressCounter}][pays]" placeholder="Country">
+                   </div>
+               </div>
+           `;
+
+           container.insertAdjacentHTML('beforeend', addressHTML);
+           addressCounter++;
+
+           // Add event listener for delete button
+           document.querySelectorAll(".remove-address").forEach(btn => {
+               btn.addEventListener("click", function () {
+                   this.parentElement.remove();
+               });
+           });
+       });
+
+   });
+
+
+document.getElementById('delete-account-btn').addEventListener('click', function() {
+        // Show confirmation dialog
+        if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+            // If user confirms, send the request to delete the account
+            deleteUserAccount();
+        }
+    });
+
+    function deleteUserAccount() {
+        fetch('/delete-account', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest', // Optional: for AJAX requests
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                alert('Your account has been deleted.');
+                window.location.href = '/home'; // Redirect to the homepage
+            } else {
+                alert('An error occurred: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while deleting your account.');
+        });
+    }
+
+
+   
+</script>
+
 
                         {% else %}
                             <p>User not found.</p>
@@ -191,37 +273,60 @@
                 <!-- Alerts Container -->
                 <div id="passwordChangeAlert"></div>
 
-                <!-- Password Change Form -->
-                <form id="changePasswordForm" method="post" action="{{ path('change_password') }}">
-                    <div class="mb-3">
-                        <div class="form-floating">
-                            <input type="password" class="form-control" id="current_password" name="current_password" placeholder="Current Password" required>
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <div class="form-floating">
-                            <input type="password" class="form-control" id="new_password" name="new_password" placeholder="New Password" required>
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <div class="form-floating">
-                            <input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="Confirm New Password" required>
-                        </div>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Change Password</button>
-                </form>
+               <!-- Password Change Form -->
+<form id="changePasswordForm" method="post" action="{{ path('change_password') }}">
+    <div class="mb-3">
+        <div class="form-floating">
+            <input type="password" class="form-control" id="current_password" name="current_password" placeholder="Current Password" required>
+            <label for="current_password">Current Password</label>
+        </div>
+    </div>
+    <div class="mb-3">
+        <div class="form-floating">
+            <input type="password" class="form-control" id="new_password" name="new_password" placeholder="New Password" required pattern="^(?=.*\d).{8,}$">
+            <label for="new_password">New Password</label>
+            <small class="text-danger d-none" id="passwordError">Password must be at least 8 characters long and contain at least 1 number.</small>
+        </div>
+    </div>
+    <div class="mb-3">
+        <div class="form-floating">
+            <input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="Confirm New Password" required>
+            <label for="confirm_password">Confirm New Password</label>
+            <small class="text-danger d-none" id="confirmPasswordError">Passwords do not match.</small>
+        </div>
+    </div>
+    <button type="submit" class="btn btn-primary">Change Password</button>
+</form>
             </div>
         </div>
     </div>
 </div>
 
-
-
-
 <script>
    document.addEventListener("DOMContentLoaded", function () {
     document.querySelector("#changePasswordForm").addEventListener("submit", function (event) {
         event.preventDefault(); // Prevent form from reloading the page
+
+        let newPassword = document.getElementById("new_password").value;
+        let confirmPassword = document.getElementById("confirm_password").value;
+        let passwordError = document.getElementById("passwordError");
+        let confirmPasswordError = document.getElementById("confirmPasswordError");
+
+        let passwordRegex = /^(?=.*\d).{8,}$/; // At least 8 characters and 1 number
+
+        if (!passwordRegex.test(newPassword)) {
+            passwordError.classList.remove("d-none");
+            return;
+        } else {
+            passwordError.classList.add("d-none");
+        }
+
+        if (newPassword !== confirmPassword) {
+            confirmPasswordError.classList.remove("d-none");
+            return;
+        } else {
+            confirmPasswordError.classList.add("d-none");
+        }
 
         let formData = new FormData(this);
 
@@ -245,7 +350,65 @@
         .catch(error => console.error("Error:", error));
     });
 });
+</script>
 
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Real-time validation for profile fields
+        function validateInput(input, regex, errorMessage) {
+            input.addEventListener("input", function () {
+                if (!regex.test(input.value)) {
+                    input.classList.add("is-invalid");
+                    if (!input.nextElementSibling || !input.nextElementSibling.classList.contains("invalid-feedback")) {
+                        let errorDiv = document.createElement("div");
+                        errorDiv.className = "invalid-feedback";
+                        errorDiv.textContent = errorMessage;
+                        input.parentNode.appendChild(errorDiv);
+                    }
+                } else {
+                    input.classList.remove("is-invalid");
+                    if (input.nextElementSibling && input.nextElementSibling.classList.contains("invalid-feedback")) {
+                        input.nextElementSibling.remove();
+                    }
+                }
+            });
+        }
+
+        // Apply validation rules
+        validateInput(document.getElementById("nom"), /^[A-Za-zÀ-ÿ -]{2,30}$/, "Please enter a valid name (2-30 characters, letters only).");
+        validateInput(document.getElementById("prenom"), /^[A-Za-zÀ-ÿ -]{2,30}$/, "Please enter a valid surname (2-30 characters, letters only).");
+        validateInput(document.getElementById("email"), /^[^\s@]+@[^\s@]+\.[^\s@]+$/, "Please enter a valid email address.");
+
+        // Address validation
+        document.querySelectorAll("[name^='adresses']").forEach(function (input) {
+            if (input.name.includes("rue")) {
+                validateInput(input, /^.{3,50}$/, "Street name must be between 3-50 characters.");
+            } else if (input.name.includes("ville")) {
+                validateInput(input, /^[A-Za-zÀ-ÿ -]{2,50}$/, "City name must contain only letters and be 2-50 characters long.");
+            } else if (input.name.includes("code_postal")) {
+                validateInput(input, /^\d{4,6}$/, "Please enter a valid postal code (4-6 digits).");
+            } else if (input.name.includes("pays")) {
+                validateInput(input, /^[A-Za-zÀ-ÿ -]{2,50}$/, "Please enter a valid country name.");
+            }
+        });
+
+        // Ensure validation runs on newly added addresses
+        document.getElementById("add-address").addEventListener("click", function () {
+            setTimeout(() => {
+                document.querySelectorAll("#addresses-container .address-block:last-child input").forEach(input => {
+                    if (input.name.includes("rue")) {
+                        validateInput(input, /^.{3,50}$/, "Street name must be between 3-50 characters.");
+                    } else if (input.name.includes("ville")) {
+                        validateInput(input, /^[A-Za-zÀ-ÿ -]{2,50}$/, "City name must contain only letters and be 2-50 characters long.");
+                    } else if (input.name.includes("code_postal")) {
+                        validateInput(input, /^\d{4,6}$/, "Please enter a valid postal code (4-6 digits).");
+                    } else if (input.name.includes("pays")) {
+                        validateInput(input, /^[A-Za-zÀ-ÿ -]{2,50}$/, "Please enter a valid country name.");
+                    }
+                });
+            }, 100);
+        });
+    });
 </script>
 
 

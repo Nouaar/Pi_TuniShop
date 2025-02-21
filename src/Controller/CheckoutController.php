@@ -12,8 +12,10 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 use App\Service\SecurityService;
+use App\Repository\CheckoutRepository;
 
 class CheckoutController extends AbstractController
 {
@@ -24,70 +26,84 @@ class CheckoutController extends AbstractController
         $this->securityService = $securityService;
     }
     // Renders the checkout form page
-    #[Route('/checkout', name: 'app_checkout')]
-    public function index(EntityManagerInterface $entityManager): Response
-    {
-        // Fetch product data (assuming you want to display product info on the checkout page)
-        $product = $entityManager->getRepository(Products::class)->find(1);  // Example product, adjust as needed
+    // #[Route('/checkout', name: 'app_checkout')]
+    // public function index(EntityManagerInterface $entityManager): Response
+    // {
+    //     // Fetch product data (assuming you want to display product info on the checkout page)
+    //     $product = $entityManager->getRepository(Products::class)->find(1);  // Example product, adjust as needed
         
-        return $this->render('checkout/index.html.twig', [
-            'product' => $product,  // Passing the product to be used in the form
-        ]);
-    }
+    //     return $this->render('checkout/index.html.twig', [
+    //         'product' => $product,  // Passing the product to be used in the form
+    //     ]);
+    // }
 
     // Saves the checkout data into the database
-   
-   #[Route('/checkout/save', name: 'checkout_save', methods: ['POST'])]
-public function saveCheckout(Request $request, EntityManagerInterface $entityManager): Response
+    #[Route('/checkout/save', name: 'checkout_save', methods: ['POST'])]
+public function saveCheckout(Request $request, EntityManagerInterface $entityManager, SessionInterface $session): Response
 {
-    // Get the email from the form
+    // Get user email
     $email = $request->request->get('email');
-    
-    // Fetch the user by email
     $user = $entityManager->getRepository(Utilisateur::class)->findOneBy(['email' => $email]);
 
     if (!$user) {
         return new Response('User not found.', 404);
     }
-    
-    // Fetch the product
-    $productId = $request->request->get('productId');
-    $product = $entityManager->getRepository(Products::class)->find($productId);
-    
-    if (!$product) {
-        return new Response('Product not found.', 404);
+
+    // Get product IDs from the form
+    $productIds = $request->request->all('productIds');
+
+    if (empty($productIds)) {
+        return new Response('No products selected for checkout.', 400);
     }
-    
-    // Create checkout entry
-    $checkout = new Checkout();
-    $checkout->setFirstName($request->request->get('firstName'));
-    $checkout->setSecondName($request->request->get('lastName'));
-    $checkout->setEmail($email);
-    $checkout->setStreet($request->request->get('address'));
-    $checkout->setCity($request->request->get('city'));
-    $checkout->setPostalCode($request->request->get('zipcode'));
-    $checkout->setCountry($request->request->get('country'));
-    $checkout->setIdUser($user);
-    $checkout->setIdProduit($product);
-    
+
+    // Fetch products from DB
+    $products = $entityManager->getRepository(Products::class)->findBy(['id' => $productIds]);
+
+    if (empty($products)) {
+        return new Response('Products not found.', 404);
+    }
+
+    // Create checkout entry for each product
+    foreach ($products as $product) {
+        $checkout = new Checkout();
+        $checkout->setFirstName($request->request->get('firstName'));
+        $checkout->setSecondName($request->request->get('lastName'));
+        $checkout->setEmail($email);
+        $checkout->setStreet($request->request->get('address'));
+        $checkout->setCity($request->request->get('city'));
+        $checkout->setPostalCode($request->request->get('zipcode'));
+        $checkout->setCountry($request->request->get('country'));
+        $checkout->setIdUser($user);
+        $checkout->setIdProduit($product);
+
+        $entityManager->persist($checkout);
+    }
+
     // Save to database
-    $entityManager->persist($checkout);
     $entityManager->flush();
-    
-    // Redirect to the list of checkouts page with user ID
+
+    // Clear cart if checkout was from cart
+    $session->set('cart', []);
+
+    // Redirect to checkouts list
     return $this->redirectToRoute('list_of_checkouts', ['userId' => $user->getId()]);
 }
+    
+
 
     
 #[Route('/listofcheckouts/{userId}', name: 'list_of_checkouts')]
-public function listCheckouts(int $userId, EntityManagerInterface $entityManager): Response
+public function listCheckouts(int $userId, Request $request, EntityManagerInterface $entityManager): Response
 {
+    $session = $request->getSession();
+    $cart = $session->get('cart', []);
     // Fetch checkouts associated with the specific user
     $checkouts = $entityManager->getRepository(Checkout::class)
         ->findBy(['id_user' => $userId]);
 
     return $this->renderWithAuth('checkout/listofcheckouts.html.twig', [
         'checkouts' => $checkouts,
+        'cart' => $cart,
     ], $entityManager);
 }
 
@@ -167,12 +183,15 @@ private function renderWithAuth(string $template, array $params = [], EntityMana
         $utilisateur = $entityManager->getRepository(Utilisateur::class)->find($userId);
     }
 
+    $session = $request->getSession();
+    $cart = $session->get('cart', []);
+
     $params['isAuthenticated'] = $this->securityService->isUserAuthenticated($request);
     $params['utilisateur'] = $utilisateur;
+    $params['cart'] = $cart; // ✅ Ensure cart is passed to all templates
 
     return $this->render($template, $params);
 }
-
 //checkout edit method that returns you to the list of checkouts page while conveying two data: the product ID and the checkouts(necessary for )
 #[Route('/listofcheckouts/product/{productId}', name: 'list_of_checkouts_by_product')]
 public function listCheckoutsByProduct(int $productId, EntityManagerInterface $entityManager): Response
@@ -256,6 +275,40 @@ public function editCheckout(int $id, int $productId, Request $request, EntityMa
     ], $entityManager);
 }
 
+
+#[Route('/checkoutback', name: 'checkout_list')]
+public function checkoutList(CheckoutRepository $checkoutRepository, EntityManagerInterface $entityManager): Response
+{
+    // Fetch all checkouts from the database
+    $checkouts = $checkoutRepository->findAll();
+
+    return $this->renderWithAuth('Back/Admincheckout/checkoutback.html.twig', [
+        'checkouts' => $checkouts,
+    ], $entityManager);
+}
+
+#[Route('/checkout/{id}', name: 'checkout_show')]
+public function checkoutShow(int $id, CheckoutRepository $checkoutRepository, EntityManagerInterface $entityManager): Response
+{
+    // Fetch checkout by ID
+    $checkout = $checkoutRepository->find($id);
+
+    // If checkout does not exist, show an error
+    if (!$checkout) {
+        throw $this->createNotFoundException("Checkout not found!");
+    }
+
+    // Calculate total price
+    $total_price = 0;
+    if ($checkout->getIdProduit()) {
+        $total_price = (float) $checkout->getIdProduit()->getPrice();
+    }
+
+    return $this->renderWithAuth('Back/Admincheckout/checkout_detail.html.twig', [
+        'checkout' => $checkout,
+        'total_price' => $total_price,
+    ], $entityManager);
+}
 
 }
 ?>

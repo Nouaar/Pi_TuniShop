@@ -7,6 +7,58 @@
     <link href="css/SignUp_LogIn_Form.css" rel="stylesheet">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+
+
+    <style>
+.modal {
+    display: none; 
+    position: fixed; 
+    z-index: 1000; /* Make sure it's above other elements */
+    top: 50%; 
+    left: 50%; 
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 20px; 
+    border-radius: 10px; 
+    box-shadow: 0 0 10px gray;
+    width: 300px; /* Adjust as needed */
+}
+
+.modal-content {
+    text-align: center;
+}
+
+.close {
+    float: right;
+    cursor: pointer;
+    font-size: 24px;
+}
+
+.group-input {
+    display: flex;
+    justify-content: space-between;
+}
+
+.group-input .input-box {
+    width: 49%;
+    margin: 10px;
+}
+.error-message{
+    color: red;
+    font-size: 12px;
+    margin-top: 5px;
+    display: block;
+}
+
+#role {
+    padding: 10px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+}
+
+</style>
+
+
 </head>
 
 <body>
@@ -16,57 +68,76 @@
     </button>
     <div class="container">
         <div class="form-box login">
-            <form action="{{ path('app_utilisateur_login') }}" method="POST">
+            <form action="{{ path('app_utilisateur_login') }}" method="POST" onsubmit="return validateLoginForm()">
                 <h1>Login</h1>
-                
+    
                 {% for message in app.flashes('error') %}
                     <div class="alert alert-danger">{{ message }}</div>
                 {% endfor %}
-                
+
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
                 <div class="input-box">
-                    <input type="text" name="email" placeholder="Email" required>
+                    <input type="text" name="email" placeholder="Email" id="login-email">
                     <i class='bx bxs-user'></i>
                 </div>
                 <div class="input-box">
-                    <input type="password" name="mot_de_passe" placeholder="Password" required>
+                    <input type="password" name="mot_de_passe" placeholder="Password" id="login-password">
                     <i class='bx bxs-lock-alt'></i>
                 </div>
                 <div class="forgot-link">
-                    <a href="#">Forgot password?</a>
+                    <a href="#" onclick="openForgotPasswordModal(); return false;">Forgot password?</a>
                 </div>
                 <button type="submit" class="btn">Log In</button>
             </form>
         </div>
 
         <div class="form-box register">
-            <!-- Updated form action to match the registration route -->
-            <form action="{{ path('app_utilisateur_register') }}" method="POST">
+            <form action="{{ path('app_utilisateur_register') }}" method="POST" onsubmit="return validateRegisterForm()">
                 <h1>Sign Up</h1>
 
                 {% for message in app.flashes('error') %}
                     <div class="alert alert-danger">{{ message }}</div>
                 {% endfor %}
-                
+
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token('register') }}">
+
+<div class="group-input d-flex">
                 <div class="input-box">
-                    <input type="text" name="prenom" placeholder="First Name" required>
+                    <input type="text" name="prenom" placeholder="First Name" id="register-prenom">
                     <i class='bx bxs-user'></i>
                 </div>
-                
+
                 <div class="input-box">
-                    <input type="text" name="nom" placeholder="Last Name" required>
+                    <input type="text" name="nom" placeholder="Last Name" id="register-nom">
                     <i class='bx bxs-user'></i>
                 </div>
-                
+</div>
+
+<div class="group-input d-flex">
                 <div class="input-box">
-                    <input type="email" name="email" placeholder="Email" required>
+                    <input type="text" name="email" placeholder="Email" id="register-email">
                     <i class='bx bxs-envelope'></i>
                 </div>
-                
                 <div class="input-box">
-                    <input type="password" name="mot_de_passe" placeholder="Password" required>
+            <select name="role" id="role">
+                <option value="ROLE_USER" selected>Choose role</option>
+                <option value="ROLE_USER" >Buyer</option>
+                <option value="ROLE_SELLER">Seller</option>
+            </select>
+        </div>
+
+</div>
+<div class="group-input d-flex">
+                <div class="input-box">
+                    <input type="password" id="register-password" name="mot_de_passe" placeholder="Password">
                     <i class='bx bxs-lock-alt'></i>
                 </div>
-                
+                <div class="input-box">
+                    <input type="password" id="confirm_password" placeholder="Confirm Password">
+                    <i class='bx bxs-lock-alt'></i>
+                </div>
+                </div>
                 <button type="submit" class="btn">Sign Up</button>
             </form>
         </div>
@@ -86,6 +157,242 @@
         </div>
     </div>
 </div>
+
+
+
+
+<!-- Forgot Password Modal -->
+<div id="forgot-password-modal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeForgotPasswordModal()">&times;</span>
+        <h2>Reset Password</h2>
+        <div class="input-box">
+            <input type="text" id="reset-email" placeholder="Enter your email">
+            <i class='bx bxs-envelope'></i>
+        </div>
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token('forgot_password') }}">
+<button type="button" class="btn" onclick="sendVerificationCode()">Send Code</button>
+
+        <div id="verification-section" style="display: none;">
+            <div class="input-box">
+                <input type="text" id="verification-code" placeholder="Enter verification code">
+                <i class='bx bxs-key'></i>
+            </div>
+            <div class="input-box">
+                <input type="password" id="new-password" placeholder="New Password">
+                <i class='bx bxs-lock-alt'></i>
+            </div>
+            <div class="input-box">
+                <input type="password" id="confirm-new-password" placeholder="Confirm New Password">
+                <i class='bx bxs-lock-alt'></i>
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token('reset_password') }}">
+            <button class="btn" onclick="resetPassword()">Reset Password</button>
+        </div>
+    </div>
+</div>
+</div>
+
+
+
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const loginFormInputs = document.querySelectorAll('.login input');
+    const registerFormInputs = document.querySelectorAll('.register input');
+
+    loginFormInputs.forEach(input => {
+        input.addEventListener('input', () => validateField(input));
+    });
+
+    registerFormInputs.forEach(input => {
+        input.addEventListener('input', () => validateField(input));
+    });
+});
+
+function validateField(input) {
+    let errorMessage = '';
+    
+    if (input.id === 'login-email' || input.id === 'register-email') {
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!input.value.match(emailPattern)) {
+            errorMessage = 'Enter a valid email address.';
+        }
+    }
+
+    if (input.id === 'register-prenom' || input.id === 'register-nom') {
+        if (input.value.trim() === '') {
+            errorMessage = `${input.placeholder} is required.`;
+        }
+    }
+
+    if (input.id === 'register-password') {
+        const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+        if (!input.value.match(passwordPattern)) {
+            errorMessage = 'Password must be at least 8 characters, with at least one letter and one number.';
+        }
+    }
+
+    if (input.id === 'confirm_password') {
+        const password = document.getElementById('register-password').value;
+        if (input.value !== password) {
+            errorMessage = 'Passwords do not match.';
+        }
+    }
+
+    if (input.id === 'login-password' || input.id === 'register-password') {
+        if (input.value.length < 8) {
+            errorMessage = 'Password must be at least 8 characters long.';
+        }
+    }
+
+    if (errorMessage) {
+        showError(input, errorMessage);
+    } else {
+        clearError(input);
+    }
+}
+
+function validateLoginForm() {
+    return validateForm(document.querySelectorAll('.login input'));
+}
+
+function validateRegisterForm() {
+    return validateForm(document.querySelectorAll('.register input'));
+}
+
+function validateForm(inputs) {
+    let isValid = true;
+
+    inputs.forEach(input => {
+        validateField(input);
+        if (input.parentNode.querySelector('.error-message')) {
+            isValid = false;
+        }
+    });
+
+    return isValid;
+}
+
+function showError(input, message) {
+    let errorSpan = input.parentNode.querySelector('.error-message');
+
+    if (!errorSpan) {
+        errorSpan = document.createElement('span');
+        errorSpan.classList.add('error-message');
+        input.parentNode.appendChild(errorSpan);
+    }
+
+    errorSpan.textContent = message;
+    input.style.border = '1px solid red';
+}
+
+function clearError(input) {
+    let errorSpan = input.parentNode.querySelector('.error-message');
+    if (errorSpan) {
+        errorSpan.remove();
+    }
+    input.style.border = '';
+}
+
+
+
+
+
+function openForgotPasswordModal() {
+        var modal = document.getElementById("forgot-password-modal");
+        if (modal) {
+            modal.style.display = "block";
+        } else {
+            console.error("Modal element not found");
+        }
+    }
+
+    function closeForgotPasswordModal() {
+        var modal = document.getElementById("forgot-password-modal");
+        if (modal) {
+            modal.style.display = "none";
+        } else {
+            console.error("Modal element not found");
+        }
+    }
+
+   function sendVerificationCode() {
+    var email = document.getElementById("reset-email").value;
+
+    if (!email) {
+        alert("Please enter your email.");
+        return;
+    }
+
+    fetch('/forgot-password', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: JSON.stringify({ email: email })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert("Verification code sent to your email.");
+            document.getElementById("verification-section").style.display = "block";
+        } else {
+            alert("Failed to send verification code. Please check your email.");
+        }
+    })
+    .catch(error => {
+        console.error("Error:", error);
+        alert("An error occurred. Please try again.");
+    });
+}
+
+
+    function resetPassword() {
+    var email = document.getElementById("reset-email").value;
+    var verificationCode = document.getElementById("verification-code").value;
+    var newPassword = document.getElementById("new-password").value;
+    var confirmNewPassword = document.getElementById("confirm-new-password").value;
+
+    if (!email || !verificationCode || !newPassword || !confirmNewPassword) {
+        alert("Please fill in all fields.");
+        return;
+    }
+
+    if (newPassword !== confirmNewPassword) {
+        alert("Passwords do not match.");
+        return;
+    }
+
+    fetch('/reset-password', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: JSON.stringify({
+            email: email,
+            verification_code: verificationCode,
+            new_password: newPassword
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert("Password has been reset successfully.");
+            window.location.href = "/login"; // Redirect to login page
+        } else {
+            alert("Error: " + data.error);
+        }
+    })
+    .catch(error => {
+        console.error("Error:", error);
+        alert("An error occurred. Please try again.");
+    });
+}
+
+</script>
 <script src="js/SignUp_LogIn_Form.js"></script>
 </body>
 </html>

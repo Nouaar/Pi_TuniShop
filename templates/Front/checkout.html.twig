@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>MultiShop - Online Shop Website Template</title>
+    <title>MultiShop - Checkout</title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <meta content="Free HTML Templates" name="keywords">
     <meta content="Free HTML Templates" name="description">
@@ -13,6 +13,7 @@
 
     <!-- Google Web Fonts -->
     <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 
     <!-- Font Awesome -->
@@ -34,8 +35,8 @@
         <div class="row px-xl-5">
             <div class="col-12">
                 <nav class="breadcrumb bg-light mb-30">
-                    <a class="breadcrumb-item text-dark" href="#">Home</a>
-                    <a class="breadcrumb-item text-dark" href="#">Shop</a>
+                    <a class="breadcrumb-item text-dark" href="{{ path('home') }}">Home</a>
+                    <a class="breadcrumb-item text-dark" href="{{ path('shop') }}">Shop</a>
                     <span class="breadcrumb-item active">Checkout</span>
                 </nav>
             </div>
@@ -52,7 +53,7 @@
                 </h5>
                 <div class="bg-light p-30 mb-5">
                     <form action="{{ path('checkout_save') }}" method="POST">
-                        <!-- First Name -->
+                        <!-- User Billing Information -->
                         <div class="row d-flex">
                             <div class="col-md-6 form-group">
                                 <label>First Name</label>
@@ -70,61 +71,78 @@
                                 <label>E-mail</label>
                                 <input class="form-control" type="email" name="email" value="{{ utilisateur.email }}" placeholder="example@email.com">
                             </div>
-
-                            <!-- Address Line 1 -->
                             <div class="col-md-6 form-group">
                                 <label>Address Line 1</label>
                                 <input class="form-control" type="text" name="address" value="{{ utilisateur.adresses[0].rue ?? '' }}" placeholder="123 Street">
                             </div>
-
-                            <!-- City -->
                             <div class="col-md-6 form-group">
                                 <label>City</label>
+                                <input class="form-control" type="text" name="city" value="{{ utilisateur.adresses[0].ville ?? '' }}" placeholder="New York">
                                 <input class="form-control" type="text" name="city" value="{{ utilisateur.adresses[0].ville ?? '' }}" placeholder="New York">
                             </div>
 
                             <!-- ZIP Code -->
                             <div class="col-md-6 form-group">
                                 <label>ZIP Code</label>
-                                <input class="form-control" type="text" name="zipcode" value="{{ utilisateur.adresses[0].codePostal ?? '' }}" placeholder="123">
+                                <input class="form-control" type="text" name="zipcode" value="{{ utilisateur.adresses[0].codePostal ?? '' }}" placeholder="12345">
                             </div>
 
                             <!-- Country -->
                             <div class="col-md-6 form-group">
                                 <label>Country</label>
                                 <input class="form-control" type="text" name="country" value="{{ utilisateur.adresses[0].pays ?? '' }}" placeholder="USA">
+                                <label>Country</label>
+                                <input class="form-control" type="text" name="country" value="{{ utilisateur.adresses[0].pays ?? '' }}" placeholder="USA">
                             </div>
                         </div>
 
-                        <!-- Product ID (hidden field) -->
-                        <input type="hidden" name="productId" value="{{ product.id }}">
+                        <!-- If coming from "Buy Now", include this single product -->
+                       <!-- If coming from "Buy Now", include this single product -->
+                        {% if product is defined and product is not null %}
+                            <input type="hidden" name="productIds[]" value="{{ product.id }}">
+                        {% endif %}
 
-                        <button type="submit" class="btn btn-block btn-primary font-weight-bold py-3">Place Order</button>
+                        <!-- If coming from the cart, include all products in cart -->
+                        {% for product in cart %}
+                            {% if product is not null %}
+                                <input type="hidden" name="productIds[]" value="{{ product.id }}">
+                            {% endif %}
+                        {% endfor %}
+
+                        <button type="submit" class="btn btn-block btn-primary font-weight-bold py-3">
+                            Place Order
+                        </button>
                     </form>
                 </div>
             </div>
 
-            <!-- Order Total -->
+            <!-- Order Summary -->
             <div class="col-lg-4">
                 <h5 class="section-title position-relative text-uppercase mb-3">
-                    <span class="bg-secondary pr-3">Order Total</span>
+                    <span class="bg-secondary pr-3">Order Summary</span>
                 </h5>
                 <div class="bg-light p-30 mb-5">
+                    <ul class="list-group">
+                        {% for product in cart %}
+                            <li class="list-group-item d-flex justify-content-between">
+                                <span>{{ product.title }} (x{{ product.quantity }})</span>
+                                <strong>${{ product.price * product.quantity }}</strong>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                    <hr>
                     <div class="d-flex justify-content-between">
-                        <div>
-                            <h6>Name of product: {{ product.title }}</h6>
-                            <p>Price: ${{ product.price }}</p>
-                        </div>
-                        <div>
-                            <p>Quantity: 1</p>
-                            <p>Subtotal: ${{ product.price }}</p>
-                            <p>Shipping: $10</p>
-                        </div>
+                        <h6>Subtotal</h6>
+                        <h6>${{ total }}</h6>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <h6>Shipping</h6>
+                        <h6>$10</h6>
                     </div>
                     <hr>
                     <div class="d-flex justify-content-between">
                         <h5>Total</h5>
-                        <h5>${{ product.price + 10 }}</h5>
+                        <h5>${{ total + 10 }}</h5>
                     </div>
                 </div>
             </div>
