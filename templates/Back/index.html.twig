@@ -41,6 +41,13 @@
             {# Initially hidden content #}
             {% include 'Back/AdminUser/EditUser.html.twig' %}
           </div>
+          <div class="col-md-9" id="editproductsContent" style="display:none;">
+            {# Initially hidden content #}
+            {% include 'Back/Adminproducts/editproducts.html.twig' %}
+        </div>
+        <div class="col-md-9" id="editcheckoutContent" style="display:none;">
+            {# Initially hidden content #}
+            {% include 'Back/Admincheckout/checkoutback.html.twig' %}
         </div>
       </div>
 
@@ -55,8 +62,27 @@
       // JavaScript to show EditUser content when button is clicked
       document.getElementById('editUserButton').addEventListener('click', function() {
         document.getElementById('editUserContent').style.display = 'block';
+        document.getElementById('editproductsContent').style.display = 'none';
+        document.getElementById('editcheckoutContent').style.display = 'none';
       });
+       document.getElementById('editproductButton').addEventListener('click', function() {
+        document.getElementById('editproductsContent').style.display = 'block';
+        document.getElementById('editUserContent').style.display = 'none';
+        document.getElementById('editcheckoutContent').style.display = 'none';
+
+      });
+       // JavaScript to show EditUser content when button is clicked
+      document.getElementById('editcheckoutsButton').addEventListener('click', function() {
+        document.getElementById('editcheckoutContent').style.display = 'block';
+        document.getElementById('editUserContent').style.display = 'none';
+        document.getElementById('editproductsContent').style.display = 'none';
+      });
+      
     </script>
+    
+      
+    </script>
+    
   </body>
 
   </html>

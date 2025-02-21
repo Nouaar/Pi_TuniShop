@@ -13,7 +13,9 @@ use App\Repository\UtilisateurRepository;
 use App\Entity\AdresseUser;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface; 
 use Symfony\Component\HttpFoundation\JsonResponse;
-
+use App\Entity\Products;
+use App\Repository\ProductsRepository;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 
 
@@ -34,23 +36,20 @@ final class FrontController extends AbstractController
 
     private function renderWithAuth(string $template, array $params = []): Response
     {
-        // Get the current request
         $request = $this->container->get('request_stack')->getCurrentRequest();
-        
-        // Get the user ID from the cookie
         $userId = $request->cookies->get('user_id');
-        
-        // Default to null if no user ID is found
         $utilisateur = null;
     
-        // If user ID exists, fetch the user from the repository
         if ($userId) {
             $utilisateur = $this->entityManager->getRepository(Utilisateur::class)->find($userId);
         }
     
-        // Add the authenticated user and status to the params
+        $session = $request->getSession();
+        $cart = $session->get('cart', []);
+    
         $params['isAuthenticated'] = $this->securityService->isUserAuthenticated($request);
         $params['utilisateur'] = $utilisateur;
+        $params['cart'] = $cart; // ✅ Ensure cart is passed to all templates
     
         return $this->render($template, $params);
     }
@@ -101,10 +100,80 @@ final class FrontController extends AbstractController
     }
 
     #[Route('/cart', name: 'cart')]
-    public function cart(): Response
+    public function cart(SessionInterface $session): Response
+{
+    // Get cart data from session
+    $cart = $session->get('cart', []);
+
+    // Calculate the total price using 'product' instead of 'item'
+    $total = array_reduce($cart, function ($sum, $product) {
+        return $sum + ($product['price'] * $product['quantity']);
+    }, 0);
+
+    return $this->renderWithAuth('Front/cart.html.twig', [
+        'cart' => $cart,
+        'total' => $total,
+    ]);
+}
+
+
+    #[Route('/cart/add/{id}', name: 'cart_add', methods: ['POST'])]
+    public function addToCart($id, SessionInterface $session, ProductsRepository $productsRepository): Response
     {
-        return $this->renderWithAuth('Front/cart.html.twig');
+        $product = $productsRepository->find($id);
+
+        if (!$product) {
+            throw $this->createNotFoundException('Product not found');
+        }
+
+        $cart = $session->get('cart', []);
+
+        if (isset($cart[$id])) {
+            $cart[$id]['quantity'] += 1;
+        } else {
+            $cart[$id] = [
+                'id' => $product->getId(),
+                'title' => $product->getTitle(),
+                'price' => $product->getPrice(),
+                'image' => $product->getImage(),
+                'quantity' => 1,
+            ];
+        }
+
+        $session->set('cart', $cart);
+
+        return $this->redirectToRoute('cart');
     }
+
+    
+    #[Route('/cart/count', name: 'cart_count', methods: ['GET'])]
+public function cartCount(SessionInterface $session): JsonResponse
+{
+    $cart = $session->get('cart', []);
+    $count = array_sum(array_column($cart, 'quantity'));
+
+    return new JsonResponse(['count' => $count]);
+}
+
+    #[Route('/cart/remove/{id}', name: 'cart_remove', methods: ['POST'])]
+public function removeFromCart($id, SessionInterface $session): Response
+{
+    $cart = $session->get('cart', []);
+
+    if (isset($cart[$id])) {
+        if ($cart[$id]['quantity'] > 1) {
+            $cart[$id]['quantity'] -= 1;
+        } else {
+            unset($cart[$id]);
+        }
+    }
+
+    $session->set('cart', $cart);
+
+    return $this->redirectToRoute('cart');
+}
+
+
 
     #[Route('/search', name: 'search')]
     public function search(): Response
@@ -115,20 +184,96 @@ final class FrontController extends AbstractController
     #[Route('/shop', name: 'shop')]
     public function shop(): Response
     {
-        return $this->renderWithAuth('Front/shop.html.twig');
+        $products = $this->entityManager->getRepository(Products::class)->findAll();
+        return $this->renderWithAuth('Front/shop.html.twig', [
+            'products' => $products,
+        ]);
+    }
+    #[Route('/shop_detail/{id}', name: 'shop_detail')]
+    public function shopDetail(int $id, ProductsRepository $productsRepository): Response
+    {
+        $product = $productsRepository->find($id);
+    
+        if (!$product) {
+            throw $this->createNotFoundException('Product not found');
+        }
+    
+        return $this->renderWithAuth('Front/detail.html.twig', [
+            'product' => $product
+        ]);
+    }
+    #[Route('/cart/update/{id}/{action}', name: 'cart_update')]
+public function updateCart(int $id, string $action, SessionInterface $session, ProductsRepository $productRepo): Response
+{
+    $cart = $session->get('cart', []);
+
+    if (isset($cart[$id])) {
+        if ($action === 'increase') {
+            $cart[$id]['quantity'] += 1;
+        } elseif ($action === 'decrease' && $cart[$id]['quantity'] > 1) {
+            $cart[$id]['quantity'] -= 1;
+        } else {
+            unset($cart[$id]);
+        }
     }
 
-    #[Route('/shop_detail', name: 'shop_detail')]
-    public function shop_detail(): Response
-    {
-        return $this->renderWithAuth('Front/detail.html.twig');
+    $session->set('cart', $cart);
+    return $this->redirectToRoute('cart');
+}
+
+    
+#[Route('/checkout/{id}', name: 'checkout_single')]
+public function checkoutSingle(int $id, EntityManagerInterface $entityManager): Response
+{
+    $product = $entityManager->getRepository(Products::class)->find($id);
+
+    if (!$product) {
+        throw $this->createNotFoundException('Product not found');
     }
 
-    #[Route('/checkout', name: 'checkout')]
-    public function checkout(): Response
-    {
-        return $this->renderWithAuth('Front/checkout.html.twig');
+    return $this->renderWithAuth('Front/checkout.html.twig', [
+        'cart' => [  // Pass a single product as a "cart" array
+            [
+                'id' => $product->getId(),
+                'title' => $product->getTitle(),
+                'price' => $product->getPrice(),
+                'quantity' => 1, // Default quantity for Buy Now
+                'image' => $product->getImage(),
+            ]
+        ],
+        'total' => $product->getPrice() + 10, // Including shipping fee
+    ]);
+}
+
+#[Route('/checkout', name: 'checkout_cart')]
+public function checkoutCart(Request $request, SessionInterface $session, EntityManagerInterface $entityManager): Response
+{
+    // Get cart data from session
+    $cart = $session->get('cart', []);
+
+    // Check if user is directly buying a single product (from "Buy Now")
+    $productId = $request->query->get('productId');
+    $product = null;
+
+    if ($productId) {
+        $product = $entityManager->getRepository(Products::class)->find($productId);
+        if (!$product) {
+            return new Response('Product not found.', 404);
+        }
     }
+
+    // Calculate total price (if coming from cart)
+    $total = array_reduce($cart, function ($sum, $product) {
+        return $sum + ($product['price'] * $product['quantity']);
+    }, 0);
+
+    return $this->renderWithAuth('Front/checkout.html.twig', [
+        'cart' => $cart,
+        'total' => $total + 10, // Adding shipping cost
+        'product' => $product // Pass the single product if "Buy Now" was used
+    ]);
+}
+
 
     #[Route('/logout', name: 'logout')]
     public function logout(Request $request): Response
@@ -137,6 +282,7 @@ final class FrontController extends AbstractController
         $session = $request->getSession();
         $session->invalidate();
 
+        // Clear authentication token (if using Symfony security)
         $this->container->get('security.token_storage')->setToken(null);
 
         // Clear JWT token cookie if using JWT authentication
@@ -145,45 +291,6 @@ final class FrontController extends AbstractController
 
         return $response;
     }
-
-    #[Route('/delete-account', name: 'delete_account', methods: ['POST'])]
-    public function deleteAccount(Request $request, EntityManagerInterface $entityManager, UtilisateurRepository $repo): JsonResponse
-    {
-        // Get the user ID from the cookie
-        $userId = $request->cookies->get('user_id');
-    
-        if (!$userId) {
-            return new JsonResponse(['status' => 'error', 'message' => 'User session expired. Please log in again.'], 400);
-        }
-    
-        // Retrieve the user based on the ID
-        $user = $repo->find($userId);
-    
-        if (!$user) {
-            return new JsonResponse(['status' => 'error', 'message' => 'User not found.'], 400);
-        }
-    
-        // Remove associated addresses if any
-        foreach ($user->getAdresses() as $adresse) {
-            $entityManager->remove($adresse);
-        }
-    
-        // Remove the user from the database
-        $entityManager->remove($user);
-        $entityManager->flush();
-    
-        // Optionally, clear session and cookies after account deletion
-        $response = new JsonResponse(['status' => 'success', 'message' => 'Account deleted successfully.'], 200);
-        $response->headers->clearCookie('user_id'); 
-        $response->headers->clearCookie('jwt_token');
-        $this->container->get('security.token_storage')->setToken(null);
-
-        $request->getSession()->invalidate(); // Invalidate the session
-    
-        return $response;
-    }
-
-
 
 
 
