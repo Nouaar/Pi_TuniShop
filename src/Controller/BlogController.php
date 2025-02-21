@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Controller;
-
+use App\Entity\Commentaire;
 use App\Entity\Blog;
 use App\Form\BlogType;
 use Doctrine\ORM\EntityManagerInterface;
@@ -73,7 +73,7 @@ final class BlogController extends AbstractController
             $em->flush();
 
             $this->addFlash('success', 'Blog created successfully!');
-            return $this->redirectToRoute('blogs');
+            return $this->redirectToRoute('back');
         }
 
         return $this->render('blog/add.html.twig', ['form' => $form->createView()]);
@@ -155,12 +155,31 @@ public function edit(Request $request, Blog $blog, EntityManagerInterface $em): 
         $em->flush();
 
         $this->addFlash('success', 'Blog updated successfully!');
-        return $this->redirectToRoute('blogs');
+        return $this->redirectToRoute('back');
     }
 
     return $this->render('blog/edit.html.twig', [
         'form' => $form->createView(),
         'blog' => $blog,
+    ]);
+}
+
+#[Route('/blog/{id}/comments', name: 'blog_comments')]
+public function commentsList(EntityManagerInterface $entityManager, int $id): Response
+{
+    // Fetch the blog using the provided id
+    $blog = $entityManager->getRepository(Blog::class)->find($id);
+
+    if (!$blog) {
+        throw $this->createNotFoundException('Blog not found');
+    }
+
+    // Fetch only comments related to this blog
+    $comments = $entityManager->getRepository(Commentaire::class)->findBy(['blog' => $blog]);
+
+    return $this->render('Back/admin_blog/listComments.html.twig', [
+        'comments' => $comments,
+        'blog' => $blog, // Pass blog info to the template
     ]);
 }
 

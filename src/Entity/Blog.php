@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Entity;
+use App\Entity\Commentaire;
 use Symfony\Component\Validator\Constraints as Assert;
 use App\Repository\BlogRepository;
 use Doctrine\Common\Collections\ArrayCollection;

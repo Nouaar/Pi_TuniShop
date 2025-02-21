@@ -82,11 +82,20 @@
                                 
                                 <!-- Update Button -->
                             
-                                <!--{#<form action="{{ path('app_blog_update', {'id': blog.id}) }}" method="post" style="display:inline;">#}
+                                <form action="{{ path('blog_update', {'id': blog.id}) }}" method="post" style="display:inline;">
                                     <button type="submit" class="btn btn-secondary btn-sm">
                                         <i class="fas fa-edit"></i> Update
                                     </button>
-                                </form>-->
+                                </form>
+
+
+                                 <!-- consulter comments Button -->
+                            
+                                <form action="{{ path('blog_comments', {'id': blog.id}) }}" method="post" style="display:inline;">
+                                    <button type="submit" class="btn btn-warning btn-sm">
+                                        <i class="fas fa-edit"></i> Comments
+                                    </button>
+                                </form>
 
                                 <!-- View Button for Blog Details -->
                                 <!--{#<form action="{{ path('app_blog_view', {'id': blog.id}) }}" method="get" style="display:inline;">#}
@@ -103,7 +112,7 @@
                     {% endfor %}
                 </tbody>
             </table>
-            <!--{#<a href="{{ path('app_blog_add') }}" class="btn btn-success">Add New Blog</a>#}-->
+           <a href="{{ path('blog_add') }}" class="btn btn-success">Add New Blog</a>
         </div>
     </div>
 

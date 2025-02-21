@@ -64,6 +64,26 @@ class CommentaireController extends AbstractController
             'blog' => $blog
         ]);
     }
-
+    #[Route('/comment/delete/{id}', name: 'comment_delete', methods: ['POST'])]
+    public function delete(EntityManagerInterface $entityManager, int $id): Response
+    {
+        // Fetch the comment by ID
+        $comment = $entityManager->getRepository(Commentaire::class)->find($id);
+    
+        if (!$comment) {
+            throw $this->createNotFoundException('Comment not found');
+        }
+    
+        // Remove the comment from the database
+        $entityManager->remove($comment);
+        $entityManager->flush();
+    
+        // Flash message (optional)
+        $this->addFlash('success', 'Comment deleted successfully.');
+    
+        // Redirect back to the comments list
+        return $this->redirectToRoute('blog_comments', ['id' => $comment->getBlog()->getId()]);
+    }
+    
    
 }
