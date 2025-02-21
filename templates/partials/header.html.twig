@@ -6,6 +6,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
 
+{% set cart_count = cart|length %}
 
 <div class="container-fluid">
 
@@ -20,40 +21,32 @@
             </div>
         </div>
 
+        <!-- Edit Profile -->
+        {% include 'utilisateur/edit.html.twig' %}
 
-
-
-
- {# edit profile #}
-{% include 'utilisateur/edit.html.twig' %}
-
-
-
-
-
-
-            <!-- Wishlist and Cart (mobile view) -->
-            <div class="d-inline-flex align-items-center d-block d-lg-none">
-                <a href="{{ path('wishlist') }}" class="btn px-0 ml-2">
-                    <i class="fas fa-heart text-dark"></i>
-                    <span class="badge text-dark border border-dark rounded-circle" style="padding-bottom: 2px;">0</span>
-                </a>
-                <a href="{{ path('cart') }}" class="btn px-0 ml-2">
-                    <i class="fas fa-shopping-cart text-dark"></i>
-                    <span class="badge text-dark border border-dark rounded-circle" style="padding-bottom: 2px;">0</span>
-                </a>
-            </div>
+        <!-- Wishlist and Cart (mobile view) -->
+        <div class="d-inline-flex align-items-center d-block d-lg-none">
+            <a href="{{ path('wishlist') }}" class="btn px-0 ml-2">
+                <i class="fas fa-heart text-dark"></i>
+                <span class="badge text-dark border border-dark rounded-circle" style="padding-bottom: 2px;">0</span>
+            </a>
+            <a href="{{ path('cart') }}" class="btn px-0 ml-2">
+                <i class="fas fa-shopping-cart text-dark"></i>
+                <span id="cart-count" class="badge text-dark border border-dark rounded-circle" style="padding-bottom: 2px;">
+                    {{ cart_count }}
+                </span>
+            </a>
         </div>
     </div>
 
     <!-- Logo and Shop Name -->
     <div class="row align-items-center bg-light py-3 px-xl-5 d-none d-lg-flex">
         <div class="col-lg-4 d-flex align-items-center">
-            <img class="img-fluid mr-3" src="img/logo.png" alt="Logo" style="max-width: 50px;">
-                <a href="{{ path('home') }}" class="text-decoration-none d-block ">
-                    <span class="h1 text-uppercase text-dark bg-light px-2">Tuni</span>
-                    <span class="h1 text-uppercase text-light bg-primary px-2 ml-n1">Shop</span>
-                </a>
+            <img class="img-fluid mr-3" src="{{ asset('img/logo.png') }}" alt="Logo" style="max-width: 50px;">
+            <a href="{{ path('home') }}" class="text-decoration-none d-block ">
+                <span class="h1 text-uppercase text-dark bg-light px-2">Tuni</span>
+                <span class="h1 text-uppercase text-light bg-primary px-2 ml-n1">Shop</span>
+            </a>
         </div>
 
         <!-- Search Bar -->
@@ -78,10 +71,6 @@
     </div>
 </div>
 <!-- Topbar End -->
-
-
-
-
 
 <!-- Navbar Start -->
 <div class="container-fluid bg-dark mb-30">
@@ -126,12 +115,10 @@
                     <div class="navbar-nav mr-auto py-0">
                         <a href="{{ path('home') }}" class="nav-item nav-link ">Home</a>
                         <a href="{{ path('shop') }}" class="nav-item nav-link">Shop</a>
-                        <a href="{{ path('shop_detail') }}" class="nav-item nav-link">Shop Detail</a>
                         <div class="nav-item dropdown">
                             <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Pages <i class="fa fa-angle-down mt-1"></i></a>
                             <div class="dropdown-menu bg-primary rounded-0 border-0 m-0">
                                 <a href="{{ path('cart') }}" class="dropdown-item">Shopping Cart</a>
-                                <a href="{{ path('checkout') }}" class="dropdown-item">Checkout</a>
                             </div>
                         </div>
                         <a href="{{ path('contact') }}" class="nav-item nav-link">Contact</a>
@@ -143,7 +130,9 @@
                         </a>
                         <a href="{{ path('cart') }}" class="btn px-0 ml-3">
                             <i class="fas fa-shopping-cart text-primary"></i>
-                            <span class="badge text-secondary border border-secondary rounded-circle" style="padding-bottom: 2px;">0</span>
+                            <span id="cart-count" class="badge text-secondary border border-secondary rounded-circle" style="padding-bottom: 2px;">
+                                {{ cart_count }}
+                            </span>
                         </a>
                     </div>
                 </div>
