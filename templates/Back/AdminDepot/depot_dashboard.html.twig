@@ -1,0 +1,114 @@
+<style>
+    /* Custom Styling for Table */
+    .table th {
+        text-align: center;
+        font-weight: bold;
+        background-color: #f8f9fa;
+    }
+
+    .table td {
+        vertical-align: middle;
+    }
+
+    /* Table row hover effect */
+    .table tbody tr:hover {
+        background-color: #f1f3f5;
+    }
+
+    /* Custom Button Styles */
+    .btn i {
+        margin-right: 8px;
+    }
+
+    /* Add custom shadow and smooth card transitions */
+    .card {
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+
+    .card:hover {
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+    }
+</style>
+{% block title %}Depots and product stocks{% endblock %}
+{% block body %}
+<div class="container my-5">
+    <!-- Users Table -->
+    <h1 class="text-center mb-4">Depots</h1>
+
+    <!-- Search Bar for Depots -->
+    <div class="mb-3">
+        <input type="text" id="searchDepots" class="form-control" placeholder="Search Depots...">
+    </div>
+
+    <div class="card shadow-lg rounded-4">
+        <div class="card-body">
+            <table class="table table-striped table-bordered table-hover" id="depotTable">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Adress</th>
+                        <th>stock capacity</th>
+                        <th>date of creation</th>
+                        <th>status</th>
+                        <th>action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for depot in depots %}
+                        <tr>
+                            <td>{{ depot.id }}</td>
+                            <td>{{ depot.nom }}</td>
+                            <td>{{ depot.adresse }}</td>
+                            <td>{{ depot.stockcapacity }}</td>
+                            <td>{{ depot.dateCreation|date('Y-m-d H:i:s') }}</td>
+                            <td>{{ depot.status }}</td>
+                            <td><!-- Delete Button -->
+                                <form action="{{ path('app_depot_delete', {'id': depot.id}) }}" method="post" style="display:inline;">
+                                    <button type="submit" class="btn btn-danger btn-sm">
+                                        <i class="fas fa-trash-alt"></i> Delete
+                                    </button>
+                                </form> 
+                                <form action="{{ path('app_depot_update', {'id': depot.id}) }}" method="post" style="display:inline;">
+                                    <button type="submit" class="btn btn-secondary">
+                                        <i class="fas fa-trash-alt"></i> Upadte
+                                    </button>
+                                </form> 
+                                <form action="{{ path('app_depot_associated_stocks', {'depotId': depot.id}) }}" id ="editStockButton" method="get" style="display:inline;">
+                                    <button type="submit" class="btn btn-warning">
+                                        <i class="fas fa-trash-alt"></i> Consult Stocks
+                                    </button>
+                                </form>
+
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center text-muted">No depots found.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <a href="{{ path('app_add_depot') }}" class="btn btn-success">Add New Depot</a>
+        </div>
+    </div>
+    <script>
+    document.getElementById('searchDepots').addEventListener('keyup', function() {
+    var input = this.value.toLowerCase();
+    var rows = document.getElementById('depotTable').getElementsByTagName('tr');
+
+    for (var i = 1; i < rows.length; i++) { // Start at 1 to skip the table header
+        var nameCell = rows[i].getElementsByTagName('td')[1]; // Column 2 (Depot Name)
+
+        if (nameCell) {
+            var depotName = nameCell.textContent.toLowerCase();
+            rows[i].style.display = depotName.includes(input) ? '' : 'none';
+        }
+    }
+});
+
+    </script>
+
+
+{% endblock %}

@@ -49,6 +49,10 @@
             {# Initially hidden content #}
             {% include 'Back/Admincheckout/checkoutback.html.twig' %}
         </div>
+        <div class="col-md-9" id="editDepotContent" style="display:none;">
+            {# Initially hidden content #}
+            {% include 'Back/AdminDepot/depot_dashboard.html.twig' %}
+          </div>
       </div>
 
       {% include 'partials/_footer.html.twig' %}
@@ -58,24 +62,35 @@
     <script src="js/hoverable-collapse.js"></script>
     <script src="js/template.js"></script>
 
-    <script>
+    <script>//VERY IMPORTANT, controls pageination/page switching, a condition for every button clicked triggers the
+    // the display of a page and the disappearnace of all others
       // JavaScript to show EditUser content when button is clicked
       document.getElementById('editUserButton').addEventListener('click', function() {
         document.getElementById('editUserContent').style.display = 'block';
         document.getElementById('editproductsContent').style.display = 'none';
         document.getElementById('editcheckoutContent').style.display = 'none';
+        document.getElementById('editDepotContent').style.display = 'none';
       });
        document.getElementById('editproductButton').addEventListener('click', function() {
         document.getElementById('editproductsContent').style.display = 'block';
         document.getElementById('editUserContent').style.display = 'none';
         document.getElementById('editcheckoutContent').style.display = 'none';
+        document.getElementById('editDepotContent').style.display = 'none';
 
       });
-       // JavaScript to show EditUser content when button is clicked
+       // JavaScript to show editcheckoutsButtons content when button is clicked
       document.getElementById('editcheckoutsButton').addEventListener('click', function() {
         document.getElementById('editcheckoutContent').style.display = 'block';
         document.getElementById('editUserContent').style.display = 'none';
         document.getElementById('editproductsContent').style.display = 'none';
+        document.getElementById('editDepotContent').style.display = 'none';
+      });
+      // JavaScript to switch to depot_dashboard content when button is clicked
+      document.getElementById('editDepotButton').addEventListener('click', function() {
+        document.getElementById('editDepotContent').style.display = 'block';
+        document.getElementById('editUserContent').style.display = 'none';
+        document.getElementById('editproductsContent').style.display = 'none';
+        document.getElementById('editcheckoutContent').style.display = 'none';
       });
       
     </script>
