@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Admin - Remboursement</title>
+    <link rel="stylesheet" href="vendors/typicons/typicons.css">
+    <link rel="stylesheet" href="vendors/css/vendor.bundle.base.css">
+    <link rel="stylesheet" href="css/vertical-layout-light/style.css">
+    <link rel="shortcut icon" href="images/favicon.png" />
+
+    <style>
+        /* Custom Styling for Table */
+        .table th {
+            text-align: center;
+            font-weight: bold;
+            background-color: #f8f9fa;
+        }
+
+        .table td {
+            vertical-align: middle;
+        }
+
+        /* Table row hover effect */
+        .table tbody tr:hover {
+            background-color: #f1f3f5;
+        }
+
+        /* Button styles */
+        .btn-custom {
+            background-color: #007bff;
+            color: white;
+            border-radius: 5px;
+            padding: 10px 20px;
+            text-decoration: none;
+        }
+
+        .btn-custom:hover {
+            background-color: #0056b3;
+        }
+
+        /* Custom Card Styling */
+        .card {
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Title color */
+        .card-title {
+            color: #343a40;
+        }
+
+        /* Add a custom background color for the container */
+        .container-scroller {
+            background-color: #f8f9fa;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container-scroller">
+        {% include 'partials/_navbar.html.twig' %}
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-3">
+                    {% include 'partials/_sidebar.html.twig' %}
+                </div>
+
+                <div class="col-md-9">
+                    <div class="card shadow-sm p-4">
+                        <h2 class="mb-4 text-uppercase card-title">Créer un Remboursement</h2>
+                        <form method="post" action="{{ path('app_remboursement_newback', {'id': reclamation.id}) }}">
+                            {{ form_start(form) }}
+                            <div class="form-group">
+                                {{ form_label(form.montant) }}
+                                {{ form_widget(form.montant, {
+                                    'attr': {
+                                        'class': isSubmitted and form.montant.vars.errors|length > 0 ? 'form-control is-invalid' : 'form-control'
+                                    }
+                                }) }}
+                                <div class="invalid-feedback">
+                                    {{ form_errors(form.montant) }}
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                {{ form_label(form.mode_remboursement) }}
+                                {{ form_widget(form.mode_remboursement, {
+                                    'attr': {
+                                        'class': isSubmitted and form.mode_remboursement.vars.errors|length > 0 ? 'form-control is-invalid' : 'form-control'
+                                    }
+                                }) }}
+                                <div class="invalid-feedback">
+                                    {{ form_errors(form.mode_remboursement) }}
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                {{ form_label(form.date) }}
+                                {{ form_widget(form.date, {
+                                    'attr': {
+                                        'class': isSubmitted and form.date.vars.errors|length > 0 ? 'form-control is-invalid' : 'form-control'
+                                    }
+                                }) }}
+                                <div class="invalid-feedback">
+                                    {{ form_errors(form.date) }}
+                                </div>
+                            </div>
+                            <input type="hidden" name="id_reclamation" value="{{ reclamation.id }}">
+                            <button type="submit" class="btn btn-primary mt-3">Créer le Remboursement</button>
+                            {{ form_end(form) }}
+                        </form>
+                        <a href="{{ path('back') }}" class="btn-custom mt-3">Retour au Dashboard</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% include 'partials/_footer.html.twig' %}
+    </div>
+
+    <!-- Scripts -->
+    <script src="vendors/js/vendor.bundle.base.js"></script>
+    <script src="js/off-canvas.js"></script>
+    <script src="js/hoverable-collapse.js"></script>
+    <script src="js/template.js"></script>
+</body>
+
+</html>

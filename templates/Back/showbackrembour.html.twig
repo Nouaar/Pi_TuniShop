@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Admin - Remboursement</title>
+  <link rel="stylesheet" href="vendors/typicons/typicons.css">
+  <link rel="stylesheet" href="vendors/css/vendor.bundle.base.css">
+  <link rel="stylesheet" href="css/vertical-layout-light/style.css">
+  <link rel="shortcut icon" href="images/favicon.png" />
+
+  <style>
+    .table th {
+        text-align: center;
+        font-weight: bold;
+        background-color: #f8f9fa;
+    }
+
+    .table td {
+        vertical-align: middle;
+    }
+
+    .table tbody tr:hover {
+        background-color: #f1f3f5;
+    }
+
+    .btn-custom {
+        background-color: #007bff;
+        color: white;
+        border-radius: 5px;
+        padding: 10px 20px;
+        text-decoration: none;
+    }
+
+    .btn-custom:hover {
+        background-color: #0056b3;
+    }
+
+    .card {
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+
+    .card:hover {
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+    }
+
+    .card-title {
+        color: #343a40;
+    }
+
+    .container-scroller {
+        background-color: #f8f9fa;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container-scroller">
+    {% include 'partials/_navbar.html.twig' %}
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-md-3">
+          {% include 'partials/_sidebar.html.twig' %}
+        </div>
+
+        <div class="col-md-9">
+          <div class="card shadow-sm p-4">
+            <h2 class="mb-4 text-uppercase card-title">Remboursement #{{ remboursement.idRemboursement }}</h2>
+            <table class="table table-bordered">
+              <tbody>
+                <tr>
+                  <th>Montant</th>
+                  <td>{{ remboursement.montant }}</td>
+                </tr>
+                <tr>
+                  <th>Mode de Remboursement</th>
+                  <td>{{ remboursement.modeRemboursement }}</td>
+                </tr>
+                <tr>
+                  <th>Date</th>
+                  <td>{{ remboursement.date ? remboursement.date|date('Y-m-d H:i:s') : 'N/A' }}</td>
+                </tr>
+              </tbody>
+            </table>
+            <a href="{{ path('back') }}" class="btn-custom mt-3">Retour au Dashboard</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {% include 'partials/_footer.html.twig' %}
+  </div>
+
+  <script src="vendors/js/vendor.bundle.base.js"></script>
+  <script src="js/off-canvas.js"></script>
+  <script src="js/hoverable-collapse.js"></script>
+  <script src="js/template.js"></script>
+</body>
+
+</html>

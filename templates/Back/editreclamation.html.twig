@@ -1,0 +1,188 @@
+{% block title %}Réclamations et Remboursements{% endblock %}
+
+{% block body %}
+<div class="container my-5">
+    <!-- Réclamations Table -->
+    <h1 class="text-center mb-4">Réclamations</h1>
+
+    <!-- Search Bar for Réclamations -->
+    <div class="mb-3">
+        <input type="text" id="searchReclamations" class="form-control" placeholder="Rechercher Réclamations...">
+    </div>
+
+    <div class="card shadow-lg rounded-4">
+        <div class="card-body">
+            <table class="table table-striped table-bordered table-hover" id="reclamationsTable">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Commande ID</th>
+                        <th>Produit ID</th>
+                        <th>Raison</th>
+                        <th>Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for reclamation in reclamations %}
+                        <tr>
+                            <td>{{ reclamation.id }}</td>
+                            <td>{{ reclamation.idCommande }}</td>
+                            <td>{{ reclamation.idProduit }}</td>
+                            <td>{{ reclamation.raison }}</td>
+                            <td>{{ reclamation.date | date('d-m-Y H:i') }}</td>
+                            <td>
+                                <a href="{{ path('app_reclamation_showback', {'id': reclamation.id}) }}" class="btn btn-info btn-sm">Show</a>
+                                
+                                <!-- Button to Create Remboursement -->
+                                <a href="{{ path('app_remboursement_newback', {'id': reclamation.id}) }}" class="btn btn-success btn-sm">Créer Remboursement</a>
+
+                                <!-- Edit Réclamation Modal -->
+                                <div class="modal fade" id="editReclamationModal{{ reclamation.id }}" tabindex="-1" aria-labelledby="editReclamationModalLabel{{ reclamation.id }}" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="editReclamationModalLabel{{ reclamation.id }}">Edit Réclamation</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <form action="{{ path('app_reclamation_edit', {'id': reclamation.id}) }}" method="post">
+                                                    <div class="mb-3">
+                                                        <label for="raison" class="form-label">Raison</label>
+                                                        <input type="text" class="form-control" id="raison" name="raison" value="{{ reclamation.raison }}" required>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label for="date" class="form-label">Date</label>
+                                                        <input type="text" class="form-control" id="date" name="date" value="{{ reclamation.date | date('Y-m-d H:i:s') }}" required>
+                                                    </div>
+
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                        <button type="submit" class="btn btn-primary">Save changes</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Delete Button -->
+                                <form method="post" action="{{ path('app_reclamation_delete', {'id': reclamation.id}) }}" onsubmit="return confirm('Are you sure you want to delete this item?');">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ reclamation.id) }}">
+                                    <button class="btn btn-danger btn-sm">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center text-muted">No reclamations found.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Remboursements Table -->
+    <h1 class="text-center mb-4">Remboursements</h1>
+
+    <!-- Search Bar for Remboursements -->
+    <div class="mb-3">
+        <input type="text" id="searchRemboursements" class="form-control" placeholder="Rechercher Remboursements...">
+    </div>
+
+    <div class="card shadow-lg rounded-4">
+        <div class="card-body">
+            <table class="table table-striped table-bordered table-hover" id="remboursementsTable">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID Remboursement</th>
+                        <th>Montant</th>
+                        <th>Mode Remboursement</th>
+                        <th>Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for remboursement in remboursements %}
+                        <tr>
+                            <td>{{ remboursement.idRemboursement }}</td>
+                            <td>{{ remboursement.montant }}</td>
+                            <td>{{ remboursement.modeRemboursement }}</td>
+                            <td>{{ remboursement.date | date('d-m-Y H:i') }}</td>
+                            <td>
+                                <!-- Edit Button -->
+                                <a href="{{ path('app_remboursement_editback', {'id': remboursement.idRemboursement}) }}" class="btn btn-sm" style="background-color: #4CAF50; color: white; border-radius: 5px;">Edit</a>
+
+                                <a href="{{ path('app_remboursement_showback', {'id': remboursement.idRemboursement}) }}" class="btn btn-info btn-sm">Show</a>
+
+                                <!-- Delete Button -->
+                                <form method="post" action="{{ path('app_remboursement_delete', {'id': remboursement.idRemboursement }) }}" onsubmit="return confirm('Are you sure you want to delete this item?');">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ remboursement.idRemboursement) }}">
+                                    <button class="btn btn-danger btn-sm">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center text-muted">No remboursements found.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+
+        </div>
+    </div>
+</div>
+
+<script>
+    // Search functionality for Réclamations
+    document.getElementById('searchReclamations').addEventListener('keyup', function() {
+        var input = this.value.toLowerCase();
+        var rows = document.getElementById('reclamationsTable').getElementsByTagName('tr');
+
+        for (var i = 1; i < rows.length; i++) {
+            var cells = rows[i].getElementsByTagName('td');
+            var found = false;
+
+            for (var j = 0; j < cells.length - 1; j++) {
+                if (cells[j].textContent.toLowerCase().includes(input)) {
+                    found = true;
+                    break;
+                }
+            }
+
+            if (found) {
+                rows[i].style.display = '';
+            } else {
+                rows[i].style.display = 'none';
+            }
+        }
+    });
+
+    // Search functionality for Remboursements
+    document.getElementById('searchRemboursements').addEventListener('keyup', function() {
+        var input = this.value.toLowerCase();
+        var rows = document.getElementById('remboursementsTable').getElementsByTagName('tr');
+
+        for (var i = 1; i < rows.length; i++) {
+            var cells = rows[i].getElementsByTagName('td');
+            var found = false;
+
+            for (var j = 0; j < cells.length - 1; j++) {
+                if (cells[j].textContent.toLowerCase().includes(input)) {
+                    found = true;
+                    break;
+                }
+            }
+
+            if (found) {
+                rows[i].style.display = '';
+            } else {
+                rows[i].style.display = 'none';
+            }
+        }
+    });
+</script>
+{% endblock %}

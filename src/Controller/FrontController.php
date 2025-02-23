@@ -5,6 +5,10 @@ namespace App\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use App\Entity\Reclamation;
+use App\Form\ReclamationType;
+
+use App\Repository\ReclamationRepository;
 use Symfony\Component\HttpFoundation\Request;
 use App\Service\SecurityService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -31,8 +35,6 @@ final class FrontController extends AbstractController
     }
 
 
-
-    
 
     private function renderWithAuth(string $template, array $params = []): Response
     {
@@ -69,11 +71,29 @@ final class FrontController extends AbstractController
         return $this->renderWithAuth('Front/about.html.twig');
     }
 
-    #[Route('/contact', name: 'contact')]
-    public function contact(): Response
+    #[Route('/contact', name: 'contact', methods: ['GET', 'POST'])]
+    public function contact(Request $request  , SessionInterface $session): Response
     {
-        return $this->renderWithAuth('Front/contact.html.twig');
+        // Création d'une nouvelle instance de Reclamation
+        $reclamation = new Reclamation();
+        
+        // Création du formulaire pour Reclamation
+        $form = $this->createForm(ReclamationType::class, $reclamation);
+        
+        // Gestion de la soumission du formulaire
+        $form->handleRequest($request);
+    
+        // Vérification si l'utilisateur est authentifié
+        $isAuthenticated = $this->getUser() !== null;
+        $cart = $session->get('cart', []);
+        // Rendre la vue avec le formulaire et l'état de l'authentification
+        return $this->render('Front/contact.html.twig', [
+            'form' => $form->createView(),
+            'isAuthenticated' => $isAuthenticated,
+            'cart' => $cart // Passage de la variable à Twig
+        ]);
     }
+    
 
     #[Route('/help', name: 'help')]
     public function help(): Response

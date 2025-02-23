@@ -41,6 +41,7 @@
             {# Initially hidden content #}
             {% include 'Back/AdminUser/EditUser.html.twig' %}
           </div>
+      
           <div class="col-md-9" id="editproductsContent" style="display:none;">
             {# Initially hidden content #}
             {% include 'Back/Adminproducts/editproducts.html.twig' %}
@@ -49,11 +50,18 @@
             {# Initially hidden content #}
             {% include 'Back/Admincheckout/checkoutback.html.twig' %}
         </div>
+
+
         <div class="col-md-9" id="editDepotContent" style="display:none;">
             {# Initially hidden content #}
             {% include 'Back/AdminDepot/depot_dashboard.html.twig' %}
           </div>
+
       </div>
+              <div  class="col-md-9"  id="editReclamationContent" style="display:none;">
+            {# Initially hidden content #}
+            {% include 'Back/editreclamation.html.twig' %}
+          </div>
 
       {% include 'partials/_footer.html.twig' %}
     </div>
@@ -92,6 +100,15 @@
         document.getElementById('editproductsContent').style.display = 'none';
         document.getElementById('editcheckoutContent').style.display = 'none';
       });
+
+      document.getElementById('editReclamationButton').addEventListener('click', function() {
+    document.getElementById('editReclamationContent').style.display = 'block';
+    document.getElementById('editUserContent').style.display = 'none';
+    document.getElementById('editproductsContent').style.display = 'none';
+    document.getElementById('editDepotContent').style.display = 'none';
+     document.getElementById('editcheckoutContent').style.display = 'none';
+});
+
       
     </script>
     
