@@ -369,6 +369,13 @@
                                 <li class="media mb-3">
                                     <div class="media-body">
                                         <p>{{ commentaire.text }}</p>
+
+                                        <form action="{{ path('comment_delete_front', {'id': commentaire.id}) }}" method="post" style="display:inline;">
+                                    <button type="submit" class="btn btn-danger btn-sm">
+                                        <i class="fas fa-trash-alt"></i> Delete Comment
+                                    </button>
+                                </form> 
+
                                         <p class="text-muted">
                                             <small>📅 Posted on: {{ commentaire.dateCreation|date('F j, Y') }}</small> 
                                             | <small>👍 <span id="comment-likes-{{ commentaire.id }}">{{ commentaire.nbLikes }}</span> Likes</small>
@@ -424,5 +431,5 @@
         });
     });
 </script>
-
+{% include 'partials/footer.html.twig' %}
 {% endblock %}
