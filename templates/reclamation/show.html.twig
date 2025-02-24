@@ -47,7 +47,7 @@
             <div class="col-12">
                 <nav class="breadcrumb bg-light mb-30">
                     <a class="breadcrumb-item text-dark" href="{{ path('home') }}">Home</a>
-                    <span class="breadcrumb-item active">Réclamation</span>
+                    <span class="breadcrumb-item active">Reclamation</span>
                 </nav>
             </div>
         </div>
@@ -57,7 +57,7 @@
     <!-- Reclamation Start -->
     <div class="container-fluid">
         <h2 class="section-title position-relative text-uppercase mx-xl-5 mb-4">
-            <span class="bg-secondary pr-3">Réclamation #{{ reclamation.id }}</span>
+            <span class="bg-secondary pr-3">Reclamation #{{ reclamation.id }}</span>
         </h2>
         <div class="row px-xl-5">
             <div class="col-lg-7 mb-5">
@@ -65,15 +65,15 @@
                     <table class="table">
                         <tbody>
                             <tr>
-                                <th>Id Commande</th>
+                                <th>Id Order</th>
                                 <td>{{ reclamation.idCommande }}</td>
                             </tr>
                             <tr>
-                                <th>Id Produit</th>
+                                <th>Id Product</th>
                                 <td>{{ reclamation.idProduit }}</td>
                             </tr>
                             <tr>
-                                <th>Raison</th>
+                                <th>Reason</th>
                                 <td>{{ reclamation.raison }}</td>
                             </tr>
                             <tr>
@@ -82,8 +82,8 @@
                             </tr>
                         </tbody>
                     </table>
-                    <a href="{{ path('app_reclamation_index') }}" class="btn btn-primary">Retour à la liste</a>
-                    <a href="{{ path('app_reclamation_edit', {'id': reclamation.id}) }}" class="btn btn-warning">Modifier</a>
+                    <a href="{{ path('app_reclamation_index') }}" class="btn btn-primary">Return to list</a>
+                    <a href="{{ path('app_reclamation_edit', {'id': reclamation.id}) }}" class="btn btn-warning">Update</a>
                     {{ include('reclamation/_delete_form.html.twig') }}
                 </div>
             </div>

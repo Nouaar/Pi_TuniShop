@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <title>Admin - Remboursement</title>
+  <title>Admin - Refund </title>
   <link rel="stylesheet" href="vendors/typicons/typicons.css">
   <link rel="stylesheet" href="vendors/css/vendor.bundle.base.css">
   <link rel="stylesheet" href="css/vertical-layout-light/style.css">
@@ -67,15 +67,15 @@
 
         <div class="col-md-9">
           <div class="card shadow-sm p-4">
-            <h2 class="mb-4 text-uppercase card-title">Remboursement #{{ remboursement.idRemboursement }}</h2>
+            <h2 class="mb-4 text-uppercase card-title">Refund #{{ remboursement.idRemboursement }}</h2>
             <table class="table table-bordered">
               <tbody>
                 <tr>
-                  <th>Montant</th>
+                  <th>sum</th>
                   <td>{{ remboursement.montant }}</td>
                 </tr>
                 <tr>
-                  <th>Mode de Remboursement</th>
+                  <th>Refund mode</th>
                   <td>{{ remboursement.modeRemboursement }}</td>
                 </tr>
                 <tr>
@@ -84,7 +84,7 @@
                 </tr>
               </tbody>
             </table>
-            <a href="{{ path('back') }}" class="btn-custom mt-3">Retour au Dashboard</a>
+            <a href="{{ path('back') }}" class="btn-custom mt-3">Return to Dashboard</a>
           </div>
         </div>
       </div>

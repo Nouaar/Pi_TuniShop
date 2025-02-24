@@ -73,19 +73,19 @@
 
         <div class="col-md-9">
           <div class="card shadow-sm p-4">
-            <h2 class="mb-4 text-uppercase card-title">Réclamation #{{ reclamation.id }}</h2>
+            <h2 class="mb-4 text-uppercase card-title">Reclamation #{{ reclamation.id }}</h2>
             <table class="table table-bordered">
               <tbody>
                 <tr>
-                  <th>ID Commande</th>
+                  <th>ID Order</th>
                   <td>{{ reclamation.idCommande }}</td>
                 </tr>
                 <tr>
-                  <th>ID Produit</th>
+                  <th>ID Product</th>
                   <td>{{ reclamation.idProduit }}</td>
                 </tr>
                 <tr>
-                  <th>Raison</th>
+                  <th>Reason</th>
                   <td>{{ reclamation.raison }}</td>
                 </tr>
                 <tr>
@@ -94,7 +94,7 @@
                 </tr>
               </tbody>
             </table>
-            <a href="{{ path('back') }}" class="btn-custom mt-3">Retour au Dashboard</a>
+            <a href="{{ path('back') }}" class="btn-custom mt-3">Return to Dashboard</a>
           </div>
         </div>
       </div>

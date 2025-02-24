@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Réclamation - TuniShop</title>
+    <title>Reclamation - TuniShop</title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <meta content="Réclamation produit" name="keywords">
     <meta content="Réclamation produit" name="description">
@@ -35,7 +35,7 @@
             <div class="col-12">
                 <nav class="breadcrumb bg-light mb-30">
                     <a class="breadcrumb-item text-dark" href="#">Home</a>
-                    <span class="breadcrumb-item active">Réclamation</span>
+                    <span class="breadcrumb-item active">Reclamation</span>
                 </nav>
             </div>
         </div>
@@ -44,7 +44,7 @@
 
     <!-- Reclamation Start -->
     <div class="container-fluid">
-        <h2 class="section-title position-relative text-uppercase mx-xl-5 mb-4"><span class="bg-secondary pr-3">Faire une Réclamation</span></h2>
+        <h2 class="section-title position-relative text-uppercase mx-xl-5 mb-4"><span class="bg-secondary pr-3">Make a reclamation</span></h2>
         <div class="row px-xl-5">
             <div class="col-lg-7 mb-5">
                 <div class="contact-form bg-light p-30">
@@ -54,23 +54,23 @@
                     <form action="{{ path('app_reclamation_new') }}" method="post">
                         {{ form_start(form) }}
                         <div class="control-group">
-                            {{ form_row(form.id_commande, {'attr': {'class': 'form-control', 'placeholder': 'ID Commande'}}) }}
+                            {{ form_row(form.id_commande, {'attr': {'class': 'form-control', 'placeholder': 'ID Order'}}) }}
                             <p class="help-block text-danger"></p>
                         </div>
                         <div class="control-group">
-                            {{ form_row(form.id_produit, {'attr': {'class': 'form-control', 'placeholder': 'ID Produit'}}) }}
+                            {{ form_row(form.id_produit, {'attr': {'class': 'form-control', 'placeholder': 'ID Produt'}}) }}
                             <p class="help-block text-danger"></p>
                         </div>
                         <div class="control-group">
-                            {{ form_row(form.raison, {'attr': {'class': 'form-control', 'placeholder': 'Raison de la Réclamation'}}) }}
+                            {{ form_row(form.raison, {'attr': {'class': 'form-control', 'placeholder': 'Reason of reclamation'}}) }}
                             <p class="help-block text-danger"></p>
                         </div>
                         <div class="control-group">
-                            {{ form_row(form.date, {'attr': {'class': 'form-control', 'placeholder': 'Date de la réclamation'}}) }}
+                            {{ form_row(form.date, {'attr': {'class': 'form-control', 'placeholder': 'Date '}}) }}
                             <p class="help-block text-danger"></p>
                         </div>
                         <div>
-                            <button class="btn btn-primary py-2 px-4" type="submit">📩 Envoyer la Réclamation</button>
+                            <button class="btn btn-primary py-2 px-4" type="submit">📩 send  Reclamation</button>
                         </div>
                         {{ form_end(form) }}
                     </form>
