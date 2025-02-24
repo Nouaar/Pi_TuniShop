@@ -13,6 +13,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Knp\Snappy\Pdf;
 
 use App\Service\SecurityService;
 use App\Repository\CheckoutRepository;
@@ -39,95 +40,106 @@ class CheckoutController extends AbstractController
 
     // Saves the checkout data into the database
     #[Route('/checkout/save', name: 'checkout_save', methods: ['POST'])]
-public function saveCheckout(Request $request, EntityManagerInterface $entityManager, SessionInterface $session): Response
-{
-    // Get user email
-    $email = $request->request->get('email');
-    $user = $entityManager->getRepository(Utilisateur::class)->findOneBy(['email' => $email]);
-
-    if (!$user) {
-        return new Response('User not found.', 404);
-    }
-
-    // Get product IDs from the form
-    $productIds = $request->request->all('productIds');
-
-    if (empty($productIds)) {
-        return new Response('No products selected for checkout.', 400);
-    }
-
-    // Fetch products from DB
-    $products = $entityManager->getRepository(Products::class)->findBy(['id' => $productIds]);
-
-    if (empty($products)) {
-        return new Response('Products not found.', 404);
-    }
-
-    // Create checkout entry for each product
-    foreach ($products as $product) {
-        $checkout = new Checkout();
-        $checkout->setFirstName($request->request->get('firstName'));
-        $checkout->setSecondName($request->request->get('lastName'));
-        $checkout->setEmail($email);
-        $checkout->setStreet($request->request->get('address'));
-        $checkout->setCity($request->request->get('city'));
-        $checkout->setPostalCode($request->request->get('zipcode'));
-        $checkout->setCountry($request->request->get('country'));
-        $checkout->setIdUser($user);
-        $checkout->setIdProduit($product);
-
-        $entityManager->persist($checkout);
-    }
-
-    // Save to database
-    $entityManager->flush();
-
-    // Clear cart if checkout was from cart
-    $session->set('cart', []);
-
-    // Redirect to checkouts list
-    return $this->redirectToRoute('list_of_checkouts', ['userId' => $user->getId()]);
-}
+    public function saveCheckout(Request $request, EntityManagerInterface $entityManager, SessionInterface $session): Response
+    {
+        $email = $request->request->get('email');
+        $user = $entityManager->getRepository(Utilisateur::class)->findOneBy(['email' => $email]);
     
-
-
+        if (!$user) {
+            return new Response('User not found.', 404);
+        }
+    
+        $productIds = $request->request->all('productIds');
+    
+        if (empty($productIds)) {
+            return new Response('No products selected for checkout.', 400);
+        }
+    
+        $products = $entityManager->getRepository(Products::class)->findBy(['id' => $productIds]);
+    
+        if (empty($products)) {
+            return new Response('Products not found.', 404);
+        }
+    
+        // ✅ Generate unique checkout ID for this session
+        $checkoutId = time();
+    
+        foreach ($products as $product) {
+            $checkout = new Checkout();
+            $checkout->setCheckoutId($checkoutId);
+            $checkout->setFirstName($request->request->get('firstName'));
+            $checkout->setSecondName($request->request->get('lastName'));
+            $checkout->setEmail($email);
+            $checkout->setStreet($request->request->get('address'));
+            $checkout->setCity($request->request->get('city'));
+            $checkout->setPostalCode($request->request->get('zipcode'));
+            $checkout->setCountry($request->request->get('country'));
+            $checkout->setIdUser($user);
+            $checkout->setIdProduit($product);
+    
+            $entityManager->persist($checkout);
+        }
+    
+        $entityManager->flush();
+        $session->set('cart', []);
+    
+        return $this->redirectToRoute('list_of_checkouts', ['userId' => $user->getId()]);
+    }
     
 #[Route('/listofcheckouts/{userId}', name: 'list_of_checkouts')]
 public function listCheckouts(int $userId, Request $request, EntityManagerInterface $entityManager): Response
 {
     $session = $request->getSession();
     $cart = $session->get('cart', []);
-    // Fetch checkouts associated with the specific user
-    $checkouts = $entityManager->getRepository(Checkout::class)
-        ->findBy(['id_user' => $userId]);
+
+    // Fetch all checkouts for the user
+    $checkouts = $entityManager->getRepository(Checkout::class)->findBy(['id_user' => $userId]);
+
+    // Ensure checkouts exist
+    if (!$checkouts) {
+        $checkouts = [];
+    }
+
+    // Group checkouts by checkoutId
+    $groupedCheckouts = [];
+    foreach ($checkouts as $checkout) {
+        $checkoutId = $checkout->getCheckoutId();
+
+        if (!isset($groupedCheckouts[$checkoutId])) {
+            $groupedCheckouts[$checkoutId] = [
+                'checkoutId' => $checkoutId,
+                'user' => $checkout,
+                'products' => [],
+                'totalPrice' => 0
+            ];
+        }
+
+        $groupedCheckouts[$checkoutId]['products'][] = $checkout->getIdProduit();
+        $groupedCheckouts[$checkoutId]['totalPrice'] += $checkout->getIdProduit()->getPrice();
+    }
 
     return $this->renderWithAuth('checkout/listofcheckouts.html.twig', [
-        'checkouts' => $checkouts,
+        'groupedCheckouts' => $groupedCheckouts, // ✅ Correct variable name
         'cart' => $cart,
     ], $entityManager);
 }
-
-
+    
 //update for frontend checkout list page
 
 #[Route('/checkout/update/{id}/{productId}', name: 'checkout_update_frontend')]
 public function updateCheckout(int $id, int $productId, Request $request, EntityManagerInterface $entityManager): Response
 {
-    // Fetch the checkout entity by id
     $checkout = $entityManager->getRepository(Checkout::class)->find($id);
     if (!$checkout) {
         throw $this->createNotFoundException('Checkout not found');
     }
 
-    // Fetch the associated product if needed
     $product = $entityManager->getRepository(Products::class)->find($productId);
     if (!$product) {
         throw $this->createNotFoundException('Product not found');
     }
 
-    // Handle form submission for updating checkout details
     if ($request->isMethod('POST')) {
-        // Update the checkout details here
         $checkout->setFirstName($request->request->get('firstName'));
         $checkout->setSecondName($request->request->get('secondName'));
         $checkout->setEmail($request->request->get('email'));
@@ -135,13 +147,10 @@ public function updateCheckout(int $id, int $productId, Request $request, Entity
         $checkout->setCity($request->request->get('city'));
         $checkout->setPostalCode($request->request->get('postalCode'));
         $checkout->setCountry($request->request->get('country'));
-        // Optionally update the product if necessary
         $checkout->setIdProduit($product);
 
-        // Persist the changes to the database
         $entityManager->flush();
 
-        // Redirect to the list of checkouts page
         return $this->redirectToRoute('list_of_checkouts', ['userId' => $checkout->getIdUser()->getId()]);
     }
 
@@ -151,27 +160,50 @@ public function updateCheckout(int $id, int $productId, Request $request, Entity
     ]);
 }
 
-
-
-
-//delete for frontend checkout list page
+// Delete Checkout
 #[Route('/checkout/remove/{id}', name: 'checkout_remove')]
 public function removeCheckout(int $id, EntityManagerInterface $entityManager): Response
 {
-    // Fetch the checkout entity by id
     $checkout = $entityManager->getRepository(Checkout::class)->find($id);
     if (!$checkout) {
         throw $this->createNotFoundException('Checkout not found');
     }
 
-    // Remove the checkout from the database
     $entityManager->remove($checkout);
     $entityManager->flush();
 
-    // Redirect back to the list of checkouts page
     return $this->redirectToRoute('list_of_checkouts', ['userId' => $checkout->getIdUser()->getId()]);
 }
 
+
+
+#[Route('/checkout/pdf/{checkoutId}', name: 'checkout_pdf')]
+public function generatePdf(int $checkoutId, EntityManagerInterface $entityManager, Pdf $pdf): Response
+{
+    // Fetch checkout details
+    $checkouts = $entityManager->getRepository(Checkout::class)->findBy(['checkoutId' => $checkoutId]);
+    if (!$checkouts) {
+        throw $this->createNotFoundException('Checkout not found.');
+    }
+
+    $checkout = $checkouts[0]; // Get first entry
+    $totalPrice = array_reduce($checkouts, fn($sum, $c) => $sum + $c->getIdProduit()->getPrice(), 0);
+
+    // Render the PDF template
+    $html = $this->renderView('checkout/pdf.html.twig', [
+        'checkout' => $checkout,
+        'products' => array_map(fn($c) => $c->getIdProduit(), $checkouts),
+        'totalPrice' => $totalPrice
+    ]);
+
+    // Generate PDF
+    $pdfContent = $pdf->getOutputFromHtml($html);
+
+    return new Response($pdfContent, 200, [
+        'Content-Type' => 'application/pdf',
+        'Content-Disposition' => 'attachment; filename="checkout_' . $checkoutId . '.pdf"'
+    ]);
+}
 
 private function renderWithAuth(string $template, array $params = [], EntityManagerInterface $entityManager): Response
 {

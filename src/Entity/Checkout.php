@@ -13,6 +13,9 @@ class Checkout
     #[ORM\Column]
     private ?int $id = null;
 
+    #[ORM\Column(type: "bigint")] // Store unique checkout session ID
+    private ?int $checkoutId = null;
+
     #[ORM\Column(length: 255)]
     private ?string $first_name = null;
 
@@ -34,7 +37,6 @@ class Checkout
     #[ORM\Column(length: 255)]
     private ?string $country = null;
 
-    // ✅ Reference the User entity properly
     #[ORM\ManyToOne(targetEntity: Utilisateur::class)]
     #[ORM\JoinColumn(name: "id_user", referencedColumnName: "id", nullable: false)]
     private ?Utilisateur $id_user = null;
@@ -43,105 +45,83 @@ class Checkout
     #[ORM\JoinColumn(name: "id_produit", referencedColumnName: "id")]
     private ?Products $id_produit = null;
 
-    public function getId(): ?int
+    public function getId(): ?int { return $this->id; }
+
+    public function getCheckoutId(): ?int { return $this->checkoutId; }
+
+    public function setCheckoutId(int $checkoutId): self
     {
-        return $this->id;
+        $this->checkoutId = $checkoutId;
+        return $this;
     }
 
-    public function getFirstName(): ?string
-    {
-        return $this->first_name;
-    }
+    public function getFirstName(): ?string { return $this->first_name; }
 
-    public function setFirstName(string $first_name): static
+    public function setFirstName(string $first_name): self
     {
         $this->first_name = $first_name;
         return $this;
     }
 
-    public function getSecondName(): ?string
-    {
-        return $this->second_name;
-    }
+    public function getSecondName(): ?string { return $this->second_name; }
 
-    public function setSecondName(string $second_name): static
+    public function setSecondName(string $second_name): self
     {
         $this->second_name = $second_name;
         return $this;
     }
 
-    public function getEmail(): ?string
-    {
-        return $this->email;
-    }
+    public function getEmail(): ?string { return $this->email; }
 
-    public function setEmail(string $email): static
+    public function setEmail(string $email): self
     {
         $this->email = $email;
         return $this;
     }
 
-    public function getStreet(): ?string
-    {
-        return $this->street;
-    }
+    public function getStreet(): ?string { return $this->street; }
 
-    public function setStreet(string $street): static
+    public function setStreet(string $street): self
     {
         $this->street = $street;
         return $this;
     }
 
-    public function getCity(): ?string
-    {
-        return $this->city;
-    }
+    public function getCity(): ?string { return $this->city; }
 
-    public function setCity(string $city): static
+    public function setCity(string $city): self
     {
         $this->city = $city;
         return $this;
     }
 
-    public function getPostalCode(): ?string
-    {
-        return $this->postal_code;
-    }
+    public function getPostalCode(): ?string { return $this->postal_code; }
 
-    public function setPostalCode(string $postal_code): static
+    public function setPostalCode(string $postal_code): self
     {
         $this->postal_code = $postal_code;
         return $this;
     }
 
-    public function getCountry(): ?string
-    {
-        return $this->country;
-    }
+    public function getCountry(): ?string { return $this->country; }
 
-    public function setCountry(string $country): static
+    public function setCountry(string $country): self
     {
         $this->country = $country;
         return $this;
     }
 
-    public function getIdUser(): ?Utilisateur
-    {
-        return $this->id_user;
-    }
+    public function getIdUser(): ?Utilisateur { return $this->id_user; }
 
-    public function setIdUser(Utilisateur $id_user): static
+    public function setIdUser(Utilisateur $id_user): self
     {
         $this->id_user = $id_user;
         return $this;
     }
 
-    public function getIdProduit(): ?Products
-    {
-        return $this->id_produit;
-    }
+    public function getIdProduit(): ?Products { return $this->id_produit; }
 
-    public function setIdProduit(?Products $id_produit): static
+    public function setIdProduit(?Products $id_produit): self
     {
         $this->id_produit = $id_produit;
         return $this;

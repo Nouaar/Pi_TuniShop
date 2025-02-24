@@ -36,62 +36,106 @@
 
 {% include 'partials/header.html.twig' %}
 
-
-{% block title %}List of Checkouts{% endblock %}
-
 {% block body %}
-    <div class="container my-5">
-        <h1 class="text-center mb-4">List of Checkouts</h1>
+<div class="container my-5">
+    <h1 class="text-center mb-4">Checkout List</h1>
 
-        <!-- Table Container -->
-        <div class="d-flex justify-content-center">
-            <div class="table-responsive">
-                <!-- Bootstrap Table Classes -->
-                <table class="table table-bordered table-striped table-hover shadow-sm">
-                    <thead class="thead-dark">
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped table-hover shadow-sm">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Checkout ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>City</th>
+                    <th>Total Price</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if groupedCheckouts is empty %}
+                    <tr>
+                        <td colspan="6" class="text-center">No checkouts found.</td>
+                    </tr>
+                {% else %}
+                    {% for checkoutId, checkoutData in groupedCheckouts %}
                         <tr>
-                            <th>First Name</th>
-                            <th>Last Name</th>
-                            <th>Email</th>
-                            <th>Street</th>
-                            <th>City</th>
-                            <th>Postal Code</th>
-                            <th>Country</th>
-                            <th>Product</th>
+                            <td>#{{ checkoutId }}</td>
+                            <td>{{ checkoutData.user.firstName }} {{ checkoutData.user.secondName }}</td>
+                            <td>{{ checkoutData.user.email }}</td>
+                            <td>{{ checkoutData.user.city }}</td>
+                            <td>${{ checkoutData.totalPrice }}</td>
+                            <td>
+                                <!-- Show Details Button -->
+                                <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#checkoutDetailsModal{{ checkoutId }}">
+                                    Show Details
+                                </button>
+
+                                <!-- Update Button -->
+                                <a href="{{ path('checkout_update_frontend', {'id': checkoutData.user.id, 'productId': checkoutData.products|first.id}) }}" 
+                                   class="btn btn-warning btn-sm">
+                                   Edit
+                                </a>
+
+                                <!-- Delete Button -->
+                                <form action="{{ path('checkout_remove', {'id': checkoutData.user.id}) }}" method="POST" style="display:inline;">
+                                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this checkout?')">
+                                        Delete
+                                    </button>
+                                </form>
+
+                                <!-- PDF Download Button -->
+                                <a href="{{ path('checkout_pdf', {'checkoutId': checkoutId}) }}" class="btn btn-primary btn-sm">
+                                    Download PDF
+                                </a>
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        {% for checkout in checkouts %}
-                            <tr>
-                                <td>{{ checkout.firstName }}</td>
-                                <td>{{ checkout.secondName }}</td>
-                                <td>{{ checkout.email }}</td>
-                                <td>{{ checkout.street }}</td>
-                                <td>{{ checkout.city }}</td>
-                                <td>{{ checkout.postalCode }}</td>
-                                <td>{{ checkout.country }}</td>
-                                <td>{{ checkout.idProduit.title ?? 'N/A' }}</td>
-                                 <td>
-                                    <a href="{{ path('checkout_update_frontend', {'id': checkout.id, 'productId': checkout.idProduit.id}) }}" class="btn btn-warning btn-sm">Edit</a>
 
-                                    <!-- Delete Button -->
-                                    <form action="{{ path('checkout_remove', {'id': checkout.id}) }}" method="POST" style="display:inline;">
-                                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this checkout?')">Delete</button>
-                                    </form>
-                                  </td>
- 
-                            </tr>
-                        {% else %}
-                            <tr>
-                                <td colspan="8" class="text-center">No checkouts found.</td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
+                        <!-- Modal for Checkout Details -->
+                        <div class="modal fade" id="checkoutDetailsModal{{ checkoutId }}" tabindex="-1" aria-labelledby="checkoutDetailsLabel{{ checkoutId }}" aria-hidden="true">
+                            <div class="modal-dialog modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">📦 Checkout Details (ID: #{{ checkoutId }})</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p><strong>👤 Name:</strong> {{ checkoutData.user.firstName }} {{ checkoutData.user.secondName }}</p>
+                                        <p><strong>📧 Email:</strong> {{ checkoutData.user.email }}</p>
+                                        <p><strong>🌆 City:</strong> {{ checkoutData.user.city }}</p>
+                                        <hr>
+                                        <h5>🛍️ Products Ordered:</h5>
+                                        <ul class="list-group">
+                                            {% set modalTotalPrice = 0 %}
+                                            {% for product in checkoutData.products %}
+                                                {% if product is not null %}
+                                                    {% set modalTotalPrice = modalTotalPrice + product.price %}
+                                                    <li class="list-group-item d-flex justify-content-between">
+                                                        <span>{{ product.title }} - ${{ product.price }}</span>
+                                                        <strong>${{ product.price }}</strong>
+                                                    </li>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </ul>
+                                        <hr>
+                                        <h5>💰 Total Price: ${{ modalTotalPrice }}</h5>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            </tbody>
+        </table>
     </div>
+</div>
 
-    {% include 'partials/footer.html.twig' %}
 {% endblock %}
+
+{% include 'partials/footer.html.twig' %}
+
 </body>
+</html>
