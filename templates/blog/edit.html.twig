@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Admin</title>
+  <link rel="stylesheet" href="vendors/typicons/typicons.css">
+  <link rel="stylesheet" href="vendors/css/vendor.bundle.base.css">
+  <link rel="stylesheet" href="css/vertical-layout-light/style.css">
+  <link rel="shortcut icon" href="images/favicon.png" />
+
+  <style>
+    /* Custom Styling for Table */
+    .table th {
+      text-align: center;
+      font-weight: bold;
+      background-color: #f8f9fa;
+    }
+
+    .table td {
+      vertical-align: middle;
+    }
+
+    /* Table row hover effect */
+    .table tbody tr:hover {
+      background-color: #f1f3f5;
+    }
+
+    /* Button styles */
+    .btn-custom {
+      background-color: #007bff;
+      color: white;
+      border-radius: 5px;
+      padding: 10px 20px;
+      text-decoration: none;
+    }
+
+    .btn-custom:hover {
+      background-color: #0056b3;
+    }
+
+    /* Custom Card Styling */
+    .card {
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+    }
+
+    .card:hover {
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Title color */
+    .card-title {
+      color: #343a40;
+    }
+
+    /* Add a custom background color for the container */
+    .container-scroller {
+      background-color: #f8f9fa;
+    }
+
+    /* Adjust Form Container */
+    .form-container {
+      background-color: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Form button spacing */
+    .form-container button {
+      margin-right: 10px;
+    }
+
+    /* Card Container */
+    .card-container {
+      margin-top: 20px;
+    }
+
+    /* Image Preview */
+    .img-thumbnail {
+      width: 150px;
+      height: auto;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container-scroller">
+    {% include 'partials/_navbar.html.twig' %}
+    
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-md-3">
+          {% include 'partials/_sidebar.html.twig' %}
+        </div>
+
+        <div class="col-md-9">
+          <!-- Main Content -->
+          <div class="container mt-4">
+            <div class="form-container">
+              <h2>Edit Blog Post</h2>
+
+              {{ form_start(form, {'attr': {'enctype': 'multipart/form-data'}}) }}
+              
+              <div class="mb-3">
+                {{ form_label(form.titre) }}
+                {{ form_widget(form.titre, {'attr': {'class': 'form-control'}}) }}
+                {{ form_errors(form.titre) }}
+              </div>
+
+              <div class="mb-3">
+                {{ form_label(form.description) }}
+                {{ form_widget(form.description, {'attr': {'class': 'form-control'}}) }}
+                {{ form_errors(form.description) }}
+              </div>
+
+              <div class="mb-3">
+                {{ form_label(form.image) }}
+                {{ form_widget(form.image, {'attr': {'class': 'form-control'}}) }}
+                {{ form_errors(form.image) }}
+              </div>
+
+              {% if blog.image %}
+                <p>Current Image:</p>
+                <img src="{{ asset(blog.image) }}" alt="Blog Image" class="img-thumbnail">
+              {% endif %}
+
+              <div class="form-buttons">
+                <button type="submit" class="btn btn-success">Update</button>
+                <a href="{{ path('blog_index') }}" class="btn btn-secondary">Cancel</a>
+              </div>
+              {{ form_end(form) }}
+            </div>
+            
+            <div class="card-container">
+              <a href="{{ path('back') }}" class="btn-custom mt-3">Retour au Dashboard</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {% include 'partials/_footer.html.twig' %}
+  </div>
+
+  <!-- Scripts -->
+  <script src="vendors/js/vendor.bundle.base.js"></script>
+  <script src="js/off-canvas.js"></script>
+  <script src="js/hoverable-collapse.js"></script>
+  <script src="js/template.js"></script>
+</body>
+
+</html>

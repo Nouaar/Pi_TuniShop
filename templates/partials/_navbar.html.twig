@@ -36,6 +36,7 @@
                     <button class="dropdown-item" type="button" onclick="window.location.href='{{ path('sign_in') }}'">Login</button>
                 {% else %}
 <button class="dropdown-item" type="button" onclick="window.location.href='{{ path('logout') }}'">Logout</button>
+ 
                     <!-- Button for Changing Password -->
                     <button class="dropdown-item" type="button" data-bs-toggle="modal" data-bs-target="#changePasswordModal">Change Password</button>
                 {% endif %}

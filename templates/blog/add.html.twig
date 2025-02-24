@@ -1,0 +1,28 @@
+{% block title %}Add Blog{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <h2>Create a New Blog Post</h2>
+
+    {{ form_start(form, {'attr': {'enctype': 'multipart/form-data'}}) }}
+        <div class="mb-3">
+            {{ form_label(form.titre) }}
+            {{ form_widget(form.titre) }}
+            {{ form_errors(form.titre) }}
+        </div>
+
+        <div class="mb-3">
+            {{ form_label(form.description) }}
+            {{ form_widget(form.description) }}
+            {{ form_errors(form.description) }}
+        </div>
+
+        <div class="mb-3">
+            {{ form_label(form.image) }}
+            {{ form_widget(form.image) }}
+            {{ form_errors(form.image) }}
+        </div>
+
+    {{ form_end(form) }}
+</div>
+{% endblock %}

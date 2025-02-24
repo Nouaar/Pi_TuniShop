@@ -11,12 +11,12 @@ use App\Form\ReclamationType;
 use App\Repository\ReclamationRepository;
 use App\Service\SecurityService;
 use Doctrine\ORM\EntityManagerInterface;
+use App\Entity\Blog;
 use App\Entity\Remboursement;
 use App\Form\RemboursementType;
 use App\Repository\RemboursementRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
-
 use App\Entity\Utilisateur;
 use App\Entity\AdresseUser;
 use App\Entity\Products;
@@ -74,7 +74,6 @@ final class BackController extends AbstractController
 
 
     
-
     #[Route('/back', name: 'back')]
     public function index(UtilisateurRepository $utilisateurRepository): Response
     {
@@ -85,7 +84,7 @@ final class BackController extends AbstractController
         $adresse_users = $this->entityManager->getRepository(AdresseUser::class)->findAll();
     
         // Fetch all products
-        $products = $this->entityManager->getRepository(Products::class)->findAll(); // Make sure 'Product' is properly capitalized
+        $products = $this->entityManager->getRepository(Products::class)->findAll();
     
         // Fetch all checkouts
         $checkouts = $this->entityManager->getRepository(Checkout::class)->findAll();
@@ -97,6 +96,9 @@ final class BackController extends AbstractController
         $reclamations = $this->entityManager->getRepository(Reclamation::class)->findAll();
         $remboursements = $this->entityManager->getRepository(Remboursement::class)->findAll();  // Use a different variable name
     
+        // Fetch all blogs
+        $blogs = $this->entityManager->getRepository(Blog::class)->findAll();
+    
         // Add the data to the params array
         return $this->renderWithAuth('back/index.html.twig', [
             'utilisateurs' => $utilisateurs, 
@@ -105,9 +107,11 @@ final class BackController extends AbstractController
             'checkouts' => $checkouts,
             'reclamations' => $reclamations,
             'remboursements' => $remboursements,  // Correctly pass reclamations
-            'depots' => $depots
+            'depots' => $depots,
+            'blogs' => $blogs  // Add blogs to the parameters
         ]);
     }
+    
     
 
 

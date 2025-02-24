@@ -51,17 +51,24 @@
             {% include 'Back/Admincheckout/checkoutback.html.twig' %}
         </div>
 
-
         <div class="col-md-9" id="editDepotContent" style="display:none;">
             {# Initially hidden content #}
             {% include 'Back/AdminDepot/depot_dashboard.html.twig' %}
           </div>
 
       </div>
-              <div  class="col-md-9"  id="editReclamationContent" style="display:none;">
+
+         <div  class="col-md-9"  id="editReclamationContent" style="display:none;">
             {# Initially hidden content #}
             {% include 'Back/editreclamation.html.twig' %}
           </div>
+         <div class="col-md-9" id="editBlogContent" style="display:none;">
+  {# Initially hidden content #}
+  {% include 'Back/admin_blog/EditBlog.html.twig' %}
+</div>
+
+
+             
 
       {% include 'partials/_footer.html.twig' %}
     </div>
@@ -78,12 +85,16 @@
         document.getElementById('editproductsContent').style.display = 'none';
         document.getElementById('editcheckoutContent').style.display = 'none';
         document.getElementById('editDepotContent').style.display = 'none';
+         document.getElementById('editBlogContent').style.display = 'none';
+          document.getElementById('editReclamationContent').style.display = 'none';
       });
        document.getElementById('editproductButton').addEventListener('click', function() {
         document.getElementById('editproductsContent').style.display = 'block';
         document.getElementById('editUserContent').style.display = 'none';
         document.getElementById('editcheckoutContent').style.display = 'none';
         document.getElementById('editDepotContent').style.display = 'none';
+         document.getElementById('editBlogContent').style.display = 'none';
+          document.getElementById('editReclamationContent').style.display = 'none';
 
       });
        // JavaScript to show editcheckoutsButtons content when button is clicked
@@ -92,6 +103,8 @@
         document.getElementById('editUserContent').style.display = 'none';
         document.getElementById('editproductsContent').style.display = 'none';
         document.getElementById('editDepotContent').style.display = 'none';
+         document.getElementById('editBlogContent').style.display = 'none';
+          document.getElementById('editReclamationContent').style.display = 'none';
       });
       // JavaScript to switch to depot_dashboard content when button is clicked
       document.getElementById('editDepotButton').addEventListener('click', function() {
@@ -99,6 +112,8 @@
         document.getElementById('editUserContent').style.display = 'none';
         document.getElementById('editproductsContent').style.display = 'none';
         document.getElementById('editcheckoutContent').style.display = 'none';
+         document.getElementById('editBlogContent').style.display = 'none';
+          document.getElementById('editReclamationContent').style.display = 'none';
       });
 
       document.getElementById('editReclamationButton').addEventListener('click', function() {
@@ -107,8 +122,17 @@
     document.getElementById('editproductsContent').style.display = 'none';
     document.getElementById('editDepotContent').style.display = 'none';
      document.getElementById('editcheckoutContent').style.display = 'none';
+      document.getElementById('editBlogContent').style.display = 'none';
+         
 });
-
+      document.getElementById('editBlogButton').addEventListener('click', function() {
+        document.getElementById('editBlogContent').style.display = 'block';
+        document.getElementById('editUserContent').style.display = 'none';
+      document.getElementById('editproductsContent').style.display = 'none';
+    document.getElementById('editDepotContent').style.display = 'none';
+     document.getElementById('editcheckoutContent').style.display = 'none';
+          document.getElementById('editReclamationContent').style.display = 'none';
+      });
       
     </script>
     
