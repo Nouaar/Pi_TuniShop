@@ -9,8 +9,10 @@ use App\Entity\Stock;
 use App\Entity\Depot;
 use App\Form\StockType;
 use Doctrine\Persistence\ManagerRegistry;
+use App\Repository\StockRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 final class StockController extends AbstractController
 {
@@ -73,9 +75,9 @@ public function deleteStock(int $id, EntityManagerInterface $entityManager): Res
         return $this->redirectToRoute('app_stock_list');
     }
 
-    $entityManager->remove($stock);
+    $stock->setDeletedAt(new \DateTime());
+    $entityManager->persist($stock);
     $entityManager->flush();
-    $this->addFlash('success', 'Stock deleted successfully.');
 
     return $this->redirectToRoute('app_depot_associated_stocks', ['depotId' => $stock->getDepot()->getId()]);
 }
@@ -108,6 +110,37 @@ public function updateStock(int $id, Request $request, EntityManagerInterface $e
         'depot' => $depot,
     ]);
 }
+#[Route('/stock/restore/{id}', methods: ['POST'], name: 'stock_restore')]
+    public function restoreStock(int $id, EntityManagerInterface $em, StockRepository $stockRepository): Response
+    {
+        $stock = $stockRepository->findWithDeleted($id);
+
+        if (!$stock) {
+            return $this->json(['error' => 'Stock not found'], 404);
+        }
+
+        $stock->setDeletedAt(null);
+        $em->persist($stock);
+        $em->flush();
+
+        return $this->redirectToRoute('app_depot_associated_stocks', ['depotId' => $stock->getDepot()->getId()]);
+    }
+    #[Route('/api/stocks/status/{depotId}', name: 'api_stock_status', methods: ['GET'])]
+    public function getStockStatusData(int $depotId, EntityManagerInterface $em): JsonResponse
+    {
+        $qb = $em->createQueryBuilder();
+        $qb->select('s.status, COUNT(s.id) as count')
+            ->from(Stock::class, 's')
+            ->where('s.depot = :depotId')
+            ->andWhere('s.deletedAt IS NULL') // Exclude deleted stocks
+            ->setParameter('depotId', $depotId)
+            ->groupBy('s.status');
+    
+        $data = $qb->getQuery()->getResult();
+    
+        return $this->json($data);
+    }
+    
 
 
 }

@@ -6,8 +6,10 @@ use App\Repository\StockRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+use Gedmo\Mapping\Annotation as Gedmo;
 
 #[ORM\Entity(repositoryClass: StockRepository::class)]
+#[Gedmo\SoftDeleteable(fieldName: "deletedAt", timeAware: false)]
 class Stock
 {
     #[ORM\Id]
@@ -30,13 +32,18 @@ class Stock
     #[Assert\Positive(message: "La quantité de stocks maximale doit être un nombre positif.")]
     private ?int $quantite_max = null;
 
-    #[ORM\Column]
+    #[Gedmo\Timestampable(on: "create")]
+    #[ORM\Column(type: "datetime_immutable")]
     private ?\DateTimeImmutable $date_creation = null;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $deletedAt = null; // Soft delete field
 
     #[ORM\Column(length: 15)]
     #[Assert\Choice(choices: ['disponible', 'indisponible'], message: "Le statut doit être 'disponible' ou 'indisponible'.")]
     private ?string $status = null;
 
+    #[Gedmo\Timestampable(on: "update")]
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $last_update_date = null;
 
@@ -47,6 +54,7 @@ class Stock
     {
         $this->date_creation = new \DateTimeImmutable(); // Auto-set creation date
         $this->last_update_date = new \DateTime();//ensures that it is not null 
+        $this->deletedAt = null;
     }
 
     #[ORM\PreUpdate]
@@ -70,6 +78,20 @@ class Stock
         $this->quantite = $quantite;
 
         return $this;
+    }
+    public function getDeletedAt(): ?\DateTimeInterface
+    {
+        return $this->deletedAt;
+    }
+
+    public function setDeletedAt(?\DateTimeInterface $deletedAt): void
+    {
+        $this->deletedAt = $deletedAt;
+    }
+
+    public function isDeleted(): bool
+    {
+        return $this->deletedAt !== null;
     }
 
     public function getQuantiteMin(): ?int

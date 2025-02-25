@@ -64,6 +64,9 @@
             "./config/packages/nelmio_cors.yaml"
         ]
     },
+    "stof/doctrine-extensions-bundle": {
+        "version": "v1.13.0"
+    },
     "symfony/console": {
         "version": "6.4",
         "recipe": {

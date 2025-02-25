@@ -49,10 +49,12 @@
                         <th>ID</th>
                         <th>Name</th>
                         <th>Adress</th>
-                        <th>stock capacity</th>
-                        <th>date of creation</th>
+                        <th>capacity</th>
+                        <th>creation date</th>
+                        <th>update date</th>
                         <th>status</th>
                         <th>action</th>
+                        <th>deleted at</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -62,26 +64,39 @@
                             <td>{{ depot.nom }}</td>
                             <td>{{ depot.adresse }}</td>
                             <td>{{ depot.stockcapacity }}</td>
-                            <td>{{ depot.dateCreation|date('Y-m-d H:i:s') }}</td>
+                            <td>{{ depot.datecreation|date('Y-m-d H:i:s') }}</td>
+                            <td>{{ depot.lastupdatedate|date('Y-m-d H:i:s') }}</td>
                             <td>{{ depot.status }}</td>
-                            <td><!-- Delete Button -->
-                                <form action="{{ path('app_depot_delete', {'id': depot.id}) }}" method="post" style="display:inline;">
-                                    <button type="submit" class="btn btn-danger btn-sm">
-                                        <i class="fas fa-trash-alt"></i> Delete
-                                    </button>
-                                </form> 
-                                <form action="{{ path('app_depot_update', {'id': depot.id}) }}" method="post" style="display:inline;">
-                                    <button type="submit" class="btn btn-secondary">
-                                        <i class="fas fa-trash-alt"></i> Upadte
-                                    </button>
-                                </form> 
-                                <form action="{{ path('app_depot_associated_stocks', {'depotId': depot.id}) }}" id ="editStockButton" method="get" style="display:inline;">
-                                    <button type="submit" class="btn btn-warning">
-                                        <i class="fas fa-trash-alt"></i> Consult Stocks
-                                    </button>
-                                </form>
-
+                            <!-- Action Column -->
+                            <td>
+                                {% if depot.deletedAt is null %}
+                                    <form action="{{ path('app_depot_delete', {'id': depot.id}) }}" method="post" style="display:inline;">
+                                        <button type="submit" class="btn btn-danger btn-sm">
+                                            <i class="fas fa-trash-alt"></i> Delete
+                                        </button>
+                                    </form> 
+                                    <form action="{{ path('app_depot_update', {'id': depot.id}) }}" method="post" style="display:inline;">
+                                        <button type="submit" class="btn btn-secondary btn-sm">
+                                            <i class="fas fa-edit"></i> Update
+                                        </button>
+                                    </form> 
+                                    <form action="{{ path('app_depot_associated_stocks', {'depotId': depot.id}) }}" method="get" style="display:inline;">
+                                        <button type="submit" class="btn btn-warning btn-sm">
+                                            <i class="fas fa-box"></i>Stocks
+                                        </button>
+                                    </form>
+                                {% else %}
+                                    <form action="{{ path('app_depot_restore', {'id': depot.id}) }}" method="post" style="display:inline;">
+                                        <button type="submit" class="btn btn-dark btn-sm">
+                                            <i class="fas fa-undo"></i> Restore
+                                        </button>
+                                    </form>
+                                
                             </td>
+                            <td>
+                                {{ depot.deletedAt ? depot.deletedAt|date('Y-m-d H:i:s') : '' }}
+                            </td>
+                            {% endif %}
                         </tr>
                     {% else %}
                         <tr>
@@ -93,6 +108,38 @@
             <a href="{{ path('app_add_depot') }}" class="btn btn-success">Add New Depot</a>
         </div>
     </div>
+     <!-- Depot Visualization -->
+    <h2 class="text-center mt-5">Depot Status Distribution</h2>
+    <div style="width: 400px; height: 400px; margin: auto;">
+        <canvas id="depotStatusChart"></canvas>
+    </div>
+
+    
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Fetch Depot Status Distribution Data
+    fetch('/api/depot-status')
+        .then(response => response.json())
+        .then(data => {
+            if (data.depot_status.length === 0) return;
+
+            const ctx = document.getElementById('depotStatusChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: data.depot_status.map(s => s.status),
+                    datasets: [{
+                        data: data.depot_status.map(s => s.count),
+                        backgroundColor: ['#4CAF50', '#F44336', '#FFC107']
+                    }]
+                }
+            });
+        });
+
+</script>
+
     <script>
     document.getElementById('searchDepots').addEventListener('keyup', function() {
     var input = this.value.toLowerCase();

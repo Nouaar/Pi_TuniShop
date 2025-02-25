@@ -6,10 +6,14 @@ use App\Repository\DepotRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\DBAL\Types\Types;
 use App\Entity\Stock;
 use Symfony\Component\Validator\Constraints as Assert;
+use Gedmo\Mapping\Annotation as Gedmo;
+
 
 #[ORM\Entity(repositoryClass: DepotRepository::class)]
+#[Gedmo\SoftDeleteable(fieldName: "deletedAt", timeAware: false)]
 class Depot
 {
     #[ORM\Id]
@@ -31,13 +35,22 @@ class Depot
     #[Assert\Positive(message: "La capacité de stockage doit être un nombre positif.")]
     private ?int $stock_capacity = null;
 
-    #[ORM\Column]
-    private \DateTimeImmutable $date_creation;
+    #[Gedmo\Timestampable(on: "create")]
+    #[ORM\Column(type: 'datetime_immutable')]
+    private ?\DateTimeInterface $date_creation = null;
+
+    
+    #[ORM\Column(type: "datetime", nullable: true)]
+    private ?\DateTimeInterface $deletedAt = null;
 
     #[ORM\Column(length: 15)]
     #[Assert\NotBlank(message: "Le statut est requis.")]
     #[Assert\Choice(choices: ['Actif', 'Inactif','Maintenance'], message: "Le statut doit être 'actif' ou 'inactif' ou 'maintenance'.")]
     private ?string $status = null;
+
+    #[Gedmo\Timestampable(on: "update")]
+    #[ORM\Column(type: 'datetime', nullable: true)]
+    private ?\DateTimeInterface $last_update_date = null;
 
     /**
      * @var Collection<int, Stock>
@@ -49,6 +62,24 @@ class Depot
     {
         $this->stock_storage = new ArrayCollection();
         $this->date_creation = new \DateTimeImmutable();
+        $this->last_update_date = new \DateTime();//ensures that it is not null
+        $this->deletedAt = null;
+    }
+    #[ORM\PreUpdate]
+    public function onPreUpdate(): void
+    {
+        $this->last_update_date = new \DateTime(); // Auto-update modification date
+    }
+    public function getLastUpdateDate(): ?\DateTimeInterface
+    {
+        return $this->last_update_date;
+    }
+
+    public function setLastUpdateDate(\DateTimeInterface $last_update_date): static
+    {
+        $this->last_update_date = $last_update_date;
+
+        return $this;
     }
 
     public function getId(): ?int
@@ -93,16 +124,13 @@ class Depot
     }
 
     public function getDateCreation(): ?\DateTimeImmutable
-    {
-        return $this->date_creation;
-    }
+{
+    return $this->date_creation instanceof \DateTime
+        ? \DateTimeImmutable::createFromMutable($this->date_creation)
+        : $this->date_creation;
+}
 
-    public function setDateCreation(\DateTimeImmutable $date_creation): static
-    {
-        $this->date_creation = $date_creation;
-
-        return $this;
-    }
+    
 
     public function getStatus(): ?string
     {
@@ -144,5 +172,16 @@ class Depot
         }
 
         return $this;
+    }
+
+    public function getDeletedAt(): ?\DateTimeInterface
+    {
+    return $this->deletedAt;
+    }
+
+    public function setDeletedAt(?\DateTimeInterface $deletedAt): static
+    {
+    $this->deletedAt = $deletedAt;
+    return $this;
     }
 }

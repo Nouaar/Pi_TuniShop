@@ -40,4 +40,12 @@ class StockRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+    public function findWithDeleted(int $id): ?Stock
+    {
+        return $this->createQueryBuilder('s')
+            ->where('s.id = :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
 }

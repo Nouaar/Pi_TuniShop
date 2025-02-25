@@ -108,8 +108,10 @@
                         <th>Min Quantity</th>
                         <th>Max Quantity</th>
                         <th>Status</th>
+                        <th>Creation Date</th>
                         <th>Last Updated</th>
                         <th>Action</th>
+                        <th>Deleted At</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -126,20 +128,32 @@
                                     
                                 </span>
                             </td>
+                            <td>{{ stock.datecreation|date('Y-m-d H:i:s') }}</td>
                             <td>{{ stock.lastupdatedate ? stock.lastupdatedate|date('Y-m-d H:i:s') : 'Never updated' }}</td>
+                            
                             <td class="action-buttons">
+                            {% if stock.deletedAt is null %}
                             <form action="{{ path('app_stock_update', {'id': stock.id}) }}" method="post" style="display:inline;">
-   <button type="submit" class="btn btn-secondary">
-                                        <i class="fas fa-trash-alt"></i> Upadte
-                                    </button>
-</form>
+                                <button type="submit" class="btn btn-secondary">
+                                    <i class="fas fa-trash-alt"></i> Upadte
+                                </button>
+                            </form>
                             <form action="{{ path('app_stock_delete', {'id': stock.id}) }}" method="post" style="display:inline;">
-    <button type="submit" class="btn btn-danger">
-        Delete
-    </button>
-</form>
+                                <button type="submit" class="btn btn-danger"><i class="fas fa-trash-alt"></i> Delete
+                                </button>
+                            </form>
+                            {% else %}
+                                    <form action="{{ path('stock_restore', {'id': stock.id}) }}" method="post" style="display:inline;">
+            <button type="submit" class="btn btn-dark btn-sm">
+                <i class="fas fa-undo"></i> Restore
+            </button>
+        </form>
                                 
                             </td>
+                            <td>
+                                {{ stock.deletedAt ? depot.deletedAt|date('Y-m-d H:i:s') : '' }}
+                            </td>
+                            {% endif %}
                         </tr>
                     {% else %}
                         <tr>
@@ -164,6 +178,10 @@
             </div>
         </div>
     </div>
+    <div class="card mt-4 p-3">
+    <h3 class="text-center">Stock Disposition by Status</h3>
+    <canvas id="stockStatusChart"></canvas>
+</div>
 </div>
 
 <!-- JavaScript for Search Filtering -->
@@ -210,6 +228,41 @@
     });
 });
 
+</script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const depotId = "{{ depot.id }}"; // Get Depot ID from Twig
+    fetch(`/api/stocks/status/${depotId}`) // Send request with depot ID
+        .then(response => response.json())
+        .then(data => {
+            const labels = data.map(entry => entry.status);
+            const counts = data.map(entry => entry.count);
+
+            const ctx = document.getElementById('stockStatusChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Stock Count',
+                        data: counts,
+                        backgroundColor: ['#28a745', '#dc3545'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        })
+        .catch(error => console.error('Error loading stock status data:', error));
+});
 </script>
 
 

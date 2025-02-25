@@ -13,6 +13,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Depot;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 
 final class DepotController extends AbstractController
@@ -30,10 +31,10 @@ final class DepotController extends AbstractController
     {
         $depot = $em->getRepository(Depot::class)->find($id);
     
-        if ($depot) {
-            $em->remove($depot);
-            $em->flush();
-        }
+        // Soft delete by setting deletedAt timestamp
+        $depot->setDeletedAt(new \DateTime());
+        $em->persist($depot);
+        $em->flush();
         return $this->redirectToRoute('back');
     }
     #[Route('/back/add_depot', name: 'app_add_depot')]
@@ -70,6 +71,40 @@ final class DepotController extends AbstractController
             'form' => $form->createView(),
         ]);
     }
+    #[Route('/api/depot-activity', name: 'api_depot_activity', methods: ['GET'])]
+public function getDepotActivity(DepotRepository $depotRepository): JsonResponse
+{
+    return new JsonResponse([
+        'depot_activity' => $depotRepository->fetchDepotLogs(),
+    ]);
+}
+
+    #[Route('/api/depot-status', name: 'api_depot_status', methods: ['GET'])]
+    public function getDepotStatus(DepotRepository $depotRepository): JsonResponse
+    {
+        return new JsonResponse([
+        'depot_status' => $depotRepository->countDepotStatus(),
+    ]);
+    }
+    #[Route('/depot/restore/{id}', name: 'app_depot_restore', methods: ['POST'])]
+public function restoreDepot(int $id, DepotRepository $depotRepository, EntityManagerInterface $entityManager): Response
+{
+    $depot = $depotRepository->find($id);
+
+    if (!$depot || $depot->getDeletedAt() === null) {
+        $this->addFlash('error', 'Depot is already active or does not exist.');
+        return $this->redirectToRoute('app_depot_list');
+    }
+
+    // Restore by setting deletedAt to null
+    $depot->setDeletedAt(null);
+    $entityManager->persist($depot);
+    $entityManager->flush();
+
+    $this->addFlash('success', 'Depot has been restored.');
+    return $this->redirectToRoute('back');
+}
+
 
    
 
