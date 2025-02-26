@@ -35,7 +35,7 @@ final class DepotController extends AbstractController
         $depot->setDeletedAt(new \DateTime());
         $em->persist($depot);
         $em->flush();
-        return $this->redirectToRoute('back');
+        return $this->redirect('/back#editDepotContent');
     }
     #[Route('/back/add_depot', name: 'app_add_depot')]
     public function add_depot(ManagerRegistry $manager,Request $req): Response
@@ -47,7 +47,7 @@ final class DepotController extends AbstractController
         if($form->isSubmitted() && $form->isValid()){
         $em->persist($depot);
         $em->flush();
-        return $this->redirectToRoute('back');
+        return $this->redirect('/back#editDepotContent');
         }
         return $this->render('depot/AddDepot.html.twig', [
             'form' => $form->createView(),
@@ -64,7 +64,7 @@ final class DepotController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $em->persist($depot);
             $em->flush();
-            return $this->redirectToRoute('back');
+            return $this->redirect('/back#editDepotContent');
         
         }
         return $this->render('depot/update_depot.html.twig', [
@@ -102,7 +102,7 @@ public function restoreDepot(int $id, DepotRepository $depotRepository, EntityMa
     $entityManager->flush();
 
     $this->addFlash('success', 'Depot has been restored.');
-    return $this->redirectToRoute('back');
+    return $this->redirect('/back#editDepotContent');
 }
 
 

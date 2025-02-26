@@ -1,45 +1,54 @@
+<link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+<style>
+.sidebar-menu i {
+    font-size: 22px;  /* Increase icon size */
+    margin-right: 10px; /* Add space between icon and text */
+    vertical-align: middle; /* Align icon with text */
+}</style>
 <nav class="sidebar sidebar-offcanvas bg-light shadow-sm p-3 rounded mt-5" id="sidebar">
   <ul class="nav flex-column">
-    <li class="nav-item mb-2">
-      <a class="nav-link d-flex align-items-center text-dark fw-bold" href="#">
-        <i class="typcn typcn-device-desktop me-2"></i>
-        <span class="menu-title">Dashboard</span>
-      </a>
-    </li>
+    
 
     <!-- Add Button to Navigate to EditUser Page -->
     <li class="nav-item mb-2">
+    <button class="nav-link d-flex align-items-center text-dark fw-bold" id="editDashBoardButton">
+        <i class="bx bx-desktop"></i>
+        <span class="menu-title">Dashboard</span>
+      </button>
+    
       <button class="nav-link d-flex align-items-center text-dark fw-bold" id="editUserButton">
-        <i class="typcn typcn-user-edit me-2"></i>
+        <i class="bx bx-user"></i>
         <span class="menu-title">Users</span>
       </button>
+
       <button class="nav-link d-flex align-items-center text-dark fw-bold" id="editproductButton">
-        <i class="typcn typcn-user-edit me-2"></i>
+        <i class="bx bx-store"></i>
         <span class="menu-title">products</span>
       </button>
-       </button>
+       
+
       <button class="nav-link d-flex align-items-center text-dark fw-bold" id="editcheckoutsButton">
-        <i class="typcn typcn-user-edit me-2"></i>
+        <i class="bx bx-credit-card"></i>
         <span class="menu-title">checkouts</span>
       </button>
+
       <button class="nav-link d-flex align-items-center text-dark fw-bold" id="editDepotButton">
-        <i class="typcn typcn-user-edit me-2"></i>
+        <i class="bx bx-package"></i>
         <span class="menu-title">Depots and Stocks</span>
-    
+      </button>
+
        <button class="nav-link d-flex align-items-center text-dark fw-bold" id="editReclamationButton">
-        <i class="typcn typcn-document-text me-2"></i>
+        <i class="bx bx-error"></i>
         <span class="menu-title">Reclamations</span>
       </button>
+
        <button class="nav-link d-flex align-items-center text-dark fw-bold" id="editBlogButton">
-        <i class="typcn typcn-document-text me-2"></i>
+        <i class="bx bx-news"></i>
         <span class="menu-title">blog</span>
       </button>
-      
-    </li>
 
-         <li class="nav-item">
     <a href="{{ path('admin_statistiques') }}" class="nav-link d-flex align-items-center text-dark fw-bold">
-        <span class="me-2">📊</span> 
+        <i class="bx bx-bar-chart-alt statistics-icon"></i> 
        statistics
     </a>
 </li>

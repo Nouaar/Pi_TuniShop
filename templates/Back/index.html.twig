@@ -27,6 +27,30 @@
     <link rel="stylesheet" href="vendors/css/vendor.bundle.base.css">
     <link rel="stylesheet" href="css/vertical-layout-light/style.css">
     <link rel="shortcut icon" href="images/favicon.png" />
+    <style>
+    .statistics-container {
+    display: flex;
+    justify-content: center; /* Centers charts */
+    align-items: center;
+    gap: 30px; /* Space between charts */
+    flex-wrap: wrap; /* Ensures responsiveness */
+}
+
+.chart-box {
+    flex: 1;
+    max-width: 400px; /* Controls max size */
+    background: #fff;
+    padding: 20px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    text-align: center;
+}
+
+.chart-container {
+    width: 100%;
+    height: 300px;
+}
+</style>
   </head>
 
   <body>
@@ -37,6 +61,36 @@
           <div class="col-md-3">
             {% include 'partials/_sidebar.html.twig' %}
           </div>
+                  <!-- Dashboard content without having clicked on anything yet -->
+
+              <div class="col-md-9" id="editDashBoardContent" style="display:block;">
+    <h2 class="text-center mt-5">Depot/Stock Status Distribution</h2>
+
+    <!-- Unified Container for Both Charts -->
+    <div class="statistics-container">
+        <!-- Depot Chart -->
+        <div class="chart-box">
+            <h4 class="text-center">Depot Status Distribution</h4>
+            <div class="chart-container">
+                <canvas id="depotStatusChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Stock Chart -->
+        <div class="chart-box">
+            <h4 class="text-center">Stock Status Distribution</h4>
+            <div class="chart-container">
+                <canvas id="stockStatusChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Button Centered Below Charts -->
+    <div class="text-center mt-3">
+        <button id="Depot_Consult" class="btn btn-outline-dark">Consult Depots</button>
+    </div>
+</div>
+
           <div class="col-md-9" id="editUserContent" style="display:none;">
             {# Initially hidden content #}
             {% include 'Back/AdminUser/EditUser.html.twig' %}
@@ -56,16 +110,19 @@
             {% include 'Back/AdminDepot/depot_dashboard.html.twig' %}
           </div>
 
-      </div>
-
-         <div  class="col-md-9"  id="editReclamationContent" style="display:none;">
+          <div  class="col-md-9"  id="editReclamationContent" style="display:none;">
             {# Initially hidden content #}
             {% include 'Back/editreclamation.html.twig' %}
           </div>
-         <div class="col-md-9" id="editBlogContent" style="display:none;">
-  {# Initially hidden content #}
-  {% include 'Back/admin_blog/EditBlog.html.twig' %}
-</div>
+
+          <div class="col-md-9" id="editBlogContent" style="display:none;">
+    {# Initially hidden content #}
+            {% include 'Back/admin_blog/EditBlog.html.twig' %}
+          </div>
+      </div>
+
+         
+         
 
 
              
@@ -87,6 +144,7 @@
         document.getElementById('editDepotContent').style.display = 'none';
          document.getElementById('editBlogContent').style.display = 'none';
           document.getElementById('editReclamationContent').style.display = 'none';
+          document.getElementById('editDashBoardContent').style.display = 'none';
       });
        document.getElementById('editproductButton').addEventListener('click', function() {
         document.getElementById('editproductsContent').style.display = 'block';
@@ -95,6 +153,7 @@
         document.getElementById('editDepotContent').style.display = 'none';
          document.getElementById('editBlogContent').style.display = 'none';
           document.getElementById('editReclamationContent').style.display = 'none';
+          document.getElementById('editDashBoardContent').style.display = 'none';
 
       });
        // JavaScript to show editcheckoutsButtons content when button is clicked
@@ -105,16 +164,19 @@
         document.getElementById('editDepotContent').style.display = 'none';
          document.getElementById('editBlogContent').style.display = 'none';
           document.getElementById('editReclamationContent').style.display = 'none';
+          document.getElementById('editDashBoardContent').style.display = 'none';
       });
       // JavaScript to switch to depot_dashboard content when button is clicked
-      document.getElementById('editDepotButton').addEventListener('click', function() {
+      document.querySelectorAll('#editDepotButton, #Depot_Consult').forEach(button => {
+    button.addEventListener('click', function() {
         document.getElementById('editDepotContent').style.display = 'block';
         document.getElementById('editUserContent').style.display = 'none';
         document.getElementById('editproductsContent').style.display = 'none';
         document.getElementById('editcheckoutContent').style.display = 'none';
          document.getElementById('editBlogContent').style.display = 'none';
           document.getElementById('editReclamationContent').style.display = 'none';
-      });
+          document.getElementById('editDashBoardContent').style.display = 'none';
+      });});
 
       document.getElementById('editReclamationButton').addEventListener('click', function() {
     document.getElementById('editReclamationContent').style.display = 'block';
@@ -123,6 +185,7 @@
     document.getElementById('editDepotContent').style.display = 'none';
      document.getElementById('editcheckoutContent').style.display = 'none';
       document.getElementById('editBlogContent').style.display = 'none';
+      document.getElementById('editDashBoardContent').style.display = 'none';
          
 });
       document.getElementById('editBlogButton').addEventListener('click', function() {
@@ -132,12 +195,90 @@
     document.getElementById('editDepotContent').style.display = 'none';
      document.getElementById('editcheckoutContent').style.display = 'none';
           document.getElementById('editReclamationContent').style.display = 'none';
+          document.getElementById('editDashBoardContent').style.display = 'none';
+      });
+      document.getElementById('editDashBoardButton').addEventListener('click', function() {
+        document.getElementById('editDashBoardContent').style.display = 'block';
+        document.getElementById('editUserContent').style.display = 'none';
+        document.getElementById('editproductsContent').style.display = 'none';
+        document.getElementById('editcheckoutContent').style.display = 'none';
+        document.getElementById('editDepotContent').style.display = 'none';
+         document.getElementById('editBlogContent').style.display = 'none';
+          document.getElementById('editReclamationContent').style.display = 'none';
       });
       
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Fetch Depot Status Distribution Data
+    fetch('/api/depot-status')
+        .then(response => response.json())
+        .then(data => {
+            if (data.depot_status.length === 0) return;
+
+            const ctx = document.getElementById('depotStatusChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: data.depot_status.map(s => s.status),
+                    datasets: [{
+                        data: data.depot_status.map(s => s.count),
+                        backgroundColor: ['#4CAF50', '#F44336', '#FFC107']
+                    }]
+                }
+            });
+        });
+
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    fetch(`/api/stocks/status`) // Fetch all stocks without filtering by depot
+        .then(response => response.json())
+        .then(data => {
+            const labels = data.map(entry => entry.status);
+            const counts = data.map(entry => entry.count);
+
+            const ctx = document.getElementById('stockStatusChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Stock Count',
+                        data: counts,
+                        backgroundColor: ['#28a745', '#dc3545', '#ffc107'], // Green, Red, Yellow
+                        borderWidth: 1
+                    }]
+                },
+                
+            });
+        })
+        .catch(error => console.error('Error loading stock status data:', error));
+});
+</script>
+<script>/* this is a way to return to route back to a specified state, eg: index.html.twig while reclamation 
+in Depot and stocks in sidebar is clicked, you can easily add it via just copying and pasting 
+while replacing window.location.hash value with #id_div assciated to your desired page, the id existing in index.html.twig
+while hidden*/
+document.addEventListener("DOMContentLoaded", function () {
+    if (window.location.hash === "#editDepotContent") {
+        showDepotContent();
+    }
+});
+
+function showDepotContent() {
+    document.getElementById('editDepotContent').style.display = 'block';
+    document.getElementById('editUserContent').style.display = 'none';
+    document.getElementById('editproductsContent').style.display = 'none';
+    document.getElementById('editcheckoutContent').style.display = 'none';
+    document.getElementById('editBlogContent').style.display = 'none';
+    document.getElementById('editReclamationContent').style.display = 'none';
+    document.getElementById('editDashBoardContent').style.display = 'none';
+}</script>
     
       
-    </script>
+            
+    
     
   </body>
 

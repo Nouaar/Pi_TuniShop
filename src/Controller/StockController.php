@@ -140,6 +140,19 @@ public function updateStock(int $id, Request $request, EntityManagerInterface $e
     
         return $this->json($data);
     }
+    #[Route('/api/stocks/status', name: 'api_stock_status_all', methods: ['GET'])]
+public function getStockStatusDataAll(EntityManagerInterface $em): JsonResponse
+{
+    $qb = $em->createQueryBuilder();
+    $qb->select('s.status, COUNT(s.id) as count')
+        ->from(Stock::class, 's')
+        ->where('s.deletedAt IS NULL') // Exclude deleted stocks
+        ->groupBy('s.status');
+
+    $data = $qb->getQuery()->getResult();
+
+    return $this->json($data);
+}
     
 
 
