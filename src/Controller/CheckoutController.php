@@ -14,10 +14,10 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Knp\Snappy\Pdf;
-
+use Endroid\QrCode\QrCode;
+use Endroid\QrCode\Writer\PngWriter;
 use App\Service\SecurityService;
 use App\Repository\CheckoutRepository;
-
 class CheckoutController extends AbstractController
 {
     private $securityService;
@@ -44,26 +44,25 @@ class CheckoutController extends AbstractController
     {
         $email = $request->request->get('email');
         $user = $entityManager->getRepository(Utilisateur::class)->findOneBy(['email' => $email]);
-    
+
         if (!$user) {
             return new Response('User not found.', 404);
         }
-    
+
         $productIds = $request->request->all('productIds');
-    
+
         if (empty($productIds)) {
             return new Response('No products selected for checkout.', 400);
         }
-    
+
         $products = $entityManager->getRepository(Products::class)->findBy(['id' => $productIds]);
-    
+
         if (empty($products)) {
             return new Response('Products not found.', 404);
         }
-    
-        // ✅ Generate unique checkout ID for this session
+
         $checkoutId = time();
-    
+
         foreach ($products as $product) {
             $checkout = new Checkout();
             $checkout->setCheckoutId($checkoutId);
@@ -76,16 +75,17 @@ class CheckoutController extends AbstractController
             $checkout->setCountry($request->request->get('country'));
             $checkout->setIdUser($user);
             $checkout->setIdProduit($product);
-    
+
             $entityManager->persist($checkout);
         }
-    
+
         $entityManager->flush();
         $session->set('cart', []);
-    
+
         return $this->redirectToRoute('list_of_checkouts', ['userId' => $user->getId()]);
     }
-    
+
+
 #[Route('/listofcheckouts/{userId}', name: 'list_of_checkouts')]
 public function listCheckouts(int $userId, Request $request, EntityManagerInterface $entityManager): Response
 {
@@ -178,32 +178,54 @@ public function removeCheckout(int $id, EntityManagerInterface $entityManager): 
 
 
 #[Route('/checkout/pdf/{checkoutId}', name: 'checkout_pdf')]
-public function generatePdf(int $checkoutId, EntityManagerInterface $entityManager, Pdf $pdf): Response
-{
-    // Fetch checkout details
-    $checkouts = $entityManager->getRepository(Checkout::class)->findBy(['checkoutId' => $checkoutId]);
-    if (!$checkouts) {
-        throw $this->createNotFoundException('Checkout not found.');
+    public function generatePdf(int $checkoutId, EntityManagerInterface $entityManager, Pdf $pdf): Response
+    {
+        // Récupérer les détails de la commande
+        $checkouts = $entityManager->getRepository(Checkout::class)->findBy(['checkoutId' => $checkoutId]);
+        if (!$checkouts) {
+            throw $this->createNotFoundException('Checkout not found.');
+        }
+
+        $checkout = $checkouts[0];  // Récupérer le premier résultat
+        $totalPrice = array_reduce($checkouts, fn($sum, $c) => $sum + $c->getIdProduit()->getPrice(), 0);
+
+        // Préparer les données pour le QR code (tu peux le formater en chaîne JSON ou texte simple)
+        $checkoutData = [
+            'checkoutId' => $checkout->getCheckoutId(),
+            'firstName' => $checkout->getFirstName(),
+            'lastName' => $checkout->getSecondName(),
+            'email' => $checkout->getEmail(),
+            'city' => $checkout->getCity(),
+            'totalPrice' => $totalPrice,
+            'products' => array_map(fn($c) => $c->getIdProduit()->getTitle(), $checkouts)
+        ];
+
+        // Convertir les données en une chaîne JSON
+        $checkoutJson = json_encode($checkoutData);
+
+        // Générer le QR code
+        $qrCode = new QrCode($checkoutJson);
+        $writer = new PngWriter();
+        
+        // Utiliser writeDataUri() pour obtenir une chaîne base64
+        $qrCodeImage = $writer->write($qrCode)->getDataUri();  // Le QR code en base64
+
+        // Rendre le template PDF
+        $html = $this->renderView('checkout/pdf.html.twig', [
+            'checkout' => $checkout,
+            'products' => array_map(fn($c) => $c->getIdProduit(), $checkouts),
+            'totalPrice' => $totalPrice,
+            'qrCodeImage' => $qrCodeImage // Passer l'image QR en base64
+        ]);
+
+        // Générer le PDF
+        $pdfContent = $pdf->getOutputFromHtml($html);
+
+        return new Response($pdfContent, 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'attachment; filename="checkout_' . $checkoutId . '.pdf"'
+        ]);
     }
-
-    $checkout = $checkouts[0]; // Get first entry
-    $totalPrice = array_reduce($checkouts, fn($sum, $c) => $sum + $c->getIdProduit()->getPrice(), 0);
-
-    // Render the PDF template
-    $html = $this->renderView('checkout/pdf.html.twig', [
-        'checkout' => $checkout,
-        'products' => array_map(fn($c) => $c->getIdProduit(), $checkouts),
-        'totalPrice' => $totalPrice
-    ]);
-
-    // Generate PDF
-    $pdfContent = $pdf->getOutputFromHtml($html);
-
-    return new Response($pdfContent, 200, [
-        'Content-Type' => 'application/pdf',
-        'Content-Disposition' => 'attachment; filename="checkout_' . $checkoutId . '.pdf"'
-    ]);
-}
 
 private function renderWithAuth(string $template, array $params = [], EntityManagerInterface $entityManager): Response
 {
