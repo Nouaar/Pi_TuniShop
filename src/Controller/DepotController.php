@@ -68,6 +68,7 @@ final class DepotController extends AbstractController
         
         }
         return $this->render('depot/update_depot.html.twig', [
+            'depot' => $depot,
             'form' => $form->createView(),
         ]);
     }

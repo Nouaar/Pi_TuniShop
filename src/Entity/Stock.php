@@ -50,6 +50,9 @@ class Stock
     #[ORM\ManyToOne(inversedBy: 'stock_storage')]
     private ?Depot $depot = null;
 
+    #[ORM\ManyToOne(inversedBy: 'associated_stocks')]
+    private ?Products $product = null;
+
     public function __construct()
     {
         $this->date_creation = new \DateTimeImmutable(); // Auto-set creation date
@@ -162,6 +165,18 @@ class Stock
     public function setDepot(?Depot $depot): static
     {
         $this->depot = $depot;
+
+        return $this;
+    }
+
+    public function getProduct(): ?Products
+    {
+        return $this->product;
+    }
+
+    public function setProduct(?Products $product): static
+    {
+        $this->product = $product;
 
         return $this;
     }

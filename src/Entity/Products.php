@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\ProductsRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use App\Entity\Utilisateur;
 
@@ -38,6 +40,17 @@ class Products
     #[ORM\ManyToOne(targetEntity: Utilisateur::class, inversedBy: "products")]
     #[ORM\JoinColumn(nullable: false)]  
       private ?Utilisateur $utilisateur = null;
+
+    /**
+     * @var Collection<int, Stock>
+     */
+    #[ORM\OneToMany(targetEntity: Stock::class, mappedBy: 'product')]
+    private Collection $associated_stocks;
+
+    public function __construct()
+    {
+        $this->associated_stocks = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -129,6 +142,36 @@ class Products
     public function setUtilisateur(?Utilisateur $utilisateur): static
     {
         $this->utilisateur = $utilisateur;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Stock>
+     */
+    public function getAssociatedStocks(): Collection
+    {
+        return $this->associated_stocks;
+    }
+
+    public function addAssociatedStock(Stock $associatedStock): static
+    {
+        if (!$this->associated_stocks->contains($associatedStock)) {
+            $this->associated_stocks->add($associatedStock);
+            $associatedStock->setProduct($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAssociatedStock(Stock $associatedStock): static
+    {
+        if ($this->associated_stocks->removeElement($associatedStock)) {
+            // set the owning side to null (unless already changed)
+            if ($associatedStock->getProduct() === $this) {
+                $associatedStock->setProduct(null);
+            }
+        }
 
         return $this;
     }

@@ -2,6 +2,7 @@
 namespace App\Form;
 
 use App\Entity\Depot;
+use App\Entity\Products;
 use App\Entity\Stock;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
@@ -36,6 +37,10 @@ class StockType extends AbstractType
                 ],
                 'label' => 'Statut',
                 'attr' => ['class' => 'form-select'],
+            ])
+            ->add('Product', EntityType::class, [
+                'class' => Products::class,
+                'choice_label' => 'title',
             ])
             
             ->add('save', SubmitType::class, [
