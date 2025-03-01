@@ -12,6 +12,59 @@
     max-width: 250px; /* Adjust width */
     max-height: 250px; /* Adjust height */
     margin: auto;
+        /* Styling for the radio buttons and labels */
+    .form-check-inline {
+        margin-right: 20px; /* Add spacing between radio buttons */
+    }
+
+    .custom-radio {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        width: 25px;
+        height: 25px;
+        border-radius: 50%;
+        border: 2px solid #007bff; /* Blue border */
+        background-color: #fff;
+        position: relative;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .custom-radio:checked {
+        background-color: #007bff; /* Blue background when checked */
+        border-color: #007bff;
+    }
+
+    .custom-radio:checked::after {
+        content: '';
+        position: absolute;
+        top: 6px;
+        left: 6px;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background-color: #fff; /* White dot in the center */
+    }
+
+    .custom-radio:focus {
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25); /* Focus state with a blue outline */
+    }
+
+    .form-check-label {
+        font-size: 16px;
+        margin-left: 8px;
+        color: #495057; /* Dark text color */
+        font-weight: 500;
+        cursor: pointer;
+    }
+
+    /* Hover and active states */
+    .custom-radio:hover {
+        border-color: #007bff;
+        background-color: #f0f8ff; /* Light blue on hover */
+    }
 }
 
 .small-chart canvas {
@@ -109,6 +162,21 @@
     <div class="mb-3">
         <input type="text" id="searchStocks" class="form-control" placeholder="Search Stocks...">
     </div>
+    <div class="mb-4">
+    <h5>Filter by Stock Status</h5>
+    <div class="form-check form-check-inline">
+        <input class="form-check-input custom-radio" type="radio" name="statusFilter" id="allStatus" value="all" checked>
+        <label class="form-check-label" for="allStatus">All</label>
+    </div>
+    <div class="form-check form-check-inline">
+        <input class="form-check-input custom-radio" type="radio" name="statusFilter" id="disponibleStatus" value="disponible">
+        <label class="form-check-label" for="disponibleStatus">Disponible</label>
+    </div>
+    <div class="form-check form-check-inline">
+        <input class="form-check-input custom-radio" type="radio" name="statusFilter" id="indisponibleStatus" value="indisponible">
+        <label class="form-check-label" for="indisponibleStatus">Indisponible</label>
+    </div>
+</div>
 
     <div class="card shadow-lg rounded-4">
         <div class="card-body">
@@ -127,7 +195,7 @@
                 </thead>
                 <tbody>
                     {% for stock in stocks %}
-                        <tr>
+                        <tr class="stock-row" data-status="{{ stock.status }}">
                         {% if stock.deletedAt is null %}
                             <td>{{ stock.id }}</td>
                             <td>{{ stock.quantite }}</td>
@@ -204,7 +272,7 @@
                 </thead>
                 <tbody>
                     {% for stock in stocks %}
-                        <tr>
+                        <tr class="stock-row" data-status="{{ stock.status }}">
                         {% if stock.deletedAt is not null %}
                             <td>{{ stock.id }}</td>
                             <td>{{ stock.quantite }}</td>
@@ -332,6 +400,27 @@ document.addEventListener("DOMContentLoaded", function () {
         .catch(error => console.error('Error loading stock status data:', error));
 });
 </script>
+<!--filter stock by status function-->
+<script>
+document.querySelectorAll('input[name="statusFilter"]').forEach(function (radio) {
+    radio.addEventListener('change', function () {
+        var selectedStatus = this.value; // Get selected status value
+        var rows = document.querySelectorAll('.stock-row'); // Get all stock rows
+
+        rows.forEach(function (row) {
+            var stockStatus = row.getAttribute('data-status'); // Get the status from data-status attribute
+
+            // If "All" is selected, show all rows
+            if (selectedStatus === 'all') {
+                row.style.display = ''; // Show all rows
+            } else if (stockStatus === selectedStatus) {
+                row.style.display = ''; // Show matching status rows
+            } else {
+                row.style.display = 'none'; // Hide non-matching rows
+            }
+        });
+    });
+});</script>
 
 
 <br>

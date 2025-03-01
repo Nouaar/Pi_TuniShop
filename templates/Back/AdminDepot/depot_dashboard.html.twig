@@ -1,4 +1,57 @@
 <style>
+    /*radio button styling*/
+    .form-check-inline {
+        margin-right: 15px;
+    }
+
+    .custom-radio {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        width: 25px;
+        height: 25px;
+        border-radius: 50%;
+        border: 2px solid #ccc;
+        background-color: #fff;
+        position: relative;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .custom-radio:checked {
+        background-color: #007bff;
+        border-color: #007bff;
+    }
+
+    .custom-radio:checked::after {
+        content: '';
+        position: absolute;
+        top: 6px;
+        left: 6px;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background-color: #fff;
+    }
+
+    .custom-radio:focus {
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+    }
+
+    .form-check-label {
+        font-size: 16px;
+        margin-left: 8px;
+        color: #495057;
+        font-weight: 500;
+        cursor: pointer;
+    }
+
+    /* Hover and active states */
+    .custom-radio:hover {
+        border-color: #007bff;
+        background-color: #f0f8ff;
+    }
     /* Custom Styling for Table */
     .table th {
         text-align: center;
@@ -40,6 +93,25 @@
     <div class="mb-3">
         <input type="text" id="searchDepots" class="form-control" placeholder="Search Depots...">
     </div>
+    <div class="mb-4">
+    <h5>Filter by Depot Status</h5>
+    <div class="form-check form-check-inline">
+        <input class="form-check-input" type="radio" name="statusFilter" id="allStatus" value="all" checked>
+        <label class="form-check-label" for="allStatus">All</label>
+    </div>
+    <div class="form-check form-check-inline">
+        <input class="form-check-input" type="radio" name="statusFilter" id="activeStatus" value="Actif">
+        <label class="form-check-label" for="activeStatus">Actif</label>
+    </div>
+    <div class="form-check form-check-inline">
+        <input class="form-check-input" type="radio" name="statusFilter" id="inactiveStatus" value="Inactif">
+        <label class="form-check-label" for="inactiveStatus">Inactif</label>
+    </div>
+    <div class="form-check form-check-inline">
+        <input class="form-check-input" type="radio" name="statusFilter" id="maintenanceStatus" value="Maintenance">
+        <label class="form-check-label" for="maintenanceStatus">Maintenance</label>
+    </div>
+</div>
 
     <h1 class="text-center mb-4">Depots</h1>
 
@@ -61,7 +133,7 @@
                 </thead>
                 <tbody>
                     {% for depot in depots %}
-                        <tr>
+                        <tr class="depot-row" data-status="{{ depot.status }}">
                         {% if depot.deletedAt is null %}
                             <td>{{ depot.id }}</td>
                             <td>{{ depot.nom }}</td>
@@ -126,7 +198,7 @@
                 </thead>
                 <tbody>
                     {% for depot in depots %}
-                        <tr>
+                        <tr class="depot-row" data-status="{{ depot.status }}">
                             {% if depot.deletedAt is not null %}
                             <td>{{ depot.id }}</td>
                             <td>{{ depot.nom }}</td>
@@ -185,6 +257,27 @@
 });
 
     </script>
+    <!-- fileter by status function-->
+    <script>
+// Filter depots based on selected status
+document.querySelectorAll('input[name="statusFilter"]').forEach(function (radio) {
+    radio.addEventListener('change', function () {
+        var selectedStatus = this.value;
+        var rows = document.querySelectorAll('.depot-row');
+
+        rows.forEach(function (row) {
+            var depotStatus = row.getAttribute('data-status');
+
+            if (selectedStatus === 'all') {
+                row.style.display = ''; // Show all rows
+            } else if (depotStatus === selectedStatus) {
+                row.style.display = ''; // Show matching status rows
+            } else {
+                row.style.display = 'none'; // Hide non-matching rows
+            }
+        });
+    });
+});</script>
 
 
 {% endblock %}
