@@ -272,6 +272,7 @@
                 <thead class="table-light">
                     <tr>
                         <th>ID</th>
+                        <th>Associated product</th>
                         <th>Quantity</th>
                         <th>Min Quantity</th>
                         <th>Max Quantity</th>
@@ -287,6 +288,17 @@
                         <tr class="stock-row" data-status="{{ stock.status }}">
                         {% if stock.deletedAt is not null %}
                             <td>{{ stock.id }}</td>
+                            {% if stock.product is not null %}
+                            <td><div class="d-flex flex-column align-items-center">
+                        <!-- Display Product Title -->
+                        <span>{{ stock.product.title }}</span>
+
+                        <!-- Display Product Image below the title -->
+                        <img src="{{ asset('uploads/images/' ~ stock.product.image) }}" alt="{{ stock.product.title }}" style="width: 275px; height: auto;">
+                    </div></td>
+                            {% else %}
+                            <td></td>
+                            {% endif %}
                             <td>{{ stock.quantite }}</td>
                             <td>{{ stock.quantitemin }}</td>
                             <td>{{ stock.quantitemax }}</td>
