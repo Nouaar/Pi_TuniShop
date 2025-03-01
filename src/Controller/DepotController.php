@@ -105,6 +105,19 @@ public function restoreDepot(int $id, DepotRepository $depotRepository, EntityMa
     $this->addFlash('success', 'Depot has been restored.');
     return $this->redirect('/back#editDepotContent');
 }
+#[Route('/depot/erasee/{id}', methods: ['POST'], name: 'depot_erase')]
+    public function eraseStock(int $id, EntityManagerInterface $em): Response
+    {
+        $depot = $em->getRepository(Depot::class)->find($id);
+
+        if (!$depot) {
+            return $this->json(['error' => 'Stock not found'], 404);
+        }
+        $em->remove($depot);
+        $em->flush();
+
+        return $this->redirect('/back#editDepotContent');
+    }
 
 
    

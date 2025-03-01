@@ -314,10 +314,15 @@
                             
                             <td class="action-buttons">
                             <form action="{{ path('stock_restore', {'id': stock.id}) }}" method="post" style="display:inline;">
-            <button type="submit" class="btn btn-dark btn-sm">
+            <button type="submit" class="btn btn-info btn-sm">
                 <i class="fas fa-undo"></i> Restore
             </button>
         </form>  
+        <form action="{{ path('stock_erase', {'id': stock.id}) }}" method="post" style="display:inline;">
+            <button type="submit" class="btn btn-dark btn-sm" onclick="confirmErase(event, '{{ path('stock_erase', {'id': stock.id}) }}')">
+                <i class="fas fa-undo"></i> Erase
+            </button>
+        </form>
                             </td>
                             <td>{{ stock.deletedAt ? stock.deletedAt|date('Y-m-d H:i:s') : '' }}</td>
                             
@@ -445,6 +450,33 @@ document.querySelectorAll('input[name="statusFilter"]').forEach(function (radio)
         });
     });
 });</script>
+<script>
+    function confirmErase(event, actionUrl) {
+        event.preventDefault(); // Prevent the form from submitting immediately
+
+        // Display a confirmation dialog
+        const userConfirmed = confirm("Are you sure you want to permanently erase this stock? This action cannot be undone.");
+
+        if (userConfirmed) {
+            // If confirmed, submit the form via JavaScript
+            const form = document.createElement("form");
+            form.method = "POST";
+            form.action = actionUrl;
+
+            // Create a hidden input to allow the form to be submitted
+            const hiddenInput = document.createElement("input");
+            hiddenInput.type = "hidden";
+            hiddenInput.name = "_method"; // Symfony uses _method for DELETE/POST overrides
+            hiddenInput.value = "POST";
+
+            form.appendChild(hiddenInput);
+            document.body.appendChild(form);
+            form.submit(); // Submit the form
+        } else {
+            console.log("Erase action was canceled.");
+        }
+    }
+</script>
 
 
 <br>

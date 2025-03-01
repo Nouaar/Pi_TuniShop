@@ -125,6 +125,19 @@ public function updateStock(int $id, Request $request, EntityManagerInterface $e
 
         return $this->redirectToRoute('app_depot_associated_stocks', ['depotId' => $stock->getDepot()->getId()]);
     }
+    #[Route('/stock/erasee/{id}', methods: ['POST'], name: 'stock_erase')]
+    public function eraseStock(int $id, EntityManagerInterface $em): Response
+    {
+        $stock = $em->getRepository(Stock::class)->find($id);
+
+        if (!$stock) {
+            return $this->json(['error' => 'Stock not found'], 404);
+        }
+        $em->remove($stock);
+        $em->flush();
+
+        return $this->redirectToRoute('app_depot_associated_stocks', ['depotId' => $stock->getDepot()->getId()]);
+    }
     #[Route('/api/stocks/status/{depotId}', name: 'api_stock_status', methods: ['GET'])]
     public function getStockStatusData(int $depotId, EntityManagerInterface $em): JsonResponse
     {
