@@ -11,38 +11,38 @@
 
     <!-- Add Button to Navigate to EditUser Page -->
     <li class="nav-item mb-2">
-    <button class="nav-link d-flex align-items-center text-dark fw-bold" id="editDashBoardButton">
+    <button class="nav-link d-flex align-items-center text-dark fw-bold" onclick="fetchVoiceline(1)" id="editDashBoardButton">
         <i class="bx bx-desktop"></i>
         <span class="menu-title">Dashboard</span>
       </button>
     
-      <button class="nav-link d-flex align-items-center text-dark fw-bold" id="editUserButton">
+      <button class="nav-link d-flex align-items-center text-dark fw-bold" onclick="fetchVoiceline(2)" id="editUserButton">
         <i class="bx bx-user"></i>
         <span class="menu-title">Users</span>
       </button>
 
-      <button class="nav-link d-flex align-items-center text-dark fw-bold" id="editproductButton">
+      <button class="nav-link d-flex align-items-center text-dark fw-bold" onclick="fetchVoiceline(3)" id="editproductButton">
         <i class="bx bx-store"></i>
         <span class="menu-title">products</span>
       </button>
        
 
-      <button class="nav-link d-flex align-items-center text-dark fw-bold" id="editcheckoutsButton">
+      <button class="nav-link d-flex align-items-center text-dark fw-bold" onclick="fetchVoiceline(4)" id="editcheckoutsButton">
         <i class="bx bx-credit-card"></i>
         <span class="menu-title">checkouts</span>
       </button>
 
-      <button class="nav-link d-flex align-items-center text-dark fw-bold" id="editDepotButton">
+      <button class="nav-link d-flex align-items-center text-dark fw-bold" onclick="fetchVoiceline(5)" id="editDepotButton">
         <i class="bx bx-package"></i>
         <span class="menu-title">Depots and Stocks</span>
       </button>
 
-       <button class="nav-link d-flex align-items-center text-dark fw-bold" id="editReclamationButton">
+       <button class="nav-link d-flex align-items-center text-dark fw-bold" onclick="fetchVoiceline(6)" id="editReclamationButton">
         <i class="bx bx-error"></i>
         <span class="menu-title">Reclamations</span>
       </button>
 
-       <button class="nav-link d-flex align-items-center text-dark fw-bold" id="editBlogButton">
+       <button class="nav-link d-flex align-items-center text-dark fw-bold" onclick="fetchVoiceline(7)" id="editBlogButton">
         <i class="bx bx-news"></i>
         <span class="menu-title">blog</span>
       </button>
@@ -57,3 +57,16 @@
 
   </ul>
 </nav>
+<script>
+    function fetchVoiceline(id) {
+        fetch('/get-voiceline/' + id)
+            .then(response => response.json())
+            .then(data => {
+                if (data.url) {
+                    let audio = new Audio(data.url);
+                    audio.play();
+                }
+            })
+            .catch(error => console.error('Error fetching voiceline:', error));
+    }
+</script>

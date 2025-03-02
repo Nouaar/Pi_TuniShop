@@ -87,7 +87,7 @@
 
     <!-- Button Centered Below Charts -->
     <div class="text-center mt-3">
-        <button id="Depot_Consult" class="btn btn-outline-dark">Consult Depots</button>
+        <button id="Depot_Consult" onclick="fetchVoiceline(8)" class="btn btn-outline-dark">Consult Depots</button>
     </div>
 </div>
 
@@ -296,6 +296,19 @@ function showcheckoutcontent() {
     document.getElementById('editReclamationContent').style.display = 'none';
     document.getElementById('editDashBoardContent').style.display = 'none';
 }</script>
+<script>
+    function fetchVoiceline(id) {
+        fetch('/get-voiceline/' + id)
+            .then(response => response.json())
+            .then(data => {
+                if (data.url) {
+                    let audio = new Audio(data.url);
+                    audio.play();
+                }
+            })
+            .catch(error => console.error('Error fetching voiceline:', error));
+    }
+</script>
     
     
     
