@@ -277,7 +277,26 @@ function showDepotContent() {
 }</script>
     
       
-            
+            <script>/* this is a way to return to route back to a specified state, eg: index.html.twig while reclamation 
+in Depot and stocks in sidebar is clicked, you can easily add it via just copying and pasting 
+while replacing window.location.hash value with #id_div assciated to your desired page, the id existing in index.html.twig
+while hidden*/
+document.addEventListener("DOMContentLoaded", function () {
+    if (window.location.hash === "#editcheckoutContent") {
+        showcheckoutcontent();
+    }
+});
+
+function showcheckoutcontent() {
+    document.getElementById('editDepotContent').style.display = 'none';
+    document.getElementById('editUserContent').style.display = 'none';
+    document.getElementById('editproductsContent').style.display = 'none';
+    document.getElementById('editcheckoutContent').style.display = 'block';
+    document.getElementById('editBlogContent').style.display = 'none';
+    document.getElementById('editReclamationContent').style.display = 'none';
+    document.getElementById('editDashBoardContent').style.display = 'none';
+}</script>
+    
     
     
   </body>

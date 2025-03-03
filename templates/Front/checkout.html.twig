@@ -112,6 +112,52 @@
                         <button type="submit" class="btn btn-block btn-primary font-weight-bold py-3">
                             Place Order
                         </button>
+                        <!-- Stripe Payment Button -->
+<button type="button" id="checkout-button" class="btn btn-block btn-success font-weight-bold py-3 mt-2">
+    Pay with Stripe
+</button>
+
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+    var stripe = Stripe("{{ stripe_public_key }}");
+
+    document.getElementById("checkout-button").addEventListener("click", function () {
+        // Prepare the list of products for Stripe
+        let products = [];
+        
+        {% if product is not null %}
+            // Single product checkout (Buy Now)
+            products.push({
+                "name": "{{ product.title }}",
+                "price": {{ product.price }},
+                "quantity": 1
+            });
+        {% else %}
+            // Cart checkout (multiple products)
+            {% for item in cart %}
+            products.push({
+                "name": "{{ item.title }}",
+                "price": {{ item.price }},
+                "quantity": {{ item.quantity }}
+            });
+            {% endfor %}
+        {% endif %}
+
+        // Send products to Stripe session API
+        fetch("{{ path('payment_create_session') }}", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(products)
+        })
+        .then(response => response.json())
+        .then(session => {
+            return stripe.redirectToCheckout({ sessionId: session.id });
+        })
+        .catch(error => console.error("Error:", error));
+    });
+</script>
+
+
                     </form>
                 </div>
             </div>

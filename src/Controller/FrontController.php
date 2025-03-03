@@ -252,26 +252,24 @@ public function checkoutSingle(int $id, EntityManagerInterface $entityManager): 
     }
 
     return $this->renderWithAuth('Front/checkout.html.twig', [
-        'cart' => [  // Pass a single product as a "cart" array
+        'cart' => [  
             [
                 'id' => $product->getId(),
                 'title' => $product->getTitle(),
                 'price' => $product->getPrice(),
-                'quantity' => 1, // Default quantity for Buy Now
+                'quantity' => 1,
                 'image' => $product->getImage(),
             ]
         ],
-        'total' => $product->getPrice() + 10, // Including shipping fee
+        'total' => $product->getPrice() + 10, 
+        'stripe_public_key' => $this->getParameter('stripe_public_key') // ✅ Pass the Stripe public key
     ]);
 }
 
 #[Route('/checkout', name: 'checkout_cart')]
 public function checkoutCart(Request $request, SessionInterface $session, EntityManagerInterface $entityManager): Response
 {
-    // Get cart data from session
     $cart = $session->get('cart', []);
-
-    // Check if user is directly buying a single product (from "Buy Now")
     $productId = $request->query->get('productId');
     $product = null;
 
@@ -282,17 +280,16 @@ public function checkoutCart(Request $request, SessionInterface $session, Entity
         }
     }
 
-    // Calculate total price (if coming from cart)
-    $total = array_reduce($cart, function ($sum, $product) {
-        return $sum + ($product['price'] * $product['quantity']);
-    }, 0);
+    $total = array_reduce($cart, fn($sum, $product) => $sum + ($product['price'] * $product['quantity']), 0);
 
     return $this->renderWithAuth('Front/checkout.html.twig', [
         'cart' => $cart,
-        'total' => $total + 10, // Adding shipping cost
-        'product' => $product // Pass the single product if "Buy Now" was used
+        'total' => $total + 10,
+        'product' => $product,
+        'stripe_public_key' => $this->getParameter('stripe_public_key') // ✅ Pass the Stripe public key
     ]);
 }
+
 
 
     #[Route('/logout', name: 'logout')]
