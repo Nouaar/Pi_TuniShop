@@ -100,7 +100,8 @@
         </div>
     </div>
 </div>
-    
+<button id="Claim_Consult" onclick="fetchVoiceline(9)" class="btn btn-outline-dark" style ="margin-left:125px; margin-top:30px;">Consulting Claims</button>
+
 
 </div>
             
@@ -190,7 +191,18 @@
          document.getElementById('editBlogContent').style.display = 'none';
           document.getElementById('editReclamationContent').style.display = 'none';
           document.getElementById('editDashBoardContent').style.display = 'none';
-      });});
+      });})
+      document.querySelectorAll('#editReclamationButton, #Claim_Consult').forEach(button => {
+    button.addEventListener('click', function() {
+        document.getElementById('editDepotContent').style.display = 'none';
+        document.getElementById('editUserContent').style.display = 'none';
+        document.getElementById('editproductsContent').style.display = 'none';
+        document.getElementById('editcheckoutContent').style.display = 'none';
+         document.getElementById('editBlogContent').style.display = 'none';
+          document.getElementById('editReclamationContent').style.display = 'block';
+          document.getElementById('editDashBoardContent').style.display = 'none';
+      });}
+      );
 
       document.getElementById('editReclamationButton').addEventListener('click', function() {
     document.getElementById('editReclamationContent').style.display = 'block';
@@ -357,6 +369,7 @@ function showcheckoutcontent() {
             .catch(error => console.error('Error fetching voiceline:', error));
     }
 </script>
+
     
     
     

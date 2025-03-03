@@ -21,6 +21,7 @@ class VoiceLineController extends AbstractController
             6 => '/audio/reclamations_switch.mp3',
             7 => '/audio/blog_switch.mp3',
             8 => '/audio/consulting_Depots.mp3',
+            9 => '/audio/claims_switcher.mp3',
             
             
         ];
