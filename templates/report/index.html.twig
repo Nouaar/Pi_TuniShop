@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="{{ app.request.locale }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ 'report_title' | trans }}</title>
+    <link href="{{ asset('img/favicon.ico') }}" rel="icon">
+    <style>
+        :root {
+            --primary-green: #ebf8e1;
+            --accent-dark: #2d3748;
+            --text-primary: #2d3748;
+            --text-secondary: #4a5568;
+            --hover-bg: rgba(235, 248, 225, 0.4);
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            margin: 0;
+            padding: 60px 0 0;
+            background-color: #f7fafc;
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Logo styling */
+        .corner-logo {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 100;
+            width: 40px; /* Smaller size */
+            height: 40px; /* Square dimensions to maintain aspect ratio */
+            border-radius: 50%; /* Circular logo */
+            overflow: hidden; /* Ensures that the logo stays within the circle */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .corner-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Ensures the logo fills the circle without distortion */
+        }
+
+        h1, h2, h3 {
+            color: var(--accent-dark);
+            font-weight: 600;
+            margin-top: 0;
+        }
+
+        .content {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 2.5rem;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .section {
+            margin-bottom: 2.5rem;
+            padding: 1.5rem;
+            border-radius: 8px;
+            background: linear-gradient(to right, rgba(235, 248, 225, 0.2), transparent);
+            transition: background 0.3s ease;
+        }
+
+        .section:hover {
+            background: var(--primary-green);
+        }
+
+        .section h2 {
+            font-size: 1.75rem;
+            border-left: 4px solid var(--primary-green);
+            padding-left: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .section h3 {
+            font-size: 1.5rem;
+            color: var(--accent-dark);
+            margin-bottom: 1.25rem;
+            position: relative;
+            padding-left: 1.75rem;
+        }
+
+        .section h3::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 12px;
+            height: 12px;
+            background: var(--primary-green);
+            border-radius: 50%;
+            box-shadow: 0 0 0 2px rgba(63, 135, 245, 0.2);
+        }
+
+        ul {
+            list-style: none;
+            padding-left: 1.5rem;
+            border-left: 2px solid var(--primary-green);
+        }
+
+        li {
+            padding: 0.75rem 1rem;
+            margin: 0.5rem 0;
+            background: rgba(235, 248, 225, 0.2);
+            border-radius: 6px;
+            transition: transform 0.2s ease, background-color 0.2s ease;
+        }
+
+        li:hover {
+            background: var(--hover-bg);
+            transform: translateX(4px);
+        }
+
+        .summary {
+            background: var(--primary-green);
+            padding: 1.5rem;
+            border-radius: 8px;
+        }
+
+        .summary p {
+            margin: 1rem 0;
+            padding: 0.75rem;
+            background: white;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            font-weight: 500;
+        }
+
+        .footer {
+            background: var(--accent-dark);
+            color: white;
+            text-align: center;
+            padding: 1.5rem;
+            margin-top: 3rem;
+            font-size: 0.9rem;
+        }
+
+        .download-btn {
+            background-color: var(--primary-green);
+            padding: 0.5rem 1rem; /* Reduced padding for smaller size */
+            border-radius: 20px; /* Slightly more rounded edges */
+            color: var(--accent-dark);
+            font-weight: bold;
+            font-size: 0.85rem; /* Smaller font size */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            position: fixed; /* Fix position */
+            top: 20px; /* Top position */
+            right: 20px; /* Right position */
+            z-index: 100;
+        }
+
+        .download-btn:hover {
+            background-color: #c7f7a5;
+            transform: scale(1.05);
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                padding: 1.5rem;
+                margin: 1rem;
+            }
+            .corner-logo {
+                width: 30px; /* Adjust size for mobile */
+                height: 30px; /* Adjust size for mobile */
+                top: 10px; /* Adjust position for mobile */
+                left: 10px; /* Adjust position for mobile */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="corner-logo">
+        <img src="{{ asset('img/favicon.ico') }}" alt="Logo">
+    </div>
+
+    <div class="d-flex justify-content-end mb-4 position-fixed top-0 right-0 p-3">
+        <a href="{{ path('admin_download_report_word') }}" class="download-btn">
+            📄 Download Word Report
+        </a>
+    </div>
+
+    <div class="content">
+        <div class="section">
+            <h1>{{ 'Rport of claims and refunds' | trans }}</h1>
+            <div class="summary">
+                <p>{{ rapportTexte }}</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h3>{{ 'claim_details' | trans }}</h3>
+            <ul>
+                {% for raison, count in reclamations %}
+                    <li>
+                        <span>{{ raison }}</span>
+                        <span>{{ count }} {{ 'claims' | trans }}</span>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="section">
+            <h3>{{ 'refund_details' | trans }}</h3>
+            <ul>
+                {% for remboursement in remboursements %}
+                    <li>
+                        <span>{{ 'amount' | trans }}:</span>
+                        {{ remboursement.montant }}€
+                        <span style="margin: 0 8px">•</span>
+                        <span>{{ 'mode' | trans }}:</span>
+                        {{ remboursement.modeRemboursement }}
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="section">
+            <h3>{{ 'statistics_summary' | trans }}</h3>
+            <div class="summary">
+                <p>
+                    <span>{{ 'total_claims' | trans }}:</span>
+                    <span>{{ totalReclamations }}</span>
+                </p>
+                <p>
+                    <span>{{ 'total_refunds' | trans }}:</span>
+                    <span>{{ totalRemboursements }}</span>
+                </p>
+                <p>
+                    <span>{{ 'min_refund' | trans }}:</span>
+                    <span>{{ montantMin }}€</span>
+                </p>
+                <p>
+                    <span>{{ 'max_refund' | trans }}:</span>
+                    <span>{{ montantMax }}€</span>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>&copy; 2025 {{ 'company_name' | trans }}. {{ 'all_rights_reserved' | trans }}</p>
+    </div>
+</body>
+</html>

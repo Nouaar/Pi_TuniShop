@@ -1,3 +1,4 @@
+
 <link rel="stylesheet" href="vendors/typicons/typicons.css">
 <link rel="stylesheet" href="vendors/css/vendor.bundle.base.css">
 <link rel="stylesheet" href="css/vertical-layout-light/style.css">
@@ -85,11 +86,24 @@
         </div>
     </div>
 
-    <!-- Button Centered Below Charts -->
-    <div class="text-center mt-3">
-        <button id="Depot_Consult" onclick="fetchVoiceline(8)" class="btn btn-outline-dark">Consult Depots</button>
+<!-- Button Centered Below Charts -->
+<div class="text-center mt-3">
+    <button id="Depot_Consult" onclick="fetchVoiceline(8)" class="btn btn-outline-dark">Consult Depots</button>
+</div>
+
+<!-- Statistics Chart Positioned Directly Below the Button -->
+<div class="text-center mt-5">
+    <div class="chart-box">
+        <h4 class="text-center">📊 Statistics of Orders and Complaints</h4>
+        <div class="chart-container">
+            <canvas id="statistiquesChart"></canvas>
+        </div>
     </div>
 </div>
+    
+
+</div>
+            
 
           <div class="col-md-9" id="editUserContent" style="display:none;">
             {# Initially hidden content #}
@@ -208,6 +222,40 @@
       });
       
     </script>
+
+
+          <script src="vendors/js/vendor.bundle.base.js"></script>
+      <script>
+        document.addEventListener("DOMContentLoaded", function () {
+          fetch("{{ path('admin_statistiques_data') }}")
+            .then(response => response.json())
+            .then(data => {
+              const ctx = document.getElementById('statistiquesChart').getContext('2d');
+              new Chart(ctx, {
+                type: 'pie',
+                data: {
+                  labels: ['Purchased Products', 'Complaints'],
+                  datasets: [{
+                    data: [data.commandes, data.reclamations],
+                    backgroundColor: ['#fcbfbf', '#fbe769'],
+                    borderColor: ['#ffffff', '#ffffff'],
+                    borderWidth: 2
+                  }]
+                },
+                options: {
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  aspectRatio: 1,
+                  plugins: {
+                    legend: { position: 'bottom' }
+                  }
+                }
+              });
+            })
+            .catch(error => console.error('Error loading data:', error));
+        });
+      </script>
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     // Fetch Depot Status Distribution Data

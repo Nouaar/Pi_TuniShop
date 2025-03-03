@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use App\Repository\CheckoutRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
 #[ORM\Entity(repositoryClass: CheckoutRepository::class)]
 class Checkout
@@ -44,6 +46,12 @@ class Checkout
     #[ORM\ManyToOne(targetEntity: Products::class)]
     #[ORM\JoinColumn(name: "id_produit", referencedColumnName: "id")]
     private ?Products $id_produit = null;
+
+        /**
+     * @var Collection<int, Reclamation>
+     */
+    #[ORM\OneToMany(targetEntity: Reclamation::class, mappedBy: 'id_commande')]
+    private Collection $id_commande;
 
     public function getId(): ?int { return $this->id; }
 
@@ -126,4 +134,42 @@ class Checkout
         $this->id_produit = $id_produit;
         return $this;
     }
+
+ /**
+     * @return Collection<int, Reclamation>
+     */
+    public function getIdCommande(): Collection
+    {
+        return $this->id_commande;
+    }
+
+    public function addIdCommande(Reclamation $idCommande): static
+    {
+        if (!$this->id_commande->contains($idCommande)) {
+            $this->id_commande->add($idCommande);
+            $idCommande->setIdCommande($this);
+        }
+
+        return $this;
+    }
+
+    public function removeIdCommande(Reclamation $idCommande): static
+    {
+        if ($this->id_commande->removeElement($idCommande)) {
+            // set the owning side to null (unless already changed)
+            if ($idCommande->getIdCommande() === $this) {
+                $idCommande->setIdCommande(null);
+            }
+        }
+
+        return $this;
+    }
+
+
+
+public function __toString(): string
+{
+    return (string) $this->getId();  // Ou une autre propriété que tu veux afficher
+}
+
 }

@@ -13,11 +13,12 @@
         "doctrine/doctrine-bundle": "^2.13",
         "doctrine/doctrine-migrations-bundle": "^3.4",
         "doctrine/orm": "^3.3",
-        "endroid/qr-code": "^6.0",
+        "endroid/qr-code": "^5.0",
         "firebase/php-jwt": "^6.11",
         "knplabs/knp-snappy-bundle": "^1.10",
         "nelmio/cors-bundle": "^2.5",
         "phpdocumentor/reflection-docblock": "^5.6",
+        "phpoffice/phpword": "*",
         "phpstan/phpdoc-parser": "^2.0",
         "stof/doctrine-extensions-bundle": "^1.13",
         "stripe/stripe-php": "^16.6",
@@ -37,7 +38,8 @@
         "symfony/serializer": "6.4.*",
         "symfony/twig-bundle": "6.4.*",
         "symfony/validator": "6.4.*",
-        "symfony/yaml": "6.4.*"
+        "symfony/yaml": "6.4.*",
+        "vich/uploader-bundle": "*"
     },
     "config": {
         "allow-plugins": {

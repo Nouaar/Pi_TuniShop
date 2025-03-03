@@ -20,36 +20,40 @@ class RemboursementType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('montant', TextType::class, [
-                'constraints' => [
-                    new NotBlank(['message' => 'Le montant est obligatoire.']),
-                    new Regex([
-                        'pattern' => '/^\d{1,8}$/',
-                        'message' => 'Le montant doit contenir entre 1 et 8 chiffres.',
-                    ]),
-                ],
-            ])
+        ->add('montant', TextType::class, [
+            'label' => 'sum', // This is the correct place for the label
+            'constraints' => [
+                new NotBlank(['message' => 'Amount is required.']),
+                new Regex([
+                    'pattern' => '/^\d{1,8}$/',
+                    'message' => 'Amount must contain between 1 and 8 digits.',
+                ]),
+            ],
+        ])
+        
             ->add('mode_remboursement', ChoiceType::class, [
+                'label' => 'Refund mode', 
                 'choices' => [
-                    'Virement' => 'virement',
-                    'Chèque' => 'cheque',
-                    'Espèces' => 'especes',
+                    'Bank Transfer' => 'virement',
+                    'Cheque' => 'cheque',
+                    'Cash' => 'especes',
                 ],
                 'constraints' => [
-                    new NotBlank(['message' => 'Le mode de remboursement est obligatoire.']),
+                    new NotBlank(['message' => 'Refund method is required.']),
                 ],
             ])
+            
             ->add('date', DateType::class, [
                 'widget' => 'single_text',
                 'constraints' => [
-                    new NotBlank(['message' => 'La date est obligatoire.']),
+                    new NotBlank(['message' => 'Date is required.']),
                 ],
             ])
             ->add('id_reclamation', EntityType::class, [
                 'class' => Reclamation::class,
                 'choice_label' => 'id',
                 'constraints' => [
-                    new NotBlank(['message' => 'La réclamation associée est obligatoire.']),
+                    new NotBlank(['message' => 'Associated claim is required.']),
                 ],
             ]);
     }

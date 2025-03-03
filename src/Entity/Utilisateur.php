@@ -32,7 +32,11 @@ class Utilisateur implements PasswordAuthenticatedUserInterface, UserInterface
     #[ORM\Column(length: 255)]
     private ?string $password = null;
     
-
+         /**
+     * @var Collection<int, Reclamation>
+     */
+    #[ORM\ManyToMany(targetEntity: Reclamation::class, mappedBy: 'id_user')]
+    private Collection $reclamations;
 
     #[ORM\OneToMany(mappedBy: 'utilisateur', targetEntity: AdresseUser::class, orphanRemoval: true, cascade: ['remove'])]
     private Collection $adresses;
@@ -154,6 +158,39 @@ class Utilisateur implements PasswordAuthenticatedUserInterface, UserInterface
     public function setVerificationToken(?string $verificationToken): static
     {
         $this->verificationToken = $verificationToken;
+        return $this;
+    }
+
+
+
+
+        /**
+     * @return Collection<int, Reclamation>
+     */
+    public function getReclamations(): Collection
+    {
+        return $this->reclamations;
+    }
+
+    public function addReclamation(Reclamation $reclamation): static
+    {
+        if (!$this->reclamations->contains($reclamation)) {
+            $this->reclamations->add($reclamation);
+            $reclamation->setIdUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeReclamation(Reclamation $reclamation): static
+    {
+        if ($this->reclamations->removeElement($reclamation)) {
+            // set the owning side to null (unless already changed)
+            if ($reclamation->getIdUser() === $this) {
+                $reclamation->setIdUser(null);
+            }
+        }
+
         return $this;
     }
 }

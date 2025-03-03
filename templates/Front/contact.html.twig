@@ -3,10 +3,10 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Reclamation - TuniShop</title>
+    <title>Claim - TuniShop</title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <meta content="Réclamation produit" name="keywords">
-    <meta content="Réclamation produit" name="description">
+    <meta content="Product Claim" name="keywords">
+    <meta content="Product Claim" name="description">
 
     <!-- Favicon -->
     <link href="img/favicon.ico" rel="icon">
@@ -24,10 +24,39 @@
 
     <!-- Customized Bootstrap Stylesheet -->
     <link href="css/style.css" rel="stylesheet">
+    
+    <style>
+        .camera-container {
+            display: flex;
+            align-items: center; /* Aligne verticalement la vidéo et le bouton */
+            gap: 10px; /* Ajoute un espace entre la vidéo et le bouton */
+            justify-content: center;
+        }
+
+        #video {
+            border: 1px solid #ccc; /* Optionnel : ajoute une bordure autour de la vidéo */
+            max-width: 300px; /* Limite la largeur de la vidéo */
+            height: auto;
+        }
+
+        #photoPreview {
+            max-width: 100%;
+            margin-top: 10px;
+        }
+
+        button {
+            margin-left: 10px; /* Un petit espace entre la vidéo et le bouton */
+        }
+
+        /* Masque le bouton de la caméra lorsque la vidéo est affichée */
+        .hidden {
+            display: none;
+        }
+    </style>
 </head>
 
 <body>
-  {% include 'partials/header.html.twig' %}
+    {% include 'partials/header.html.twig' %}
 
     <!-- Breadcrumb Start -->
     <div class="container-fluid">
@@ -35,42 +64,52 @@
             <div class="col-12">
                 <nav class="breadcrumb bg-light mb-30">
                     <a class="breadcrumb-item text-dark" href="#">Home</a>
-                    <span class="breadcrumb-item active">Reclamation</span>
+                    <span class="breadcrumb-item active">Claim</span>
                 </nav>
             </div>
         </div>
     </div>
     <!-- Breadcrumb End -->
 
-    <!-- Reclamation Start -->
+    <!-- Claim Start -->
     <div class="container-fluid">
-        <h2 class="section-title position-relative text-uppercase mx-xl-5 mb-4"><span class="bg-secondary pr-3">Make a reclamation</span></h2>
+        <h2 class="section-title position-relative text-uppercase mx-xl-5 mb-4"><span class="bg-secondary pr-3">Submit a claim</span></h2>
         <div class="row px-xl-5">
             <div class="col-lg-7 mb-5">
                 <div class="contact-form bg-light p-30">
                     <div id="success"></div>
-
-                    {# Formulaire de réclamation intégré #}
                     <form action="{{ path('app_reclamation_new') }}" method="post">
                         {{ form_start(form) }}
                         <div class="control-group">
-                            {{ form_row(form.id_commande, {'attr': {'class': 'form-control', 'placeholder': 'ID Order'}}) }}
+                            {{ form_row(form.id_commande, {'attr': {'class': 'form-control', 'placeholder': 'Order ID'}}) }}
                             <p class="help-block text-danger"></p>
                         </div>
                         <div class="control-group">
-                            {{ form_row(form.id_produit, {'attr': {'class': 'form-control', 'placeholder': 'ID Produt'}}) }}
+                            {{ form_row(form.id_produit, {'attr': {'class': 'form-control', 'placeholder': 'Product ID'}}) }}
                             <p class="help-block text-danger"></p>
                         </div>
                         <div class="control-group">
-                            {{ form_row(form.raison, {'attr': {'class': 'form-control', 'placeholder': 'Reason of reclamation'}}) }}
+                            {{ form_row(form.raison, {'attr': {'class': 'form-control', 'placeholder': 'Reason for the claim'}}) }}
                             <p class="help-block text-danger"></p>
                         </div>
                         <div class="control-group">
-                            {{ form_row(form.date, {'attr': {'class': 'form-control', 'placeholder': 'Date '}}) }}
+                            {{ form_row(form.date, {'attr': {'class': 'form-control', 'placeholder': 'Date'}}) }}
                             <p class="help-block text-danger"></p>
                         </div>
+
+                        <div class="control-group">
+                            <label>If you wish, you can send us a picture of your product:</label>
+                            <div class="camera-container">
+                                <button type="button" class="btn btn-secondary" id="cameraButton" onclick="openCamera()">📷 Camera</button>
+                                <video id="video" width="100%" height="250" autoplay style="display:none;"></video>
+                                <canvas id="canvas" style="display:none;"></canvas>
+                                <img id="photoPreview" style="display:none; max-width:100%; margin-top:10px;">
+                                <input type="hidden" name="photo" id="photoInput">
+                            </div>
+                        </div>
+
                         <div>
-                            <button class="btn btn-primary py-2 px-4" type="submit">📩 send  Reclamation</button>
+                            <button class="btn btn-primary py-2 px-4" type="submit">📩 Submit Claim</button>
                         </div>
                         {{ form_end(form) }}
                     </form>
@@ -83,32 +122,56 @@
                     frameborder="0" style="border:0;" allowfullscreen="" aria-hidden="false" tabindex="0"></iframe>
                 </div>
                 <div class="bg-light p-30 mb-3">
-                    <p class="mb-2"><i class="fa fa-map-marker-alt text-primary mr-3"></i>123 Rue, Tunis, Tunisie</p>
+                    <p class="mb-2"><i class="fa fa-map-marker-alt text-primary mr-3"></i>123 Street, Tunis, Tunisia</p>
                     <p class="mb-2"><i class="fa fa-envelope text-primary mr-3"></i>support@tunishop.com</p>
                     <p class="mb-2"><i class="fa fa-phone-alt text-primary mr-3"></i>+216 12 345 678</p>
                 </div>
             </div>
         </div>
     </div>
-    <!-- Reclamation End -->
+    <!-- Claim End -->
 
-   {% include 'partials/footer.html.twig' %}
+    {% include 'partials/footer.html.twig' %}
 
-    <!-- Back to Top -->
-    <a href="#" class="btn btn-primary back-to-top"><i class="fa fa-angle-double-up"></i></a>
+    <script>
+        function openCamera() {
+            let video = document.getElementById('video');
+            let canvas = document.getElementById('canvas');
+            let photoPreview = document.getElementById('photoPreview');
+            let photoInput = document.getElementById('photoInput');
+            let cameraButton = document.getElementById('cameraButton');
 
-    <!-- JavaScript Libraries -->
-    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
-    <script src="lib/easing/easing.min.js"></script>
-    <script src="lib/owlcarousel/owl.carousel.min.js"></script>
+            // Masquer le bouton "Camera"
+            cameraButton.classList.add('hidden');
 
-    <!-- Contact Javascript File -->
-    <script src="mail/jqBootstrapValidation.min.js"></script>
-    <script src="mail/contact.js"></script>
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(stream => {
+                    video.style.display = 'block';
+                    video.srcObject = stream;
 
-    <!-- Template Javascript -->
-    <script src="js/main.js"></script>
+                    // Crée un bouton de capture et place-le juste à côté de la vidéo
+                    let captureButton = document.createElement('button');
+                    captureButton.innerText = '📸 Take Photo';
+                    captureButton.className = 'btn btn-success mt-2';
+                    captureButton.onclick = function() {
+                        canvas.width = video.videoWidth;
+                        canvas.height = video.videoHeight;
+                        canvas.getContext('2d').drawImage(video, 0, 0);
+                        let imageData = canvas.toDataURL('image/png');
+                        photoPreview.src = imageData;
+                        photoPreview.style.display = 'block';
+                        photoInput.value = imageData;
+                        video.style.display = 'none';
+                        stream.getTracks().forEach(track => track.stop());
+                        captureButton.remove();
+                    };
+
+                    // Ajoute le bouton de capture à la même section que la vidéo
+                    document.querySelector('.camera-container').appendChild(captureButton);
+                })
+                .catch(err => console.error('Camera error:', err));
+        }
+    </script>
 </body>
 
 </html>

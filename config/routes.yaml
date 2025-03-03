@@ -3,3 +3,9 @@ controllers:
         path: ../src/Controller/
         namespace: App\Controller
     type: attribute
+
+    # Valid route example
+download_report_word:
+    path: /download-report-word
+    controller: App\Controller\YourController::downloadReportWord
+    methods: [GET]  # Optional, specify HTTP methods if needed

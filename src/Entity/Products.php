@@ -47,6 +47,13 @@ class Products
     #[ORM\OneToMany(targetEntity: Stock::class, mappedBy: 'product')]
     private Collection $associated_stocks;
 
+
+      /**
+     * @var Collection<int, Reclamation>
+     */
+    #[ORM\OneToMany(targetEntity: Reclamation::class, mappedBy: 'id_produit')]
+    private Collection $reclamations;
+
     public function __construct()
     {
         $this->associated_stocks = new ArrayCollection();
@@ -175,4 +182,43 @@ class Products
 
         return $this;
     }
+
+
+
+
+        /**
+     * @return Collection<int, Reclamation>
+     */
+    public function getReclamations(): Collection
+    {
+        return $this->reclamations;
+    }
+
+  public function addReclamation(Reclamation $reclamation): static
+{
+    if (!$this->reclamations->contains($reclamation)) {
+        $this->reclamations->add($reclamation);
+        // Set the product (Produit) for the reclamation (this should be correct)
+        $reclamation->setIdProduit($this);
+    }
+
+    return $this;
+}
+
+    public function removeReclamation(Reclamation $reclamation): static
+    {
+        if ($this->reclamations->removeElement($reclamation)) {
+            // set the owning side to null (unless already changed)
+            if ($reclamation->getIdProduit() === $this) {
+                $reclamation->setIdProduit(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function __toString(): string
+{
+    return (string) $this->getId();  // Ou une autre propriété que tu veux afficher
+}
 }

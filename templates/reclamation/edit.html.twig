@@ -1,27 +1,19 @@
-   {% include 'partials/header.html.twig' %}
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="utf-8">
-    <title>reclamation</title>
+    <title>Edit Claim - TuniShop</title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <meta content="pi" name="keywords">
-    <meta content="pi" name="description">
+    <meta content="Product Claim" name="keywords">
+    <meta content="Product Claim" name="description">
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
-
-
- 
-
+    <!-- Favicon -->
+    <link href="img/favicon.ico" rel="icon">
 
     <!-- Google Web Fonts -->
     <link rel="preconnect" href="https://fonts.gstatic.com">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">  
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 
     <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
@@ -34,39 +26,121 @@
     <link href="{{ asset('css/style.css') }}" rel="stylesheet">
 
 </head>
+
 <body>
+  {% include 'partials/header.html.twig' %}
 
+    <!-- Breadcrumb Start -->
+    <div class="container-fluid">
+        <div class="row px-xl-5">
+            <div class="col-12">
+                <nav class="breadcrumb bg-light mb-30">
+                    <a class="breadcrumb-item text-dark" href="#">Home</a>
+                    <span class="breadcrumb-item active">Edit Claim</span>
+                </nav>
+            </div>
+        </div>
+    </div>
+    <!-- Breadcrumb End -->
 
-{% block body %}
-    <h1>Edit Reclamation</h1>
+    <!-- Edit Claim Start -->
+    <div class="container-fluid">
+        <h2 class="section-title position-relative text-uppercase mx-xl-5 mb-4"><span class="bg-secondary pr-3">Edit your claim</span></h2>
+        <div class="row px-xl-5">
+            <div class="col-lg-7 mb-5">
+                <div class="contact-form bg-light p-30">
+                    <div id="success"></div>
+                    <form action="{{ path('app_reclamation_edit', {'id': reclamation.id}) }}" method="post">
+                        {{ form_start(form) }}
+                        <div class="control-group">
+                            {{ form_row(form.id_commande, {'attr': {'class': 'form-control', 'placeholder': 'Order ID'}}) }}
+                            <p class="help-block text-danger"></p>
+                        </div>
+                        <div class="control-group">
+                            {{ form_row(form.id_produit, {'attr': {'class': 'form-control', 'placeholder': 'Product ID'}}) }}
+                            <p class="help-block text-danger"></p>
+                        </div>
+                        <div class="control-group">
+                            {{ form_row(form.raison, {'attr': {'class': 'form-control', 'placeholder': 'Reason for the claim'}}) }}
+                            <p class="help-block text-danger"></p>
+                        </div>
+                        <div class="control-group">
+                            {{ form_row(form.date, {'attr': {'class': 'form-control', 'placeholder': 'Date'}}) }}
+                            <p class="help-block text-danger"></p>
+                        </div>
 
-    {{ include('remboursement/_form.html.twig', {'button_label': 'Update'}) }}
+                        <!-- Display current photo if it exists -->
+                        {% if reclamation.photo %}
+                            <div class="control-group">
+                                <label>Current photo:</label>
+                                <img src="{{ asset('uploads/images/' ~ reclamation.photo) }}" id="currentPhoto" style="max-width:100%; margin-top:10px;">
+                                <p>Want to update the photo? Use the camera button below.</p>
+                            </div>
+                        {% endif %}
 
-    <a href="{{ path('app_reclamation_index') }}">back to list</a>
+                        <!-- Camera for new photo -->
+                        <div class="control-group">
+                            <label>Thank you for taking the time to show us your product:</label>
+                            <div class="camera-container">
+                                <button type="button" class="btn btn-secondary" id="cameraButton" onclick="openCamera()">📷 Camera</button>
+                                <video id="video" width="100%" height="250" autoplay style="display:none;"></video>
+                                <canvas id="canvas" style="display:none;"></canvas>
+                                <img id="photoPreview" style="display:none; max-width:100%; margin-top:10px;">
+                                <input type="hidden" name="photo" id="photoInput" value="{{ reclamation.photo }}">
+                            </div>
+                        </div>
 
-    {{ include('reclamation/_delete_form.html.twig') }}
+                        <div>
+                            <button class="btn btn-primary py-2 px-4" type="submit">📩 Update Claim</button>
+                        </div>
+                        {{ form_end(form) }}
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Edit Claim End -->
 
+   {% include 'partials/footer.html.twig' %}
 
-    {% include 'partials/footer.html.twig' %}
+    <script>
+        function openCamera() {
+            let video = document.getElementById('video');
+            let canvas = document.getElementById('canvas');
+            let photoPreview = document.getElementById('photoPreview');
+            let photoInput = document.getElementById('photoInput');
+            let cameraButton = document.getElementById('cameraButton');
 
+            // Masquer le bouton "Camera" une fois qu'il est cliqué
+            cameraButton.classList.add('hidden');
 
-    <!-- Back to Top -->
-    <a href="#" class="btn btn-primary back-to-top"><i class="fa fa-angle-double-up"></i></a>
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(stream => {
+                    video.style.display = 'block';
+                    video.srcObject = stream;
 
+                    let captureButton = document.createElement('button');
+                    captureButton.innerText = '📸 Take Photo';
+                    captureButton.className = 'btn btn-success mt-2';
+                    captureButton.onclick = function() {
+                        canvas.width = video.videoWidth;
+                        canvas.height = video.videoHeight;
+                        canvas.getContext('2d').drawImage(video, 0, 0);
+                        let imageData = canvas.toDataURL('image/png');
+                        photoPreview.src = imageData;
+                        photoPreview.style.display = 'block';
+                        photoInput.value = imageData; // Enregistrer l'image dans l'input caché
+                        video.style.display = 'none';
+                        stream.getTracks().forEach(track => track.stop());
+                        captureButton.remove();
+                    };
 
-    <!-- JavaScript Libraries -->
-    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
-    <script src="lib/easing/easing.min.js"></script>
-    <script src="lib/owlcarousel/owl.carousel.min.js"></script>
-
-    <!-- Contact Javascript File -->
-    <script src="mail/jqBootstrapValidation.min.js"></script>
-    <script src="mail/contact.js"></script>
-
-    <!-- Template Javascript -->
-    <script src="js/main.js"></script>
-
+                    // Ajouter le bouton "Take Photo" juste après la vidéo
+                    document.querySelector('.camera-container').appendChild(captureButton);
+                })
+                .catch(err => console.error('Camera error:', err));
+        }
+    </script>
 </body>
-{% endblock %}
+
 </html>

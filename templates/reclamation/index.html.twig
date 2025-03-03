@@ -1,5 +1,5 @@
-   {% include 'partials/header.html.twig' %}
- <!DOCTYPE html>
+{% include 'partials/header.html.twig' %}
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -34,14 +34,7 @@
     <link href="css/style.css" rel="stylesheet">
 </head>
 
-
-
-
 <body>
-
-
-<!-- Topbar End -->
-
 
 {% block body %}
 <div class="container mt-5">
@@ -56,6 +49,7 @@
                     <th>Id Product</th>
                     <th>Reason</th>
                     <th>Date</th>
+                    <th>Photo</th> <!-- New column for photo -->
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -68,6 +62,14 @@
                         <td>{{ reclamation.raison }}</td>
                         <td>{{ reclamation.date ? reclamation.date|date('Y-m-d') : '' }}</td>
                         <td>
+                            {% if reclamation.photo %}
+                                <img src="{{ asset('uploads/images/' ~ reclamation.photo) }}" alt="Réclamation Photo" style="max-width: 100px; max-height: 100px;">
+
+                            {% else %}
+                                No photo available
+                            {% endif %}
+                        </td>
+                        <td>
                             <a href="{{ path('app_reclamation_show', {'id': reclamation.id}) }}" class="btn btn-info btn-sm">Show</a>
                             <a href="{{ path('app_reclamation_edit', {'id': reclamation.id}) }}" class="btn btn-warning btn-sm">Edit</a>
                             {{ include('reclamation/_delete_form.html.twig') }}
@@ -75,7 +77,7 @@
                     </tr>
                 {% else %}
                     <tr>
-                        <td colspan="6" class="text-center text-danger">❌ No records found.</td>
+                        <td colspan="7" class="text-center text-danger">❌ No records found.</td>
                     </tr>
                 {% endfor %}
             </tbody>
@@ -88,23 +90,20 @@
 </div>
 {% include 'partials/footer.html.twig' %}
 
+<!-- Back to Top -->
+<a href="#" class="btn btn-primary back-to-top"><i class="fa fa-angle-double-up"></i></a>
 
-    <!-- Back to Top -->
-    <a href="#" class="btn btn-primary back-to-top"><i class="fa fa-angle-double-up"></i></a>
+<!-- JavaScript Libraries -->
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+<script src="lib/easing/easing.min.js"></script>
+<script src="lib/owlcarousel/owl.carousel.min.js"></script>
 
+<!-- Contact Javascript File -->
+<script src="mail/jqBootstrapValidation.min.js"></script>
+<script src="mail/contact.js"></script>
 
-    <!-- JavaScript Libraries -->
-    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
-    <script src="lib/easing/easing.min.js"></script>
-    <script src="lib/owlcarousel/owl.carousel.min.js"></script>
-
-    <!-- Contact Javascript File -->
-    <script src="mail/jqBootstrapValidation.min.js"></script>
-    <script src="mail/contact.js"></script>
-
-    <!-- Template Javascript -->
-    <script src="js/main.js"></script>
+<!-- Template Javascript -->
+<script src="js/main.js"></script>
 </body>
-{% endblock %}  
-
+{% endblock %}

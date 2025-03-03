@@ -12,4 +12,5 @@ return [
     Symfony\Bundle\DebugBundle\DebugBundle::class => ['dev' => true],
     Knp\Bundle\SnappyBundle\KnpSnappyBundle::class => ['all' => true],
     Stof\DoctrineExtensionsBundle\StofDoctrineExtensionsBundle::class => ['all' => true],
+    Vich\UploaderBundle\VichUploaderBundle::class => ['all' => true],
 ];
