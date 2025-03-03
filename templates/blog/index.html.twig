@@ -274,9 +274,7 @@
                     <div class="navbar-nav mr-auto py-0">
                         <a href="{{ path('home') }}" class="nav-item nav-link ">Home</a>
                         <a href="{{ path('shop') }}" class="nav-item nav-link">Shop</a>
-                        {% for product in products %}
-    <a href="{{ path('shop_detail', {'id': product.id}) }}" class="nav-item nav-link">Shop Detail</a>
-{% endfor %}
+                        
 
                         <div class="nav-item dropdown">
                             <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Pages <i class="fa fa-angle-down mt-1"></i></a>

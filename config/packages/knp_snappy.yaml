@@ -1,5 +1,5 @@
 knp_snappy:
     pdf:
         enabled: true
-        binary: "D:/wkhtmltopdf/bin/wkhtmltopdf.exe"
+        binary: "C:/wkhtmltopdf/bin/wkhtmltopdf.exe"
         options: []

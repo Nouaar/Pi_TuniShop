@@ -6,6 +6,8 @@ use App\Entity\Blog;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
+
+
 /**
  * @extends ServiceEntityRepository<Blog>
  */
@@ -30,6 +32,24 @@ class BlogRepository extends ServiceEntityRepository
     //            ->getResult()
     //        ;
     //    }
+    public function findUnlikedBlogs(): array
+{
+    return $this->createQueryBuilder('b')
+        ->where('b.nb_likes = 0')
+        ->getQuery()
+        ->getResult();
+}
+
+public function findMostLikedBlog(): ?Blog
+{
+    return $this->createQueryBuilder('b')
+        ->orderBy('b.nb_likes', 'DESC')
+        ->setMaxResults(1)
+        ->getQuery()
+        ->getOneOrNullResult();
+}
+
+
 
     //    public function findOneBySomeField($value): ?Blog
     //    {

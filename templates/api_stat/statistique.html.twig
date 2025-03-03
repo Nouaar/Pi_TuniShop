@@ -1,0 +1,67 @@
+{% block body %}
+    <div style="display: flex; justify-content: space-around; flex-wrap: wrap;">
+        <div>
+            <h3 style="margin-bottom: 30px; font-size: 26px; color: #4CAF50; font-weight: bold; text-align: center; text-transform: uppercase;">Répartition des Likes</h3>
+            <canvas id="likesChart" style="margin-top: 20px;"></canvas>
+        </div>
+        <div>
+            <h3 style="margin-bottom: 30px; font-size: 26px; color: #FF9800; font-weight: bold; text-align: center; text-transform: uppercase;">Répartition des Commentaires</h3>
+            <canvas id="commentsChart" style="margin-top: 20px;"></canvas>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var blogTitles = {{ blogs|map(b => b.titre)|json_encode|raw }};
+            var blogLikes = {{ blogs|map(b => b.nb_likes)|json_encode|raw }};
+            var blogComments = {{ blogs|map(b => b.nb_comments)|json_encode|raw }};
+            
+            var colors = [
+                '#FF6384', '#36A2EB', '#FFCE56', '#4CAF50', '#9C27B0', '#FF9800', '#795548'
+            ];
+
+            // Graphique des Likes
+            new Chart(document.getElementById('likesChart').getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: blogTitles,
+                    datasets: [{
+                        label: 'Likes',
+                        data: blogLikes,
+                        backgroundColor: colors.slice(0, blogTitles.length)
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom', // Position des légendes sous le graphique
+                        }
+                    }
+                }
+            });
+
+            // Graphique des Commentaires
+            new Chart(document.getElementById('commentsChart').getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: blogTitles,
+                    datasets: [{
+                        label: 'Commentaires',
+                        data: blogComments,
+                        backgroundColor: colors.slice(0, blogTitles.length)
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom', // Position des légendes sous le graphique
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+{% endblock %}

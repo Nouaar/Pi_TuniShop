@@ -14,7 +14,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use App\Repository\BlogRepository;
 use App\Repository\ProductsRepository;
+use App\Service\MailService;
 
 final class BlogController extends AbstractController
 { 
@@ -204,6 +206,35 @@ public function commentsList(EntityManagerInterface $entityManager, int $id): Re
         'blog' => $blog, // Pass blog info to the template
     ]);
 }
+#[Route('/blogs/unliked', name: 'app_blog_unliked')]
+public function showUnlikedBlogs(BlogRepository $blogRepository): Response
+{
+    $unlikedBlogs = $blogRepository->findUnlikedBlogs();
+
+    return $this->render('blog/unliked_blogs.html.twig', [
+        'unlikedBlogs' => $unlikedBlogs,
+    ]);
+}
+#[Route('/blog/most-liked', name: 'blog_most_liked')]
+public function mostLikedBlog(BlogRepository $blogRepository): Response
+{
+    $blog = $blogRepository->findMostLikedBlog();
+
+    return $this->render('blog/most_liked.html.twig', [
+        'blog' => $blog,
+    ]);
+}
+#[Route('/blog/{id}/like', name: 'blog_like')]
+    public function like_Blog(Blog $blog, EntityManagerInterface $em, MailService $mailService)
+    {
+        $blog->addLike();
+        $em->flush();
+
+        // Envoi de l'email
+        $mailService->sendLikeNotification('admin@example.com', $blog->getTitre());
+
+        return $this->json(['message' => 'Like ajouté et email envoyé', 'likes' => $blog->getNbLikes()]);
+    }
 
     
 }
