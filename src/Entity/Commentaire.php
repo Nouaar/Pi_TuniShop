@@ -31,6 +31,9 @@ class Commentaire
     #[ORM\ManyToOne(inversedBy: 'comments_section')]
     private ?Blog $blog = null;
 
+    #[ORM\ManyToOne(inversedBy: 'associated_comments')]
+    private ?Utilisateur $utilisateur = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -103,5 +106,17 @@ class Commentaire
     }
 
     public function addLike(): self { $this->nb_likes++; return $this; }
+
+    public function getUtilisateur(): ?Utilisateur
+    {
+        return $this->utilisateur;
+    }
+
+    public function setUtilisateur(?Utilisateur $utilisateur): static
+    {
+        $this->utilisateur = $utilisateur;
+
+        return $this;
+    }
 
 }

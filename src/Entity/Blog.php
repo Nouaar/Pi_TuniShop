@@ -41,6 +41,9 @@ class Blog
     #[ORM\OneToMany(targetEntity: Commentaire::class, mappedBy: 'blog')]
     private Collection $comments_section;
 
+    #[ORM\ManyToOne(inversedBy: 'associated_blogs')]
+    private ?Utilisateur $utilisateur = null;
+
     public function __construct()
     {
         $this->comments_section = new ArrayCollection();
@@ -144,5 +147,17 @@ class Blog
     }
 
     public function addLike(): self { $this->nb_likes++; return $this; }
+
+    public function getUtilisateur(): ?Utilisateur
+    {
+        return $this->utilisateur;
+    }
+
+    public function setUtilisateur(?Utilisateur $utilisateur): static
+    {
+        $this->utilisateur = $utilisateur;
+
+        return $this;
+    }
 
 }

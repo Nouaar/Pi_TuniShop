@@ -42,11 +42,25 @@ class Utilisateur implements PasswordAuthenticatedUserInterface, UserInterface
     private Collection $adresses;
 
     #[ORM\Column(length: 255, nullable: true)]
-    private ?string $verificationToken = null; // New field for email verification
+    private ?string $verificationToken = null;
+
+    /**
+     * @var Collection<int, Blog>
+     */
+    #[ORM\OneToMany(targetEntity: Blog::class, mappedBy: 'utilisateur')]
+    private Collection $associated_blogs;
+
+    /**
+     * @var Collection<int, Commentaire>
+     */
+    #[ORM\OneToMany(targetEntity: Commentaire::class, mappedBy: 'utilisateur')]
+    private Collection $associated_comments; // New field for email verification
 
     public function __construct()
     {
         $this->adresses = new ArrayCollection();
+        $this->associated_blogs = new ArrayCollection();
+        $this->associated_comments = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -188,6 +202,66 @@ class Utilisateur implements PasswordAuthenticatedUserInterface, UserInterface
             // set the owning side to null (unless already changed)
             if ($reclamation->getIdUser() === $this) {
                 $reclamation->setIdUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Blog>
+     */
+    public function getAssociatedBlogs(): Collection
+    {
+        return $this->associated_blogs;
+    }
+
+    public function addAssociatedBlog(Blog $associatedBlog): static
+    {
+        if (!$this->associated_blogs->contains($associatedBlog)) {
+            $this->associated_blogs->add($associatedBlog);
+            $associatedBlog->setUtilisateur($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAssociatedBlog(Blog $associatedBlog): static
+    {
+        if ($this->associated_blogs->removeElement($associatedBlog)) {
+            // set the owning side to null (unless already changed)
+            if ($associatedBlog->getUtilisateur() === $this) {
+                $associatedBlog->setUtilisateur(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Commentaire>
+     */
+    public function getAssociatedComments(): Collection
+    {
+        return $this->associated_comments;
+    }
+
+    public function addAssociatedComment(Commentaire $associatedComment): static
+    {
+        if (!$this->associated_comments->contains($associatedComment)) {
+            $this->associated_comments->add($associatedComment);
+            $associatedComment->setUtilisateur($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAssociatedComment(Commentaire $associatedComment): static
+    {
+        if ($this->associated_comments->removeElement($associatedComment)) {
+            // set the owning side to null (unless already changed)
+            if ($associatedComment->getUtilisateur() === $this) {
+                $associatedComment->setUtilisateur(null);
             }
         }
 
