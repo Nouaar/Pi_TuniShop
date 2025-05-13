@@ -1,8 +1,3 @@
-project prerequiries : download wkhtmltopdf via https://wkhtmltopdf.org/downloads.html, necessary for PDF file download of respective checkout objects.
-
-once cloning the project is complete, access /config/packages/wkhtmltopdf.yaml
-there sill be a line containig binary option "binary : " add to that line the link in which you downloaded wkhtmltopdf
-
 # 🛒 TuniShop Symfony App - E-Shopping Management System
 
 TuniShop Symfony App is a robust web-based e-shopping platform that helps manage products, depots, stock items, checkouts, claims, and much more. The app enables efficient inventory management, secure transactions, and dynamic interactions for users and administrators alike.
